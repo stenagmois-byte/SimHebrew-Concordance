@@ -1,6 +1,5 @@
 These pages contain a full concordance to the Tanach, the five books of Moses (torh) Instruction / Law, the prophets (nbiaim) from Joshua to Malachi, and the writings (ctubim) from Psalms to Chronicles. I update the pages occasionally. Updates are complete as of April 29, 2026.
 
-[2022 - The popups - used instead of tooltips (which don't work on a phone) - are implemented. October, updated with new control break on vowels so that similar vowel patterns by stem are more obvious.]
 In these pages every word in the Tanach is present and every place that it used. In the full set of posts referenced on the Index page, each word is listed with:
 its root.
 its semantic domain, (a hierarchical categorizing of every root and word to help distinguish homonyms and other word differences for words with the same root consonants).
@@ -28,11 +27,11 @@ Each word appears only once in the concordance. I use a cascading rule to determ
 
 Note: The following chapters and verses are Aramaic. Everything else is Hebrew. Daniel, chapter 2 from verse 4 on, chapters 3, 4, 5, 6, and 7, Ezra chapter 4 from verse 8 on, chapters 5, and 6 where the verse is less than 18, and chapter 7, verses between 12 and 26, and Jeremiah chapter 10 verse 10.
 
-In the Glossary page, English users may track down the usage of a gloss and the corresponding Hebrew root(s) used for this gloss. The sequence of this table is by Domain, and within Domain, the SimHebrew word. 
+In the Glossary page (available here https://qonqordnxih-ltnk.blogspot.com/p/search-by-gloss.html -- to be moved), English users may track down the usage of a gloss and the corresponding Hebrew root(s) used for this gloss. The sequence of this table is by Domain, and within Domain, the SimHebrew word. 
 
 My name is Bob MacDonald. I am a retired musician, business owner and database designer. I translated the Hebrew Scriptures beginning at age 60 in the period from 2006 to 2025. Many people helped me learn in this period: Gidi Nashon of Congregation Emanu-El, Victoria BC, provided my first steps in Hebrew. Jonathan Orr-Stav answered many questions and we continue our collaboration with the SimHebrew Bible. Many fellows at the University of Victoria Centre for Studies in Religion and Society were supportive of my learning Hebrew and taught me something of how to avoid conversational pitfalls.  Susan Gillingham of Oxford and David Mitchell of Brussels introduced me to the music in 2010 and have been very supportive of my subsequent efforts.
 
-The history of my translation and the books that resulted are on my blog, Dust. All the pages in this concordance and the SimHebrew Bible are generated from my translation database. I began my translation to restore recurring sounds that are evident as a technique in the poetry of the Psalms through the use of recurring Hebrew roots. Secondarily, the translation was extended to the whole of the Tanach for the sake of the music of the accents. At every stage, considerable care is taken to preserve similar English glosses for recurring similar words in the Tanach. 
+The history of my translation and the books that resulted are on my blog, Dust. All the content in this concordance and the SimHebrew Bible are generated from my translation database. I began my translation to restore recurring sounds that are evident as a technique in the poetry of the Psalms through the use of recurring Hebrew roots. Secondarily, the translation was extended to the whole of the Tanach for the sake of the music of the accents. At every stage, considerable care is taken to preserve similar English glosses for recurring similar words in the Tanach. 
 
 Meaning?
 
