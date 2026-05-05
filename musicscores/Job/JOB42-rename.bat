@@ -1,0 +1,21 @@
+
+rename JOB-042-8.svg JOB-042-7-2.svg
+rename JOB-042-9.svg JOB-042-8.svg
+rename JOB-042-10.svg JOB-042-8-2.svg
+rename JOB-042-11.svg JOB-042-8-3.svg
+rename JOB-042-12.svg JOB-042-9.svg
+rename JOB-042-13.svg JOB-042-9-2.svg
+rename JOB-042-14.svg JOB-042-10.svg
+rename JOB-042-15.svg JOB-042-10-2.svg
+rename JOB-042-16.svg JOB-042-11.svg
+rename JOB-042-17.svg JOB-042-11-2.svg
+rename JOB-042-18.svg JOB-042-11-3.svg
+rename JOB-042-19.svg JOB-042-12.svg
+rename JOB-042-20.svg JOB-042-12-2.svg
+rename JOB-042-21.svg JOB-042-13.svg
+rename JOB-042-22.svg JOB-042-14.svg
+rename JOB-042-23.svg JOB-042-15.svg
+rename JOB-042-24.svg JOB-042-15-2.svg
+rename JOB-042-25.svg JOB-042-16.svg
+rename JOB-042-26.svg JOB-042-16-2.svg
+rename JOB-042-27.svg JOB-042-17.svg

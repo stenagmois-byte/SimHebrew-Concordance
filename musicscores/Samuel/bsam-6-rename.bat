@@ -1,0 +1,37 @@
+rename 2-SAMUEL-006-3.svg 2-SAMUEL-006-2-2.svg 
+rename 2-SAMUEL-006-4.svg 2-SAMUEL-006-3.svg 
+rename 2-SAMUEL-006-5.svg 2-SAMUEL-006-3-2.svg 
+rename 2-SAMUEL-006-6.svg 2-SAMUEL-006-4.svg 
+rename 2-SAMUEL-006-7.svg 2-SAMUEL-006-4-2.svg 
+rename 2-SAMUEL-006-8.svg 2-SAMUEL-006-5.svg 
+rename 2-SAMUEL-006-9.svg 2-SAMUEL-006-5-2.svg 
+rename 2-SAMUEL-006-10.svg 2-SAMUEL-006-6.svg 
+rename 2-SAMUEL-006-11.svg 2-SAMUEL-006-7.svg 
+rename 2-SAMUEL-006-12.svg 2-SAMUEL-006-7-2.svg 
+rename 2-SAMUEL-006-13.svg 2-SAMUEL-006-8.svg 
+rename 2-SAMUEL-006-14.svg 2-SAMUEL-006-8-2.svg 
+rename 2-SAMUEL-006-15.svg 2-SAMUEL-006-9.svg 
+rename 2-SAMUEL-006-16.svg 2-SAMUEL-006-10.svg 
+rename 2-SAMUEL-006-17.svg 2-SAMUEL-006-10-2.svg 
+rename 2-SAMUEL-006-18.svg 2-SAMUEL-006-11.svg 
+rename 2-SAMUEL-006-19.svg 2-SAMUEL-006-11-2.svg 
+rename 2-SAMUEL-006-20.svg 2-SAMUEL-006-12.svg 
+rename 2-SAMUEL-006-21.svg 2-SAMUEL-006-12-2.svg 
+
+rename 2-SAMUEL-006-22.svg 2-SAMUEL-006-13.svg 
+rename 2-SAMUEL-006-23.svg 2-SAMUEL-006-14.svg 
+rename 2-SAMUEL-006-24.svg 2-SAMUEL-006-15.svg 
+rename 2-SAMUEL-006-25.svg 2-SAMUEL-006-16.svg 
+rename 2-SAMUEL-006-26.svg 2-SAMUEL-006-16-2.svg 
+rename 2-SAMUEL-006-27.svg 2-SAMUEL-006-17.svg 
+rename 2-SAMUEL-006-28.svg 2-SAMUEL-006-17-2.svg 
+rename 2-SAMUEL-006-29.svg 2-SAMUEL-006-18.svg 
+rename 2-SAMUEL-006-30.svg 2-SAMUEL-006-19.svg 
+rename 2-SAMUEL-006-31.svg 2-SAMUEL-006-19-2.svg 
+rename 2-SAMUEL-006-32.svg 2-SAMUEL-006-20.svg 
+rename 2-SAMUEL-006-33.svg 2-SAMUEL-006-20-2.svg 
+rename 2-SAMUEL-006-34.svg 2-SAMUEL-006-21.svg 
+rename 2-SAMUEL-006-35.svg 2-SAMUEL-006-21-2.svg 
+rename 2-SAMUEL-006-36.svg 2-SAMUEL-006-22.svg 
+
+rename 2-SAMUEL-006-37.svg 2-SAMUEL-006-23.svg 

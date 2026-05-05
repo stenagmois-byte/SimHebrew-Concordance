@@ -1,0 +1,20 @@
+
+
+rename PSALMS-040-7.svg PSALMS-040-6-2.svg
+rename PSALMS-040-8.svg PSALMS-040-7.svg
+rename PSALMS-040-9.svg PSALMS-040-8.svg
+rename PSALMS-040-10.svg PSALMS-040-9.svg
+rename PSALMS-040-11.svg PSALMS-040-10.svg
+rename PSALMS-040-12.svg PSALMS-040-11.svg
+rename PSALMS-040-13.svg PSALMS-040-11-2.svg
+rename PSALMS-040-14.svg PSALMS-040-12.svg
+rename PSALMS-040-15.svg PSALMS-040-13.svg
+rename PSALMS-040-16.svg PSALMS-040-13-2.svg
+rename PSALMS-040-17.svg PSALMS-040-14.svg
+rename PSALMS-040-18.svg PSALMS-040-15.svg
+rename PSALMS-040-19.svg PSALMS-040-15-2.svg
+rename PSALMS-040-20.svg PSALMS-040-16.svg
+rename PSALMS-040-21.svg PSALMS-040-17.svg
+rename PSALMS-040-22.svg PSALMS-040-17-2.svg
+rename PSALMS-040-23.svg PSALMS-040-18.svg
+rename PSALMS-040-24.svg PSALMS-040-18-2.svg

@@ -1,0 +1,17 @@
+rename SONG-001-5.svg SONG-001-4-2.svg 
+rename SONG-001-6.svg SONG-001-5.svg 
+rename SONG-001-7.svg SONG-001-6.svg 
+rename SONG-001-8.svg SONG-001-6-2.svg 
+rename SONG-001-9.svg SONG-001-7.svg 
+rename SONG-001-10.svg SONG-001-7-2.svg 
+rename SONG-001-11.svg SONG-001-8.svg 
+rename SONG-001-12.svg SONG-001-8-2.svg 
+rename SONG-001-13.svg SONG-001-9.svg 
+rename SONG-001-14.svg SONG-001-10.svg 
+rename SONG-001-15.svg SONG-001-11.svg 
+rename SONG-001-16.svg SONG-001-12.svg 
+rename SONG-001-17.svg SONG-001-13.svg 
+rename SONG-001-18.svg SONG-001-14.svg 
+rename SONG-001-19.svg SONG-001-15.svg 
+rename SONG-001-20.svg SONG-001-16.svg 
+rename SONG-001-21.svg SONG-001-17.svg 

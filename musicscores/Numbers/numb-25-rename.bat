@@ -1,0 +1,21 @@
+rename NUMBERS-025-5.svg NUMBERS-025-4-2.svg 
+rename NUMBERS-025-6.svg NUMBERS-025-5.svg 
+rename NUMBERS-025-7.svg NUMBERS-025-6.svg 
+rename NUMBERS-025-8.svg NUMBERS-025-6-2.svg 
+rename NUMBERS-025-9.svg NUMBERS-025-7.svg 
+rename NUMBERS-025-10.svg NUMBERS-025-8.svg 
+rename NUMBERS-025-11.svg NUMBERS-025-8-2.svg 
+rename NUMBERS-025-12.svg NUMBERS-025-9.svg 
+rename NUMBERS-025-13.svg NUMBERS-025-10.svg 
+rename NUMBERS-025-14.svg NUMBERS-025-11.svg 
+rename NUMBERS-025-15.svg NUMBERS-025-11-2.svg 
+rename NUMBERS-025-16.svg NUMBERS-025-12.svg 
+rename NUMBERS-025-17.svg NUMBERS-025-13.svg 
+rename NUMBERS-025-18.svg NUMBERS-025-13-2.svg 
+rename NUMBERS-025-19.svg NUMBERS-025-14.svg 
+rename NUMBERS-025-20.svg NUMBERS-025-15.svg 
+rename NUMBERS-025-21.svg NUMBERS-025-16.svg 
+rename NUMBERS-025-22.svg NUMBERS-025-17.svg 
+rename NUMBERS-025-23.svg NUMBERS-025-18.svg 
+rename NUMBERS-025-24.svg NUMBERS-025-18-2.svg 
+

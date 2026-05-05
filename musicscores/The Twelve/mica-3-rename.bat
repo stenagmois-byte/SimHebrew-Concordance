@@ -1,0 +1,16 @@
+rename MICAH-003-4.svg MICAH-003-3-2.svg 
+rename MICAH-003-5.svg MICAH-003-4.svg 
+rename MICAH-003-6.svg MICAH-003-4-2.svg 
+rename MICAH-003-7.svg MICAH-003-5.svg 
+rename MICAH-003-8.svg MICAH-003-5-2.svg 
+rename MICAH-003-9.svg MICAH-003-6.svg 
+rename MICAH-003-10.svg MICAH-003-6-2.svg 
+rename MICAH-003-11.svg MICAH-003-7.svg 
+rename MICAH-003-12.svg MICAH-003-8.svg 
+rename MICAH-003-13.svg MICAH-003-8-2.svg 
+rename MICAH-003-14.svg MICAH-003-9.svg 
+rename MICAH-003-15.svg MICAH-003-9-2.svg 
+rename MICAH-003-16.svg MICAH-003-10.svg 
+rename MICAH-003-17.svg MICAH-003-11.svg 
+rename MICAH-003-18.svg MICAH-003-11-2.svg 
+rename MICAH-003-19.svg MICAH-003-12.svg 

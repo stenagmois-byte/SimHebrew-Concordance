@@ -1,0 +1,15 @@
+rename PSALMS-031-13.svg PSALMS-031-12-2.svg 
+rename PSALMS-031-14.svg PSALMS-031-13.svg 
+rename PSALMS-031-15.svg PSALMS-031-14.svg 
+rename PSALMS-031-16.svg PSALMS-031-15.svg 
+rename PSALMS-031-17.svg PSALMS-031-16.svg 
+rename PSALMS-031-18.svg PSALMS-031-17.svg 
+rename PSALMS-031-19.svg PSALMS-031-18.svg 
+rename PSALMS-031-20.svg PSALMS-031-19.svg 
+rename PSALMS-031-21.svg PSALMS-031-20.svg 
+rename PSALMS-031-22.svg PSALMS-031-21.svg 
+rename PSALMS-031-23.svg PSALMS-031-22.svg 
+rename PSALMS-031-24.svg PSALMS-031-23.svg 
+rename PSALMS-031-25.svg PSALMS-031-23-2.svg 
+rename PSALMS-031-26.svg PSALMS-031-24.svg 
+rename PSALMS-031-27.svg PSALMS-031-25.svg 

@@ -1,0 +1,17 @@
+rename EZEKIEL-009-3.svg EZEKIEL-009-2-2.svg 
+rename EZEKIEL-009-4.svg EZEKIEL-009-2-3.svg 
+rename EZEKIEL-009-5.svg EZEKIEL-009-3.svg 
+rename EZEKIEL-009-6.svg EZEKIEL-009-3-2.svg 
+rename EZEKIEL-009-7.svg EZEKIEL-009-4.svg 
+rename EZEKIEL-009-8.svg EZEKIEL-009-4-2.svg 
+rename EZEKIEL-009-9.svg EZEKIEL-009-5.svg 
+rename EZEKIEL-009-10.svg EZEKIEL-009-6.svg 
+rename EZEKIEL-009-11.svg EZEKIEL-009-6-2.svg 
+rename EZEKIEL-009-12.svg EZEKIEL-009-7.svg 
+rename EZEKIEL-009-13.svg EZEKIEL-009-8.svg 
+rename EZEKIEL-009-14.svg EZEKIEL-009-8-2.svg 
+rename EZEKIEL-009-15.svg EZEKIEL-009-9.svg 
+rename EZEKIEL-009-16.svg EZEKIEL-009-9-2.svg 
+rename EZEKIEL-009-17.svg EZEKIEL-009-10.svg 
+rename EZEKIEL-009-18.svg EZEKIEL-009-11.svg 
+rename EZEKIEL-009-19.svg EZEKIEL-009-11-2.svg 

@@ -1,0 +1,24 @@
+rename JUDGES-012-2.svg JUDGES-012-1-2.svg 
+rename JUDGES-012-3.svg JUDGES-012-2.svg 
+rename JUDGES-012-4.svg JUDGES-012-2-2.svg 
+rename JUDGES-012-5.svg JUDGES-012-3.svg 
+rename JUDGES-012-6.svg JUDGES-012-3-2.svg 
+rename JUDGES-012-7.svg JUDGES-012-4.svg 
+rename JUDGES-012-8.svg JUDGES-012-4-2.svg 
+rename JUDGES-012-9.svg JUDGES-012-5.svg 
+rename JUDGES-012-10.svg JUDGES-012-5-2.svg 
+rename JUDGES-012-11.svg JUDGES-012-6.svg 
+rename JUDGES-012-12.svg JUDGES-012-6-2.svg 
+rename JUDGES-012-13.svg JUDGES-012-6-3.svg 
+rename JUDGES-012-14.svg JUDGES-012-7.svg 
+rename JUDGES-012-15.svg JUDGES-012-8.svg 
+rename JUDGES-012-16.svg JUDGES-012-9.svg 
+rename JUDGES-012-17.svg JUDGES-012-9-2.svg 
+rename JUDGES-012-18.svg JUDGES-012-10.svg 
+rename JUDGES-012-19.svg JUDGES-012-11.svg 
+rename JUDGES-012-20.svg JUDGES-012-12.svg 
+rename JUDGES-012-21.svg JUDGES-012-13.svg 
+rename JUDGES-012-22.svg JUDGES-012-14.svg 
+rename JUDGES-012-23.svg JUDGES-012-14-2.svg 
+rename JUDGES-012-24.svg JUDGES-012-15.svg 
+

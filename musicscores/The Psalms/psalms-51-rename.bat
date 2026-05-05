@@ -1,0 +1,16 @@
+rename x-051-7.svg x-051-6-2.svg 
+rename x-051-8.svg x-051-7.svg 
+rename x-051-9.svg x-051-8.svg 
+rename x-051-10.svg x-051-9.svg 
+rename x-051-11.svg x-051-10.svg 
+rename x-051-12.svg x-051-11.svg 
+rename x-051-13.svg x-051-12.svg 
+rename x-051-14.svg x-051-13.svg 
+rename x-051-15.svg x-051-14.svg 
+rename x-051-16.svg x-051-15.svg 
+rename x-051-17.svg x-051-16.svg 
+rename x-051-18.svg x-051-17.svg 
+rename x-051-19.svg x-051-18.svg 
+rename x-051-20.svg x-051-19.svg 
+rename x-051-21.svg x-051-20.svg 
+rename x-051-22.svg x-051-21.svg 

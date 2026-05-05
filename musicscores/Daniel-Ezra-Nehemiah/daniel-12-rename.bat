@@ -1,0 +1,20 @@
+rename DANIEL-012-2.svg DANIEL-012-1-2.svg 
+rename DANIEL-012-3.svg DANIEL-012-1-3.svg 
+rename DANIEL-012-4.svg DANIEL-012-2.svg 
+
+rename DANIEL-012-5.svg DANIEL-012-3.svg 
+rename DANIEL-012-6.svg DANIEL-012-4.svg 
+rename DANIEL-012-7.svg DANIEL-012-4-2.svg 
+rename DANIEL-012-8.svg DANIEL-012-5.svg 
+rename DANIEL-012-9.svg DANIEL-012-5-2.svg 
+rename DANIEL-012-10.svg DANIEL-012-6.svg 
+rename DANIEL-012-11.svg DANIEL-012-7.svg 
+rename DANIEL-012-12.svg DANIEL-012-7-2.svg 
+rename DANIEL-012-13.svg DANIEL-012-7-3.svg 
+rename DANIEL-012-14.svg DANIEL-012-8.svg 
+rename DANIEL-012-15.svg DANIEL-012-9.svg 
+rename DANIEL-012-16.svg DANIEL-012-10.svg 
+rename DANIEL-012-17.svg DANIEL-012-10-2.svg 
+rename DANIEL-012-18.svg DANIEL-012-11.svg 
+rename DANIEL-012-19.svg DANIEL-012-12.svg 
+rename DANIEL-012-20.svg DANIEL-012-13.svg 

@@ -1,0 +1,17 @@
+rename 1-KINGS-004-8.svg 1-KINGS-004-7-2.svg 
+rename 1-KINGS-004-9.svg 1-KINGS-004-8.svg 
+rename 1-KINGS-004-10.svg 1-KINGS-004-9.svg 
+rename 1-KINGS-004-11.svg 1-KINGS-004-10.svg 
+rename 1-KINGS-004-12.svg 1-KINGS-004-11.svg 
+rename 1-KINGS-004-13.svg 1-KINGS-004-12.svg 
+rename 1-KINGS-004-14.svg 1-KINGS-004-12-2.svg 
+rename 1-KINGS-004-15.svg 1-KINGS-004-13.svg 
+rename 1-KINGS-004-16.svg 1-KINGS-004-13-2.svg 
+rename 1-KINGS-004-17.svg 1-KINGS-004-14.svg 
+rename 1-KINGS-004-18.svg 1-KINGS-004-15.svg 
+rename 1-KINGS-004-19.svg 1-KINGS-004-16.svg 
+rename 1-KINGS-004-20.svg 1-KINGS-004-17.svg 
+rename 1-KINGS-004-21.svg 1-KINGS-004-18.svg 
+rename 1-KINGS-004-22.svg 1-KINGS-004-19.svg 
+rename 1-KINGS-004-23.svg 1-KINGS-004-19-2.svg 
+rename 1-KINGS-004-24.svg 1-KINGS-004-20.svg 

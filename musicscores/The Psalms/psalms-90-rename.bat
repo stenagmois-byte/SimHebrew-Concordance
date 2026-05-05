@@ -1,0 +1,10 @@
+rename PSALMS-090-11.svg PSALMS-090-10-2.svg
+rename PSALMS-090-12.svg PSALMS-090-11.svg
+rename PSALMS-090-13.svg PSALMS-090-12.svg
+rename PSALMS-090-14.svg PSALMS-090-13.svg
+rename PSALMS-090-15.svg PSALMS-090-14.svg
+rename PSALMS-090-16.svg PSALMS-090-15.svg
+
+rename PSALMS-090-17.svg PSALMS-090-16.svg
+rename PSALMS-090-18.svg PSALMS-090-17.svg
+rename PSALMS-090-19.svg PSALMS-090-17-2.svg

@@ -1,0 +1,13 @@
+rename PSALMS-143-2.svg PSALMS-143-1-2.svg 
+rename PSALMS-143-3.svg PSALMS-143-2.svg 
+rename PSALMS-143-4.svg PSALMS-143-3.svg 
+rename PSALMS-143-5.svg PSALMS-143-4.svg 
+rename PSALMS-143-6.svg PSALMS-143-5.svg 
+rename PSALMS-143-7.svg PSALMS-143-6.svg 
+rename PSALMS-143-8.svg PSALMS-143-7.svg 
+rename PSALMS-143-9.svg PSALMS-143-8.svg 
+rename PSALMS-143-10.svg PSALMS-143-8-2.svg 
+rename PSALMS-143-11.svg PSALMS-143-9.svg 
+rename PSALMS-143-12.svg PSALMS-143-10.svg 
+rename PSALMS-143-13.svg PSALMS-143-11.svg 
+rename PSALMS-143-14.svg PSALMS-143-12.svg 

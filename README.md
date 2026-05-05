@@ -43,3 +43,7 @@ What does it mean?
 The mean is the mid-value of a series of numbers. It does not tell us about the series. It is mean in the sense of stingy with information. Today I may draw a sense from the text for me. Tomorrow I will hear it in another sense, perhaps for many of us or on behalf of someone else. Meaning, in other words, has its own context. Judgment may mean satisfaction to me today and fear tomorrow.
 
 My concentration as a translator has been to deliver the English as close to the Hebrew as I was able, to reflect what the text says. I have sometimes loosened the grip of my algorithms on my thought process. And there are times when my wording is too awkward or I have omitted a grammatical issue that I should not have left out. I will fix what I find. There are times when I cannot find words.
+
+Music Scores, Data extracts and analysis
+These are in the directory .\musicscores they are organized by volume of the published books. User requires Musescore to read them.
+Although the database is Oracle, there are some direct extracts that allow for pattern recognition in a simple spreadsheet file.

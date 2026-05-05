@@ -1,0 +1,13 @@
+rename QOHELET-006-3.svg QOHELET-006-2-2.svg 
+rename QOHELET-006-4.svg QOHELET-006-3.svg 
+rename QOHELET-006-5.svg QOHELET-006-3-2.svg 
+rename QOHELET-006-6.svg QOHELET-006-4.svg 
+rename QOHELET-006-7.svg QOHELET-006-5.svg 
+rename QOHELET-006-8.svg QOHELET-006-6.svg 
+rename QOHELET-006-9.svg QOHELET-006-7.svg 
+rename QOHELET-006-10.svg QOHELET-006-8.svg 
+rename QOHELET-006-11.svg QOHELET-006-9.svg 
+rename QOHELET-006-12.svg QOHELET-006-10.svg 
+rename QOHELET-006-13.svg QOHELET-006-11.svg 
+rename QOHELET-006-14.svg QOHELET-006-12.svg 
+rename QOHELET-006-15.svg QOHELET-006-12-2.svg 

@@ -1,0 +1,9 @@
+rename JONAH-002-5.svg JONAH-002-4-2.svg 
+rename JONAH-002-6.svg JONAH-002-5.svg 
+rename JONAH-002-7.svg JONAH-002-6.svg 
+rename JONAH-002-8.svg JONAH-002-7.svg 
+rename JONAH-002-9.svg JONAH-002-7-2.svg 
+rename JONAH-002-10.svg JONAH-002-8.svg 
+rename JONAH-002-11.svg JONAH-002-9.svg 
+rename JONAH-002-12.svg JONAH-002-10.svg 
+rename JONAH-002-13.svg JONAH-002-11.svg 

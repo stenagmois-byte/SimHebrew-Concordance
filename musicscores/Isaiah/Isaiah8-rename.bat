@@ -1,0 +1,29 @@
+
+rename ISAIAH-008-5.svg ISAIAH-008-4-2.svg
+rename ISAIAH-008-6.svg ISAIAH-008-5.svg
+rename ISAIAH-008-7.svg ISAIAH-008-6.svg
+rename ISAIAH-008-8.svg ISAIAH-008-7.svg
+rename ISAIAH-008-9.svg ISAIAH-008-7-2.svg
+rename ISAIAH-008-10.svg ISAIAH-008-8.svg
+rename ISAIAH-008-11.svg ISAIAH-008-8-2.svg
+rename ISAIAH-008-12.svg ISAIAH-008-9.svg
+rename ISAIAH-008-13.svg ISAIAH-008-10.svg
+rename ISAIAH-008-14.svg ISAIAH-008-11.svg
+rename ISAIAH-008-15.svg ISAIAH-008-12.svg
+rename ISAIAH-008-16.svg ISAIAH-008-13.svg
+rename ISAIAH-008-17.svg ISAIAH-008-14.svg
+rename ISAIAH-008-18.svg ISAIAH-008-14-2.svg
+
+rename ISAIAH-008-19.svg ISAIAH-008-15.svg
+rename ISAIAH-008-20.svg ISAIAH-008-16.svg
+rename ISAIAH-008-21.svg ISAIAH-008-17.svg
+rename ISAIAH-008-22.svg ISAIAH-008-18.svg
+rename ISAIAH-008-23.svg ISAIAH-008-18-2.svg
+rename ISAIAH-008-24.svg ISAIAH-008-19.svg
+rename ISAIAH-008-25.svg ISAIAH-008-19-2.svg
+rename ISAIAH-008-26.svg ISAIAH-008-20.svg
+rename ISAIAH-008-27.svg ISAIAH-008-21.svg
+rename ISAIAH-008-28.svg ISAIAH-008-21-2.svg
+rename ISAIAH-008-29.svg ISAIAH-008-22.svg
+rename ISAIAH-008-30.svg ISAIAH-008-23.svg
+rename ISAIAH-008-31.svg ISAIAH-008-23-2.svg

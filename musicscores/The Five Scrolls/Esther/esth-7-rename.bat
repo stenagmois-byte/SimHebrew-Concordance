@@ -1,0 +1,17 @@
+rename ESTHER-007-3.svg ESTHER-007-2-2.svg 
+rename ESTHER-007-4.svg ESTHER-007-3.svg 
+rename ESTHER-007-5.svg ESTHER-007-3-2.svg 
+rename ESTHER-007-6.svg ESTHER-007-4.svg 
+rename ESTHER-007-7.svg ESTHER-007-4-2.svg 
+rename ESTHER-007-8.svg ESTHER-007-5.svg 
+rename ESTHER-007-9.svg ESTHER-007-5-2.svg 
+rename ESTHER-007-10.svg ESTHER-007-6.svg 
+rename ESTHER-007-11.svg ESTHER-007-7.svg 
+rename ESTHER-007-12.svg ESTHER-007-7-2.svg 
+rename ESTHER-007-13.svg ESTHER-007-8.svg 
+rename ESTHER-007-14.svg ESTHER-007-8-2.svg 
+rename ESTHER-007-15.svg ESTHER-007-8-3.svg 
+rename ESTHER-007-16.svg ESTHER-007-9.svg 
+rename ESTHER-007-17.svg ESTHER-007-9-2.svg 
+rename ESTHER-007-18.svg ESTHER-007-9-3.svg 
+rename ESTHER-007-19.svg ESTHER-007-10.svg 

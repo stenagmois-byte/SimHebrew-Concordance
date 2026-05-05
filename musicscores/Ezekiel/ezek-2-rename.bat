@@ -1,0 +1,11 @@
+rename EZEKIEL-002-4.svg EZEKIEL-002-3-2.svg 
+rename EZEKIEL-002-5.svg EZEKIEL-002-4.svg 
+rename EZEKIEL-002-6.svg EZEKIEL-002-4-2.svg 
+rename EZEKIEL-002-7.svg EZEKIEL-002-5.svg 
+rename EZEKIEL-002-8.svg EZEKIEL-002-6.svg 
+rename EZEKIEL-002-9.svg EZEKIEL-002-6-2.svg 
+rename EZEKIEL-002-10.svg EZEKIEL-002-7.svg 
+rename EZEKIEL-002-11.svg EZEKIEL-002-8.svg 
+rename EZEKIEL-002-12.svg EZEKIEL-002-8-2.svg 
+rename EZEKIEL-002-13.svg EZEKIEL-002-9.svg 
+rename EZEKIEL-002-14.svg EZEKIEL-002-10.svg 

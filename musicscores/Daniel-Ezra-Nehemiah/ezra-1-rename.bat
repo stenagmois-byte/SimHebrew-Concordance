@@ -1,0 +1,20 @@
+rename EZRA-001-2.svg EZRA-001-1-2.svg 
+rename EZRA-001-3.svg EZRA-001-2.svg 
+rename EZRA-001-4.svg EZRA-001-2-2.svg 
+rename EZRA-001-5.svg EZRA-001-3.svg 
+rename EZRA-001-6.svg EZRA-001-3-2.svg 
+rename EZRA-001-7.svg EZRA-001-4.svg 
+rename EZRA-001-8.svg EZRA-001-4-2.svg 
+rename EZRA-001-9.svg EZRA-001-5.svg 
+rename EZRA-001-10.svg EZRA-001-5-2.svg 
+rename EZRA-001-11.svg EZRA-001-6.svg 
+rename EZRA-001-12.svg EZRA-001-6-2.svg 
+rename EZRA-001-13.svg EZRA-001-7.svg 
+rename EZRA-001-14.svg EZRA-001-7-2.svg 
+rename EZRA-001-15.svg EZRA-001-8.svg 
+rename EZRA-001-16.svg EZRA-001-8-2.svg 
+rename EZRA-001-17.svg EZRA-001-9.svg 
+
+rename EZRA-001-18.svg EZRA-001-10.svg 
+rename EZRA-001-19.svg EZRA-001-11.svg 
+rename EZRA-001-20.svg EZRA-001-11-2.svg 

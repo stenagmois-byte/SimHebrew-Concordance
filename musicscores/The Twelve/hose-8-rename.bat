@@ -1,0 +1,14 @@
+rename HOSEA-008-5.svg HOSEA-008-4-2.svg 
+rename HOSEA-008-6.svg HOSEA-008-5.svg 
+rename HOSEA-008-7.svg HOSEA-008-6.svg 
+rename HOSEA-008-8.svg HOSEA-008-7.svg 
+rename HOSEA-008-9.svg HOSEA-008-7-2.svg 
+rename HOSEA-008-10.svg HOSEA-008-8.svg 
+rename HOSEA-008-11.svg HOSEA-008-9.svg 
+rename HOSEA-008-12.svg HOSEA-008-10.svg 
+rename HOSEA-008-13.svg HOSEA-008-11.svg 
+rename HOSEA-008-14.svg HOSEA-008-12.svg 
+rename HOSEA-008-15.svg HOSEA-008-13.svg 
+rename HOSEA-008-16.svg HOSEA-008-13-2.svg 
+rename HOSEA-008-17.svg HOSEA-008-14.svg 
+rename HOSEA-008-18.svg HOSEA-008-14-2.svg 

@@ -1,0 +1,15 @@
+rename NAHUM-001-4.svg NAHUM-001-3-2.svg 
+rename NAHUM-001-5.svg NAHUM-001-4.svg 
+rename NAHUM-001-6.svg NAHUM-001-5.svg 
+rename NAHUM-001-7.svg NAHUM-001-5-2.svg 
+rename NAHUM-001-8.svg NAHUM-001-6.svg 
+rename NAHUM-001-9.svg NAHUM-001-6-2.svg 
+rename NAHUM-001-10.svg NAHUM-001-7.svg 
+rename NAHUM-001-11.svg NAHUM-001-8.svg 
+rename NAHUM-001-12.svg NAHUM-001-9.svg 
+rename NAHUM-001-13.svg NAHUM-001-10.svg 
+rename NAHUM-001-14.svg NAHUM-001-11.svg 
+rename NAHUM-001-15.svg NAHUM-001-12.svg 
+rename NAHUM-001-16.svg NAHUM-001-13.svg 
+rename NAHUM-001-17.svg NAHUM-001-14.svg 
+rename NAHUM-001-18.svg NAHUM-001-14-2.svg 

@@ -1,0 +1,15 @@
+rename PSALMS-079-2.svg PSALMS-079-1-2.svg 
+rename PSALMS-079-3.svg PSALMS-079-2.svg 
+rename PSALMS-079-4.svg PSALMS-079-3.svg 
+rename PSALMS-079-5.svg PSALMS-079-4.svg 
+rename PSALMS-079-6.svg PSALMS-079-5.svg 
+rename PSALMS-079-7.svg PSALMS-079-6.svg 
+rename PSALMS-079-8.svg PSALMS-079-7.svg 
+rename PSALMS-079-9.svg PSALMS-079-8.svg 
+rename PSALMS-079-10.svg PSALMS-079-9.svg 
+rename PSALMS-079-11.svg PSALMS-079-9-2.svg 
+rename PSALMS-079-12.svg PSALMS-079-10.svg 
+rename PSALMS-079-13.svg PSALMS-079-10-2.svg 
+rename PSALMS-079-14.svg PSALMS-079-11.svg 
+rename PSALMS-079-15.svg PSALMS-079-12.svg 
+rename PSALMS-079-16.svg PSALMS-079-13.svg 

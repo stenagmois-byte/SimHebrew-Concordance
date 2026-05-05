@@ -1,0 +1,6 @@
+
+rename PSALMS-065-11.svg PSALMS-065-10-2.svg
+rename PSALMS-065-12.svg PSALMS-065-11.svg
+rename PSALMS-065-13.svg PSALMS-065-12.svg
+rename PSALMS-065-14.svg PSALMS-065-13.svg
+rename PSALMS-065-15.svg PSALMS-065-14.svg

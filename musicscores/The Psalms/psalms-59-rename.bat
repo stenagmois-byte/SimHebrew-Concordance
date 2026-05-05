@@ -1,0 +1,17 @@
+
+
+rename PSALMS-059-7.svg PSALMS-059-6-2.svg
+rename PSALMS-059-8.svg PSALMS-059-7.svg
+rename PSALMS-059-9.svg PSALMS-059-8.svg
+rename PSALMS-059-10.svg PSALMS-059-9.svg
+rename PSALMS-059-11.svg PSALMS-059-10.svg
+rename PSALMS-059-12.svg PSALMS-059-11.svg
+rename PSALMS-059-13.svg PSALMS-059-12.svg
+rename PSALMS-059-14.svg PSALMS-059-13.svg
+rename PSALMS-059-15.svg PSALMS-059-14.svg
+rename PSALMS-059-16.svg PSALMS-059-14-2.svg
+rename PSALMS-059-17.svg PSALMS-059-15.svg
+rename PSALMS-059-18.svg PSALMS-059-16.svg
+rename PSALMS-059-19.svg PSALMS-059-17.svg
+rename PSALMS-059-20.svg PSALMS-059-17-2.svg
+rename PSALMS-059-21.svg PSALMS-059-18.svg

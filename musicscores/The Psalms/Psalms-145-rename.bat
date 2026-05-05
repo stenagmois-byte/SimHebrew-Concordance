@@ -1,0 +1,10 @@
+rename PSALMS-145-14.svg PSALMS-145-13-2.svg
+rename PSALMS-145-15.svg PSALMS-145-14.svg
+rename PSALMS-145-16.svg PSALMS-145-15.svg
+rename PSALMS-145-17.svg PSALMS-145-16.svg
+rename PSALMS-145-18.svg PSALMS-145-17.svg
+rename PSALMS-145-19.svg PSALMS-145-18.svg
+
+rename PSALMS-145-20.svg PSALMS-145-19.svg
+rename PSALMS-145-21.svg PSALMS-145-20.svg
+rename PSALMS-145-22.svg PSALMS-145-21.svg

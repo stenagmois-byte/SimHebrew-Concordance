@@ -1,0 +1,11 @@
+rename PSALMS-045-9.svg PSALMS-045-8-2.svg 
+rename PSALMS-045-10.svg PSALMS-045-9.svg 
+rename PSALMS-045-11.svg PSALMS-045-10.svg 
+rename PSALMS-045-12.svg PSALMS-045-11.svg 
+rename PSALMS-045-13.svg PSALMS-045-12.svg 
+rename PSALMS-045-14.svg PSALMS-045-13.svg 
+rename PSALMS-045-15.svg PSALMS-045-14.svg 
+rename PSALMS-045-16.svg PSALMS-045-15.svg 
+rename PSALMS-045-17.svg PSALMS-045-16.svg 
+rename PSALMS-045-18.svg PSALMS-045-17.svg 
+rename PSALMS-045-19.svg PSALMS-045-18.svg 

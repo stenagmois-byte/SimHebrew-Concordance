@@ -1,0 +1,11 @@
+rename JOSHUA-020-5.svg JOSHUA-020-4-2.svg 
+rename JOSHUA-020-6.svg JOSHUA-020-5.svg 
+rename JOSHUA-020-7.svg JOSHUA-020-5-2.svg 
+rename JOSHUA-020-8.svg JOSHUA-020-6.svg 
+rename JOSHUA-020-9.svg JOSHUA-020-6-2.svg 
+rename JOSHUA-020-10.svg JOSHUA-020-7.svg 
+rename JOSHUA-020-11.svg JOSHUA-020-7-2.svg 
+rename JOSHUA-020-12.svg JOSHUA-020-8.svg 
+rename JOSHUA-020-13.svg JOSHUA-020-8-2.svg 
+rename JOSHUA-020-14.svg JOSHUA-020-9.svg 
+rename JOSHUA-020-15.svg JOSHUA-020-9-2.svg 

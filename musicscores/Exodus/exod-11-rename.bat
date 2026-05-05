@@ -1,0 +1,17 @@
+rename EXODUS-011-2.svg EXODUS-011-1-2.svg 
+rename EXODUS-011-3.svg EXODUS-011-2.svg 
+rename EXODUS-011-4.svg EXODUS-011-2-2.svg 
+rename EXODUS-011-5.svg EXODUS-011-3.svg 
+rename EXODUS-011-6.svg EXODUS-011-3-2.svg 
+rename EXODUS-011-7.svg EXODUS-011-4.svg 
+rename EXODUS-011-8.svg EXODUS-011-5.svg 
+rename EXODUS-011-9.svg EXODUS-011-5-2.svg 
+rename EXODUS-011-10.svg EXODUS-011-6.svg 
+rename EXODUS-011-11.svg EXODUS-011-6-2.svg 
+rename EXODUS-011-12.svg EXODUS-011-7.svg 
+rename EXODUS-011-13.svg EXODUS-011-7-2.svg 
+rename EXODUS-011-14.svg EXODUS-011-8.svg 
+rename EXODUS-011-15.svg EXODUS-011-8-2.svg 
+rename EXODUS-011-16.svg EXODUS-011-9.svg 
+rename EXODUS-011-17.svg EXODUS-011-10.svg 
+rename EXODUS-011-18.svg EXODUS-011-10-2.svg 
