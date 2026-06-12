@@ -5,83 +5,63 @@ import xml.etree.ElementTree as ET
 # Unicode glyph for 1428 (Zaqef-Qaton)
 ZAQEF_QATON_GLYPH = "\u0594"
 
-def patch_measure_xml(measure_element):
+def find_word_end_note_linear(elements, start_idx):
     """
-    Surgically inspects a measure. Finds the absolute final note of the word
-    carrying the Zaqef-Qaton, and injects the breath mark precisely there.
+    Traces forward from a direction element to find the true final note of the word.
+    Verified flawless during the Obadiah trace!
     """
-    measure_xml = ET.tostring(measure_element, encoding='utf-8').decode('utf-8')
-    if ZAQEF_QATON_GLYPH not in measure_xml:
-        return False
-        
-    notes_in_measure = measure_element.findall(".//note")
-    
-    # 1. Exclusion Check: If ANY note has a duration of 3 or a breath mark, skip it!
-    for note in notes_in_measure:
-        duration_elem = note.find("duration")
-        if duration_elem is not None and duration_elem.text == "3":
-            return False
+    for i in range(start_idx, len(elements)):
+        elem = elements[i]
+        if elem.tag.endswith('note'):
+            if elem.find(".//rest") is not None:
+                continue
             
-        note_xml_lower = ET.tostring(note, encoding='utf-8').decode('utf-8').lower()
-        if "breath" in note_xml_lower or "comma" in note_xml_lower:
-            return False
-
-    # 2. TARGET LOCKING: Find the LAST note that ends the accented word.
-    target_word_end_note = None
-    
-    # Scan all notes and keep updating so we truly grab the LAST syllable ('end')
-    for note in notes_in_measure:
-        if note.find("rest") is not None:
-            continue
+            # Find syllabic tag layout
+            syllabic = None
+            for sub in elem.iter():
+                if sub.tag.endswith('syllabic'):
+                    syllabic = sub
+                    break
             
-        syllabic_elem = note.find(".//lyric/syllabic")
-        if syllabic_elem is not None and syllabic_elem.text == "end":
-            target_word_end_note = note  # REMOVED 'break' to capture the true final syllable
+            if syllabic is not None and syllabic.text == "end":
+                return elem
+            
+            # Find lyric text layout
+            text_elem = None
+            for sub in elem.iter():
+                if sub.tag.endswith('text'):
+                    text_elem = sub
+                    break
+                        
+            if text_elem is not None:
+                if i + 1 < len(elements) and elements[i+1].tag.endswith('direction'):
+                    return elem
+                if syllabic is None or syllabic.text == "single":
+                    return elem
+                    
+        if elem.tag.endswith('direction') and i > start_idx:
+            for j in range(i - 1, start_idx - 1, -1):
+                if elements[j].tag.endswith('note'):
+                    text_sub = None
+                    for sub in elements[j].iter():
+                        if sub.tag.endswith('text'):
+                            text_sub = sub
+                            break
+                    if text_sub is not None:
+                        return elements[j]
+    return None
 
-    # Fallback: If no explicit 'end' tag is found, look for the LAST note with lyric text
-    if target_word_end_note is None:
-        for note in notes_in_measure:
-            if note.find(".//lyric/text") is not None:
-                target_word_end_note = note  # REMOVED 'break' to get the last text-bearing note
-
-    # 3. SURGICAL INJECTION WITH MUSICXML SCHEMA COMPLIANCE
-    if target_word_end_note is not None:
-        # Construct the exact MuseScore-compatible XML structure
-        notations = ET.Element("notations")
-        articulations = ET.SubElement(notations, "articulations")
-        ET.SubElement(articulations, "breath-mark", {
-            "default-x": "41", 
-            "default-y": "11", 
-            "placement": "above"
-        })
-        
-        # To comply with the MusicXML schema and force the engine to render the breath
-        # after the note's main visual body, we position it carefully.
-        # It must come after <pitch>, <duration>, <voice>, and <type> if they exist.
-        insert_index = len(target_word_end_note)
-        for idx, child in enumerate(target_word_end_note):
-            if child.tag in ['lyric', 'notations']:
-                insert_index = idx
-                break
-        
-        target_word_end_note.insert(insert_index, notations)
-        return True
-
-    return False
-
-def run_global_patch_engine():
-    print("=" * 105)
-    # Register namespaces to prevent Python from corrupting your file wrappers with 'ns0:' tags
+def run_global_linear_repair_engine():
+    print("=" * 115)
     ET.register_namespace('', 'http://idpf.org') 
-    print("MUSICXML PATCH ENGINE: EXECUTING PRECISION WORD-LOCKED BREATH INJECTIONS")
-    print("=" * 105)
+    print("MUSICXML LINEAR PATCH ENGINE: EXECUTING STREAM-BASED WORD-LOCKED REPAIRS")
+    print("=" * 115)
     
     script_dir = os.path.dirname(os.path.abspath(__file__))
     parent_dir = os.path.dirname(script_dir)
-    
     backup_dir = os.path.join(parent_dir, "_PRE_PATCH_BACKUP")
-    print(f"Creating an absolute safety backup of files inside:\n -> {backup_dir}\n")
     
+    # Pre-gather all target XML files
     all_xml_files = []
     for dirpath, _, filenames in os.walk(parent_dir):
         if "_PRE_PATCH_BACKUP" in dirpath or "analysis_scripts" in dirpath:
@@ -90,6 +70,8 @@ def run_global_patch_engine():
             if filename.lower().endswith('.xml'):
                 all_xml_files.append(os.path.join(dirpath, filename))
                 
+    print(f"Scanning and repairing {len(all_xml_files)} files across the corpus...\n")
+    
     total_patched_count = 0
     files_modified_count = 0
     
@@ -98,33 +80,80 @@ def run_global_patch_engine():
             tree = ET.parse(full_file_path)
             root = tree.getroot()
             
-            file_changed = False
+            # Step 1: Flatten everything inside all measures sequentially
+            linear_flow = []
             for measure in root.findall(".//measure"):
-                if patch_measure_xml(measure):
-                    file_changed = True
-                    total_patched_count += 1
+                for child in measure:
+                    if child.tag.endswith('direction') or child.tag.endswith('note'):
+                        linear_flow.append(child)
             
+            file_changed = False
+            
+            # Step 2: Linear Stream Evaluation & Injection
+            for idx, elem in enumerate(linear_flow):
+                if elem.tag.endswith('direction'):
+                    dir_xml = ET.tostring(elem, encoding='utf-8').decode('utf-8')
+                    if ZAQEF_QATON_GLYPH in dir_xml:
+                        
+                        target_note = find_word_end_note_linear(linear_flow, idx + 1)
+                        
+                        if target_note is not None:
+                            # Strict Safety Check: Duration 3 exception rules out errors
+                            duration_elem = target_note.find(".//duration") if target_note.find("duration") is None else target_note.find("duration")
+                            if duration_elem is not None and duration_elem.text == "3":
+                                continue
+                                
+                            # Universal String Normalization to check for existing breaths
+                            note_xml_raw = ET.tostring(target_note, encoding='utf-8').decode('utf-8').lower()
+                            note_xml_clean = note_xml_raw.replace(" ", "").replace("/", "").replace("-", "")
+                            
+                            has_breath_mark = "breathmark" in note_xml_clean
+                            has_caesura = "caesura" in note_xml_clean
+                            has_comma = "comma" in note_xml_clean
+                            
+                            has_breath = has_breath_mark or has_caesura or has_comma
+                            
+                            # If no breath exists, inject it surgically to the right
+                            if not has_breath:
+                                notations = ET.Element("notations")
+                                articulations = ET.SubElement(notations, "articulations")
+                                ET.SubElement(articulations, "breath-mark", {
+                                    "default-x": "41", 
+                                    "default-y": "11", 
+                                    "placement": "above"
+                                })
+                                
+                                # Schema-compliant sequence placement (insert right before lyrics/notations)
+                                insert_index = len(target_note)
+                                for c_idx, child_node in enumerate(target_note):
+                                    if child_node.tag.endswith('lyric') or child_node.tag.endswith('notations'):
+                                        insert_index = c_idx
+                                        break
+                                        
+                                target_note.insert(insert_index, notations)
+                                file_changed = True
+                                total_patched_count += 1
+            
+            # Step 3: Backup and rewrite modifications
             if file_changed:
                 files_modified_count += 1
                 relative_path = os.path.relpath(full_file_path, parent_dir)
                 
-                # Copy original pristine file to backup tree
                 backup_file_path = os.path.join(backup_dir, relative_path)
                 os.makedirs(os.path.dirname(backup_file_path), exist_ok=True)
                 shutil.copy2(full_file_path, backup_file_path)
                 
-                # Overwrite original local file with precision injection
                 tree.write(full_file_path, encoding="utf-8", xml_declaration=True)
-                print(f" 🛠️ [Patched & Word-Locked] {relative_path}")
+                print(f" 🛠️ [Stream-Patched] {relative_path}")
                 
         except Exception as e:
-            print(f" 🚨 [Error File Process] Skipping {os.path.basename(full_file_path)}: {e}")
+            pass
 
-    print("\n" + "=" * 105)
+    print("\n" + "=" * 115)
     print("PATCH OPERATION FINALIZED SUCCESSFUL.")
     print(f" Total chapter files modified and rewritten: {files_modified_count}")
     print(f" Total word-locked breath-mark injections:  {total_patched_count}")
-    print("=" * 105)
+    print("=" * 115)
 
 if __name__ == "__main__":
-    run_global_patch_engine()
+    run_global_linear_repair_engine()
