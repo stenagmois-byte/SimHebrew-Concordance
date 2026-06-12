@@ -1,0 +1,19 @@
+Initialize Developer Workspace Context:
+- Project: "The Music of the Bible" score compilation and publishing pipeline.
+- Input Files: MusicXML (.xml) documents structured as continuous left-to-right melodic timelines. Barlines (<barline>) function as visual indicators for page-width fitting, meaning words and musical phrases frequently span across measure boundaries.
+- Naming Conventions: Full capital letters following the format: [BOOK_NAME]-[CHAPTER_CD].XML (e.g., OBADIAH-001.XML, 1 CHRONICLES-001.XML). Files can contain spaces.
+
+Core Structural XML Patterns:
+1. Hebrew words and cantillation accents are explicitly stored inside <direction><direction-type><words> text containers placed above the staff, NOT inside the notes themselves.
+2. The specific target glyph we look for is the Zaqef-Qaton cantillation accent, defined as Unicode: ZAQEF_QATON_GLYPH = "\u0594".
+3. Notes following a <direction> contain text syllables in <lyric> elements, tracked by <syllabic> values ("begin", "middle", "end", "single").
+
+Established Production Business Rules:
+- Rule 1 (The Trigger): Every word carrying a Zaqef-Qaton glyph in its text direction element MUST conclude with a breath mark structure assigned to the final text note of that exact word block (even if that note crosses into the subsequent measure block).
+- Rule 2 (The Target Placement): Breath marks must be injected inside the final note's <notations><articulations><breath-mark placement="above" default-x="41" default-y="11"/> block. To comply with MusicXML rendering layout, the <notations> block must be sequentially inserted into the note element right BEFORE any <lyric> or pre-existing <notations> blocks, forcing it to render to the right side of the Hebrew word.
+- Rule 3 (The Exclusions): 
+  a) If a target note carries a <duration> of "3", it is never an error and must be completely skipped.
+  b) If a target note already contains a <breath-mark>, <caesura>, or text reference to "comma", it is completely valid and must not receive duplicate injections.
+- Rule 4 (Parsing Engine): We use xml.etree.ElementTree. Due to MusicXML schema default namespace blockades (e.g., http://idpf.org), we search using structural tag endings (.endswith('note'), .endswith('direction')) and use flat string normalization (stripping spaces, slashes, and hyphens) to cleanly detect existing breath components.
+
+Acknowledge these rules, data structures, and constraints. Confirm you are ready to write or debug Python parsing scripts for this pipeline.
