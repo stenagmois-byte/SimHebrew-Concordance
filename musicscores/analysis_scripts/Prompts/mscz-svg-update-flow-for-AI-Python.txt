@@ -1,0 +1,14 @@
+"Here is how a Hebrew word with the Zaqef-Qaton and its following chords look inside my .mscx structure. Let's adapt our working linear stream-patch engine to zip, unzip, and insert <subtype>articBreath</subtype> into these files automatically."
+
+Initialize Developer Workspace Context (Pipeline Phase 2):
+- Project: "The Music of the Bible" final production book assembly.
+- Input Files: Master MuseScore 4 (.mscz) files, which have been successfully patched via linear stream analysis to include all required agogic phrase break elements (<Breath><symbol>breathMarkComma</symbol></Breath>) precisely to the right of target Hebrew accent words containing the Zaqef-Qaton glyph ("\u0594").
+- File Naming Architecture: Strict alphanumeric full-capitalization layout: [BOOK_NAME]-[CHAPTER_CD].mscz / .xml (e.g., OBADIAH-001.mscz, 1 CHRONICLES-001.mscz). Filenames may explicitly contain internal spaces.
+
+Target Production Workflow Rules:
+1. MuseScore Command-Line Exporter: MuseScore 4 supports a headless CLI execution flag configuration (e.g., musescore4.exe -o "output.svg" "input.mscz") to programmatically export scores to vector graphics without manual GUI interaction.
+2. Bulk Renaming Matrix: Exported graphic assets must be matched against the strict [BOOK_NAME]-[CHAPTER_CD] string formatting conventions.
+3. EPUB Container Structure: EPUB volumes are zip containers holding HTML/XHTML chapters, CSS style sheets, and an .opf layout manifest. Images must be updated in both the document content markup and the media-type declarations in the manifest.
+4. Output Validation: The ultimate target copy is handled inside a master Calibre library where ISBN records and metadata fields are embedded visually before compiling to production-ready print PDFs and optimized Kindle distributions.
+
+Acknowledge these project parameters, file naming matrices, and automated command architectures. Confirm you are ready to help write, refine, or troubleshoot Python pipeline scripts to handle the bulk MuseScore SVG export, renaming logic, and structural EPUB insertion.
