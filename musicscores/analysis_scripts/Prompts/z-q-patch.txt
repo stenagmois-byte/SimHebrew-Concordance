@@ -1,3 +1,23 @@
+Initialize Developer Workspace Context (Unified Production Pipeline):
+- Project: "The Music of the Bible" score compilation and publishing pipeline.
+- Input Files: MusicXML (.xml) documents and native MuseScore 4 (.mscz / .mscx) compressed layout files, structured as continuous left-to-right melodic timelines. Barlines function as visual markers for layout page-width fitting; words and phrases span across measure boundaries.
+- File Naming Architecture: Strict alphanumeric full-capitalization layout: [BOOK_NAME]-[CHAPTER_CD].mscz / .xml (e.g., OBADIAH-001.mscz, 1 CHRONICLES-001.mscz). Filenames can explicitly contain internal spaces.
+
+Core Production Geography & Directories:
+1. Source & Git Workspace: C:\Users\Bob\OneDrive\Documents\GitHub\SimHebrew-Concordance\musicscores and its subdirectories by volume. This folder holds the master .mscz scores, MusicXML baselines, and serves as the live staging inbox where MuseScore exports and your batch file renames .svg graphic pages.
+2. Local Staging Input Folder: C:\Users\Bob\KindleProject\Input. This holds the working master .epub book files (e.g., "The Twelve.epub" or "Deuteronomy.epub"). 
+3. Local Staging Output Folder: C:\Users\Bob\KindleProject\Output. The destination folder for optimized, low-colour 8-bit Kindle distribution files.
+
+Established Programmatic Business Rules:
+- Rule 1 (The Trigger): Every word carrying the Zaqef-Qaton glyph ("\u0594") in its text framework must conclude with an agogic phrase break. In MusicXML, this is a <breath-mark> or <caesura> element right before lyric tokens. In MuseScore 4 (.mscx), this is a standalone <Breath><symbol>breathMarkComma</symbol></Breath> node inserted in the parent voice element timeline immediately following the word's final closing <Chord> node.
+- Rule 2 (The Exclusions): 
+  a) Notes with a <duration> of "3" or <durationType> of "eighth" represent active, built-in phrasing markers. They are never errors and must be skipped.
+  b) Notes that already possess a breath, caesura, or comma tracking element must be left untouched to avoid duplicate injections.
+- Rule 3 (The Staging Injector): Python processing tools crawl your Git volume folders for active .svg files, use flexible case-insensitive partial string matching to connect folder names with their corresponding .epub files in KindleProject\Input, surgically wipe out and overwrite old graphics inside the EPUB zip container, recompile the EPUB container safely, and automatically delete (unlink) the staging SVGs from the Git folder to clear the workspace.
+- Rule 4 (The Monochrome Engine): The system flattens vector graphics into high-resolution PNG format and applies a low-colour adaptive palette post-processing filter (quantizing to a tight, 8-color grayscale palette with zero dither) to optimize scores for Kindle E-ink rendering.
+
+Acknowledge these system directories, automated workflows, and parsing constraints. Confirm you are ready to write, refine, or troubleshoot scripts for either the XML/MSCZ parsing engines, the bulk SVG-to-EPUB staging injector, or the Kindle monochrome compressor.
+
 Initialize Developer Workspace Context:
 - Project: "The Music of the Bible" score compilation and publishing pipeline.
 - Input Files: MusicXML (.xml) documents structured as continuous left-to-right melodic timelines. Barlines (<barline>) function as visual indicators for page-width fitting, meaning words and musical phrases frequently span across measure boundaries.
