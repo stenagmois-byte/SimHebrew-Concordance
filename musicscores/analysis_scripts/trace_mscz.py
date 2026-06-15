@@ -72,5 +72,5 @@ def trace_mscz_structure(mscz_filename):
 
 if __name__ == "__main__":
     # Put a native MuseScore compressed archive into this folder and type its filename here:
-    TARGET_MSCZ = "OBADIAH-001.mscz" 
+    TARGET_MSCZ = "GENESIS-001.mscz" 
     trace_mscz_structure(TARGET_MSCZ)

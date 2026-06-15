@@ -1,20 +1,11 @@
 import os
 import pandas as pd
 from collections import Counter
-
-# =====================================================================
-# CONFIGURATION
-# This script automatically finds MUSICSTATS.xlsx in the parent folder.
-# Change PHRASE_LENGTH to look for longer or shorter musical segments.
-# =====================================================================
-PHRASE_LENGTH = 3  
-TARGET_BOOK = "GENESIS"
-TARGET_CHAPTER = 1
-# =====================================================================
-
-def run_local_repo_analysis():
+import argparse  # <-- Added parameter library
+# example call python your_script_name.py --pulses 3 --book "GENESIS" --chapter 1
+def run_local_repo_analysis(phrase_length, target_book, target_chapter):
     print("=" * 80)
-    print(f"LOCAL REPOSITORY ENGINE: RUNNING ANALYSIS ON {TARGET_BOOK} {TARGET_CHAPTER}")
+    print(f"LOCAL REPOSITORY ENGINE: RUNNING ANALYSIS ON {target_book} {target_chapter} ({phrase_length}-PULSE)")
     print("=" * 80)
     
     # Dynamically find MUSICSTATS.xlsx relative to where this script is saved
@@ -45,21 +36,21 @@ def run_local_repo_analysis():
         row_book = str(row[3]).strip().upper()
         row_chapter = str(row[4]).strip()
         
-        if row_book == TARGET_BOOK and (row_chapter == str(TARGET_CHAPTER) or row_chapter.lstrip('0') == str(TARGET_CHAPTER)):
+        if row_book == target_book and (row_chapter == str(target_chapter) or row_chapter.lstrip('0') == str(target_chapter)):
             verse_counter += 1
             
             # --- Parse Clean Equivalent Notes (Col 7 / H) ---
             clean_notes_str = str(row[7]).strip()
             clean_notes = [note for note in clean_notes_str.split() if note]
-            for i in range(len(clean_notes) - PHRASE_LENGTH + 1):
-                window = tuple(clean_notes[i : i + PHRASE_LENGTH])
+            for i in range(len(clean_notes) - phrase_length + 1):
+                window = tuple(clean_notes[i : i + phrase_length])
                 clean_notes_phrases.append(window)
 
             # --- Parse Full Accent Strings (Col 0 / A) ---
             raw_music_str = str(row[0]).strip()
             pure_music_notes = [token for token in raw_music_str.split() if not token.endswith(',')]
-            for i in range(len(pure_music_notes) - PHRASE_LENGTH + 1):
-                window = tuple(pure_music_notes[i : i + PHRASE_LENGTH])
+            for i in range(len(pure_music_notes) - phrase_length + 1):
+                window = tuple(pure_music_notes[i : i + phrase_length])
                 full_music_phrases.append(window)
 
     print(f"Successfully processed {verse_counter} verses.")
@@ -80,5 +71,15 @@ def run_local_repo_analysis():
     print("\n" + "=" * 80)
 
 if __name__ == "__main__":
-    run_local_repo_analysis()
-
+    # Create the command-line parameter parser
+    parser = argparse.ArgumentParser(description="Analyze Hebrew Music Score Note Sequences dynamically.")
+    
+    # Define parameters with your original values as the standard defaults
+    parser.add_argument("--pulses", type=int, default=7, help="Length of the musical phrase sliding window (Default: 7)")
+    parser.add_argument("--book", type=str, default="PSALMS", help="Target book name in uppercase (Default: PSALMS)")
+    parser.add_argument("--chapter", type=int, default=78, help="Target chapter number (Default: 78)")
+    
+    args = parser.parse_args()
+    
+    # Run the logic using the terminal inputs
+    run_local_repo_analysis(args.pulses, args.book.upper(), args.chapter)
