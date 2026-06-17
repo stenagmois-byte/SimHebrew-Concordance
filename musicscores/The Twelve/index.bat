@@ -18,10 +18,10 @@ for %%f in (*.mscz) do (
 )
 
 echo ^</ul^> >> index.html
-echo ^<h2^>Compressed MusicXML (.mxl)^</h2^> >> index.html
+echo ^<h2^>MusicXML^</h2^> >> index.html
 echo ^<ul^> >> index.html
 
-for %%f in (*.mxl) do (
+for %%f in (*.xml) do (
     set "name=%%~nf"
     set "chap=!name:~-3!"
     echo ^<li^>^<a href="%%f" download^>Chapter !chap!^</a^>^</li^> >> index.html
