@@ -1,3 +1,3 @@
  
-rename QOHELET-010-21.svg QOHELET-010-20.svg 
-rename QOHELET-010-22.svg QOHELET-010-20-2.svg 
+rename QOHELET-010-21.svg QOHELET-010-20-2.svg 
+
