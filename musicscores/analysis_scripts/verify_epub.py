@@ -144,7 +144,7 @@ def verify_single_file(mscz_path, display_path):
                     )
 
         if not file_errors and not alignment_issues:
-            print(f"✅ {display_path:<60} | Verses Tracked: {total_verses_found:<3} | Perfect Layout")
+         #   print(f"✅ {display_path:<60} | Verses Tracked: {total_verses_found:<3} | Perfect Layout")
             return True
         else:
             print(f"❌ {display_path:<60} | Verses Tracked: {total_verses_found:<3} | Issues Found:")
