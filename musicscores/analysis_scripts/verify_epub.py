@@ -162,36 +162,59 @@ def verify_single_file(mscz_path, display_path):
 
 def run_restricted_batch():
     print("=" * 115)
-    print("AUTOMATED VERSE VALIDATION & ALIGNMENT INSPECTOR: PATH RESOLVED SCALE")
+    print("AUTOMATED VERSE VALIDATION & ALIGNMENT INSPECTOR: DEEP RECURSIVE SCALE")
     print("=" * 115)
     
-    clean_book_folder = get_active_book_folder()
-    if not clean_book_folder:
-        print("❌ CRITICAL: No matching volume directory could be mapped from the Input folder. Exiting.")
+    # 1. Get the complex EPUB file name sitting in your Input folder
+    if not INPUT_DIR.exists():
+        print(f"❌ ERROR: Input folder {INPUT_DIR} does not exist.")
         return
-        
-    target_volume_dir = MUSIC_SCORES_BASE / clean_book_folder
-    print(f"Targeting Folder: {target_volume_dir}\n")
     
+    epubs = list(INPUT_DIR.glob("*.epub"))
+    if not epubs:
+        print(f"⚠️ No active .epub found inside {INPUT_DIR} to verify.")
+        return
+    
+    # Use the first active epub (e.g., "The Five Scrolls - D. Robert MacDonald.epub")
+    epub_stem = epubs[0].stem
+    print(f"🎯 Active EPUB Detected: '{epub_stem}'")
+
+    # 2. Extract a smart match token (e.g., "The Five Scrolls" or "The Twelve")
+    # If there is a hyphen, split there; otherwise clean up the text string
+    if " - " in epub_stem:
+        book_match_token = epub_stem.split(" - ")[0].strip().lower()
+    else:
+        book_match_token = epub_stem.strip().lower()
+
+    print(f"🔍 Deep searching GitHub for music scores matching volume token: '{book_match_token}'...")
+    
+    # 3. Use rglob to find all .mscz files regardless of how deep they are nested
     all_mscz_files = []
-    for dirpath, _, filenames in os.walk(target_volume_dir):
-        if "_PRE_PATCH_BACKUP" in dirpath or "analysis_scripts" in dirpath:
+    for mscz_path in MUSIC_SCORES_BASE.rglob("*.mscz"):
+        # Skip backup and tool directories safely
+        if "_PRE_PATCH_BACKUP" in mscz_path.parts or "analysis_scripts" in mscz_path.parts:
             continue
-        for filename in filenames:
-            if filename.lower().endswith('.mscz'):
-                all_mscz_files.append(os.path.join(dirpath, filename))
-                
+            
+        # Get the relative path starting from inside your \musicscores folder
+        rel_path_str = str(mscz_path.relative_to(MUSIC_SCORES_BASE)).lower()
+        
+        # If the file path contains "the twelve", "the five scrolls", etc., it belongs to this run!
+        if book_match_token in rel_path_str:
+            all_mscz_files.append(mscz_path)
+            
     if not all_mscz_files:
-        print(f"🔍 No targeted .mscz files found inside folder '{clean_book_folder}'.")
+        print(f"🔍 No targeted .mscz files discovered matching volume token '{book_match_token}'.")
+        print(f"   Searched globally inside: {MUSIC_SCORES_BASE}")
         return
         
-    print(f"Found {len(all_mscz_files)} file(s) for active volume '{clean_book_folder}' to verify. Processing...\n")
+    print(f"✅ Found {len(all_mscz_files)} file(s) for active volume segment. Processing verification...\n")
     print("-" * 115)
     
     failures = 0
+    # Sort the Path objects cleanly before running the loops
     for full_path in sorted(all_mscz_files):
         relative_display = os.path.relpath(full_path, MUSIC_SCORES_BASE)
-        success = verify_single_file(full_path, relative_display)
+        success = verify_single_file(str(full_path), relative_display)
         if success is False:
             failures += 1
             
