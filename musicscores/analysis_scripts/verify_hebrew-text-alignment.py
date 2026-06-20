@@ -63,13 +63,26 @@ def scan_mscz_alignment(file_path):
         # Keep the terminal clean if the post-edit alignment is perfect
         pass
 
-# Example usage to run on your target directory or specific files
+import os
+
 if __name__ == "__main__":
-    # You can update this to loop through your active 10-chapter workspace folder
-    target_score = r"C:\Users\Bob\OneDrive\Documents\GitHub\SimHebrew-Concordance\musicscores\your_test_file.mscx"
-    
-    if os.path.exists(target_score):
+    # Path to your active folder
+    target_score_dir = r"C:\Users\Bob\OneDrive\Documents\GitHub\SimHebrew-Concordance\musicscores\Genesis"
+
+    if os.path.exists(target_score_dir):
         print("Starting post-edit Hebrew alignment verification...")
-        scan_mscz_alignment(target_score)
+        
+        # Loop through every file in the directory
+        for filename in os.listdir(target_score_dir):
+            # Filter for files that end with .mscz
+            if filename.endswith(".mscz"):
+                # Create the full path to the file
+                full_path = os.path.join(target_score_dir, filename)
+                
+                # Verify it is a file and not a directory ending in .mscz
+                if os.path.isfile(full_path):
+                    print(f"Scanning MuseScore file: {filename}")
+                    scan_mscz_alignment(full_path)
     else:
         print("Please configure the target_score path to run the alignment scan.")
+
