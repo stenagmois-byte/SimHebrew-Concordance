@@ -1,0 +1,29 @@
+CONCORDANCE RESET PROMPT: RESUMING MUSICOLOGICAL ANALYSIS FOR "THE MUSIC OF THE BIBLE"
+
+PROJECT & DIRECTORY GEOGRAPHY:
+- Core Workspace Path: C:\Users\Bob\OneDrive\Documents\GitHub\SimHebrew-Concordance\musicscores
+- Analysis Scripts Pile: C:\Users\Bob\OneDrive\Documents\GitHub\SimHebrew-Concordance\musicscores\analysis_scripts\
+- File Naming Scheme: Strict alphanumeric full-capitalization layouts (e.g., GENESIS-001.mscz).
+- Relational Ledger Spreadsheet: 'MUSICSTATS.xlsx' sitting in the parent workspace directory.
+
+TECHNICAL PROTOCOL BENCHMARK SUMMARY:
+We have successfully developed a Python state engine ('motif-concordance.py') that pulls master MuseScore 4 .mscz files, unzips them on the fly, and uses ET.fromstring to bypass ElementTree's native unhashable list/dict pointer conflicts. 
+1. Single-Voice Linear Flattening: Chronologically extracts <pitch> integers, <StaffText><text> full Hebrew words, and <Lyrics><text> transliteration syllables.
+2. Melodic Compression: Condenses adjacent duplicate pitches (e.g., 64->64->68->68->71 flattens to 64->68->71) so syllable updates on a static pitch do not break motif matching.
+3. Chronological Caesura Slicing: Treats the agogic phrase break (<Breath>) as a standalone milestone on the timeline, cutting off the look-ahead text loop the exact millisecond it hits the boundary to isolate the first verse half cleanly.
+4. Verse Alignment Engine: Uses a dynamic look-ahead parse to extract explicit verse prefixes embedded inside the text stream, dropping prior hanging text remnants when crossing structural boundaries.
+
+THE BENCHMARK METRIC:
+When running correctly against GENESIS-001, the system isolates exactly:
+- Verse: 1.1
+- Motif: E Major Triad (64->68->71)
+- Atnah/Caesura: True
+- Hebrew Context: "בְּרֵאשִׁ֖ית בָּרָ֣א אֱלֹהִ֑ים"
+- Phonetics: "be-rei-shit-ba-ra-e-lo-him"
+
+CURRENT PROBLEM FOR THIS NEXT PHASE:
+While the rest-guarded script successfully runs through Genesis 1-11 and writes to MUSICSTATS.xlsx, it is STILL missing verified instances from our human ledger. 
+- The Culprit: Intricate layout ornaments, complex cantillation accent markers, or intermediate disjunctives like the Zaqef-Qaton (z-q) nested subdivisions are shifting the XML node sequence, causing the text loop to slice incorrectly or drop out entirely.
+- The Architectural Goal: All accents below the text (like the Tifha) define a static, unyielding default prose reciting mode on G# (68). We need to calibrate the engine to identify these ornaments directly from the text's Unicode bytes or track the melodic intervals around them.
+
+Please acknowledge receipt of this state, confirm the directory and single-voice stream rules, and prepare to expand the XML tracking mechanism to catch the remaining hidden instances in Genesis 1-11.
