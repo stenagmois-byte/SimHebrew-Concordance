@@ -9,7 +9,7 @@ INPUT_DIR = Path(r"C:\Users\Bob\KindleProject\Input")
 MUSIC_SCORES_BASE = Path(r"C:\Users\Bob\OneDrive\Documents\GitHub\SimHebrew-Concordance\musicscores")
 
 def get_active_book_folder():
-    """Maps the complex EPUB name in Input to the clean GitHub volume folder."""
+    """Maps the complex EPUB name in Input to the clean GitHub volume folder using token validation."""
     if not INPUT_DIR.exists():
         print(f"❌ ERROR: Input folder {INPUT_DIR} does not exist.")
         return None
@@ -19,17 +19,36 @@ def get_active_book_folder():
         print(f"⚠️ No active .epub found inside {INPUT_DIR} to extract folder context.")
         return None
     
-    epub_stem = epubs[0].stem
-    match = re.split(r'[\s\-]', epub_stem)
-    base_book_name = match[0].strip() if match else epub_stem
+    # FIX: Get the stem of the first file in the list correctly
+    epub_stem = epubs[0].stem  # e.g., "Daniel_Ezra_Nehemiah - D. Robert MacDonald"
+    
+    # Strip author metadata if present
+    if " - " in epub_stem:
+        base_epub_clean = epub_stem.split(" - ")[0].strip().lower()
+    else:
+        base_epub_clean = epub_stem.strip().lower()
+        
+    # Split the file name into discrete words to identify compound volumes correctly
+    epub_tokens = [t for t in re.split(r'[_ \-]+', base_epub_clean) if t]
     
     if MUSIC_SCORES_BASE.exists():
         for item in MUSIC_SCORES_BASE.iterdir():
-            if item.is_dir() and item.name.lower() == base_book_name.lower():
+            if not item.is_dir():
+                continue
+                
+            folder_name_lower = item.name.lower()
+            folder_tokens = [t for t in re.split(r'[_ \-]+', folder_name_lower) if t]
+            
+            # Match if shared tokens overlap (e.g., 'daniel' token cross-matches 'Daniel Ezra Nehemiah')
+            if (folder_name_lower in base_epub_clean or 
+                base_epub_clean in folder_name_lower or 
+                any(t in folder_name_lower for t in epub_tokens) or
+                any(t in base_epub_clean for t in folder_tokens)):
                 print(f"🎯 EPUB Target '{epub_stem}' successfully mapped to GitHub folder: '{item.name}'")
                 return item.name
                 
-    return base_book_name
+    print(f"⚠️ Warning: Direct GitHub folder match mapping failed. Falling back to default: {epub_stem}")
+    return epub_stem
 
 def verify_single_file(mscz_path, display_path):
     filename = os.path.basename(mscz_path)
@@ -175,35 +194,34 @@ def run_restricted_batch():
         print(f"⚠️ No active .epub found inside {INPUT_DIR} to verify.")
         return
     
-    # Use the first active epub (e.g., "The Five Scrolls - D. Robert MacDonald.epub")
+    # Process the first active epub
     epub_stem = epubs[0].stem
     print(f"🎯 Active EPUB Detected: '{epub_stem}'")
 
-    # 2. Extract a smart match token (e.g., "The Five Scrolls" or "The Twelve")
-    # If there is a hyphen, split there; otherwise clean up the text string
+    # 2. Extract and split book tokens to catch mixed delimiters (_, -, spaces)
     if " - " in epub_stem:
-        book_match_token = epub_stem.split(" - ")[0].strip().lower()
+        base_epub_clean = epub_stem.split(" - ")[0].strip().lower()
     else:
-        book_match_token = epub_stem.strip().lower()
-
-    print(f"🔍 Deep searching GitHub for music scores matching volume token: '{book_match_token}'...")
+        base_epub_clean = epub_stem.strip().lower()
+        
+    # Split the EPUB name into individual book words (e.g., ['joshua', 'judges'])
+    epub_tokens = [t for t in re.split(r'[_ \-]+', base_epub_clean) if t]
+    print(f"🔍 Deep searching GitHub for music scores matching volume tokens: {epub_tokens}...")
     
-    # 3. Use rglob to find all .mscz files regardless of how deep they are nested
+    # 3. Use rglob to scan and filter .mscz files by overlapping tokens
     all_mscz_files = []
     for mscz_path in MUSIC_SCORES_BASE.rglob("*.mscz"):
-        # Skip backup and tool directories safely
         if "_PRE_PATCH_BACKUP" in mscz_path.parts or "analysis_scripts" in mscz_path.parts:
             continue
             
-        # Get the relative path starting from inside your \musicscores folder
         rel_path_str = str(mscz_path.relative_to(MUSIC_SCORES_BASE)).lower()
         
-        # If the file path contains "the twelve", "the five scrolls", etc., it belongs to this run!
-        if book_match_token in rel_path_str:
+        # UPGRADED MATCH ENGINE: If any part of the path matches any of our book tokens, collect it!
+        if any(token in rel_path_str for token in epub_tokens):
             all_mscz_files.append(mscz_path)
             
     if not all_mscz_files:
-        print(f"🔍 No targeted .mscz files discovered matching volume token '{book_match_token}'.")
+        print(f"🔍 No targeted .mscz files discovered matching volume tokens {epub_tokens}.")
         print(f"   Searched globally inside: {MUSIC_SCORES_BASE}")
         return
         
@@ -211,7 +229,6 @@ def run_restricted_batch():
     print("-" * 115)
     
     failures = 0
-    # Sort the Path objects cleanly before running the loops
     for full_path in sorted(all_mscz_files):
         relative_display = os.path.relpath(full_path, MUSIC_SCORES_BASE)
         success = verify_single_file(str(full_path), relative_display)

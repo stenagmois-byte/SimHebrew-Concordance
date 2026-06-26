@@ -1,6 +1,7 @@
 import os
 import zipfile
 import shutil
+import re
 from pathlib import Path
 
 # Definitive Path Mapping
@@ -39,9 +40,28 @@ def run_volume_svg_injector():
     for epub_path in epub_files:
         epub_name_base = epub_path.stem
         
+        # Clean out author metadata flags if present
+        if " - " in epub_name_base:
+            base_epub_clean = epub_name_base.split(" - ")[0].strip().lower()
+        else:
+            base_epub_clean = epub_name_base.strip().lower()
+            
+        # Tokenize the EPUB file name (e.g., ['daniel', 'ezra', 'nehemiah'])
+        epub_tokens = [t for t in re.split(r'[_ \-]+', base_epub_clean) if t]
+        
         matched_volume_folder = None
         for volume_folder in staged_svgs_by_volume.keys():
-            if volume_folder.lower() in epub_name_base.lower():
+            volume_folder_lower = volume_folder.lower()
+            
+            # Tokenize the GitHub folder name
+            folder_tokens = [t for t in re.split(r'[_ \-]+', volume_folder_lower) if t]
+            
+            # UPGRADED MATCH ENGINE: Match if either contains the other directly,
+            # OR if they share any unique text components (e.g., 'daniel' matches 'Daniel_Ezra_Nehemiah')
+            if (volume_folder_lower in base_epub_clean or 
+                base_epub_clean in volume_folder_lower or 
+                any(t in volume_folder_lower for t in epub_tokens) or
+                any(t in base_epub_clean for t in folder_tokens)):
                 matched_volume_folder = volume_folder
                 break
                 
@@ -62,7 +82,6 @@ def run_volume_svg_injector():
                 zip_ref.extractall(temp_extract_dir)
                 
             injections_made = 0
-            # SAFETY VALVE: Track exactly which source files were successfully injected
             successfully_injected_paths = []
             skipped_svg_names = []
             
@@ -70,7 +89,6 @@ def run_volume_svg_injector():
             for svg_src_path in active_svgs:
                 filename = svg_src_path.name
                 
-                # Search the unzipped EPUB for the old file matching this exact name
                 target_dest_paths = list(temp_extract_dir.rglob(filename))
                 if target_dest_paths:
                     for target_dest in target_dest_paths:
@@ -78,14 +96,12 @@ def run_volume_svg_injector():
                         injections_made += 1
                     successfully_injected_paths.append(svg_src_path)
                 else:
-                    # Fallback if it's a completely new page layout name
                     images_folders = [d for d in temp_extract_dir.rglob("*") if d.is_dir() and d.name.lower() in ["images", "image", "media"]]
                     if images_folders:
                         shutil.copy2(svg_src_path, images_folders[0] / filename)
                         injections_made += 1
                         successfully_injected_paths.append(svg_src_path)
                     else:
-                        # File did not match any EPUB infrastructure target
                         skipped_svg_names.append(filename)
 
             # Step 4: Re-compile the updated files back into a pristine compressed EPUB archive
@@ -118,7 +134,6 @@ def run_volume_svg_injector():
                         pass
                 print(f" 🧹 [Cleared] Removed {len(successfully_injected_paths)} deployed SVGs from GitHub workspace.")
                 
-                # SAFETY VALVE NOTICE: Print warnings for the manual/unmatched exceptions that were preserved
                 if skipped_svg_names:
                     print(f" 🛑 [Warning] The following {len(skipped_svg_names)} SVGs did NOT match the EPUB and were NOT deleted:")
                     for name in skipped_svg_names:
