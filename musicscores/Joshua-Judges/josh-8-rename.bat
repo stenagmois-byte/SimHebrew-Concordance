@@ -15,14 +15,15 @@ rename JOSHUA-008-15.svg JOSHUA-008-8-2.svg
 rename JOSHUA-008-16.svg JOSHUA-008-9.svg 
 rename JOSHUA-008-17.svg JOSHUA-008-9-2.svg 
 rename JOSHUA-008-18.svg JOSHUA-008-10.svg 
-rename JOSHUA-008-19.svg JOSHUA-008-10-2.svg 
-rename JOSHUA-008-20.svg JOSHUA-008-11.svg 
-rename JOSHUA-008-21.svg JOSHUA-008-11-2.svg 
-rename JOSHUA-008-22.svg JOSHUA-008-12.svg 
-rename JOSHUA-008-23.svg JOSHUA-008-13.svg 
-rename JOSHUA-008-24.svg JOSHUA-008-13-2.svg 
-rename JOSHUA-008-25.svg JOSHUA-008-14.svg 
-rename JOSHUA-008-26.svg JOSHUA-008-14-2.svg 
+
+rename JOSHUA-008-19.svg JOSHUA-008-11.svg 
+rename JOSHUA-008-20.svg JOSHUA-008-11-2.svg 
+rename JOSHUA-008-21.svg JOSHUA-008-12.svg 
+rename JOSHUA-008-22.svg JOSHUA-008-13.svg 
+rename JOSHUA-008-23.svg JOSHUA-008-13-2.svg 
+rename JOSHUA-008-24.svg JOSHUA-008-14.svg 
+rename JOSHUA-008-25.svg JOSHUA-008-14-2.svg 
+rename JOSHUA-008-26.svg JOSHUA-008-14-3.svg 
 rename JOSHUA-008-27.svg JOSHUA-008-15.svg 
 rename JOSHUA-008-28.svg JOSHUA-008-16.svg 
 rename JOSHUA-008-29.svg JOSHUA-008-16-2.svg 

@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 # --- DIRECTORY CONFIGURATION ---
-INPUT_DIR = Path(r"C:\Users\Bob\KindleProject\Input")
+INPUT_DIR = Path(r"C:\Users\Bob\KindleProject\Verify")
 MUSIC_SCORES_BASE = Path(r"C:\Users\Bob\OneDrive\Documents\GitHub\SimHebrew-Concordance\musicscores")
 
 def get_active_book_folder():
