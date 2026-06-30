@@ -1,3 +1,19 @@
+# SimHebrew Concordance & The Music of the Bible
+
+An open-source database and toolkit dedicated to reconstructing the comprehensive musical footprint of the Hebrew Bible text.
+
+## 🚀 Getting Started
+1. **Browse the Concordance**: Open `index.html` via GitHub Pages to explore the [Letter-Pair Root Matrix](https://stenagmois-byte.github.io/SimHebrew-Concordance/).
+2. **Analyze the Melodies**: Clone the repository to access the full `/Music Scores` directory containing 929 chapter files in MuseScore (`.mscz`) and analysis-ready `.xml` formats.
+3. **Run Scripts**: Review the python workspace to experiment with sequence and motif parsing algorithms.
+
+## 🎓 Academic Endorsements
+> "Bob MacDonald offers us here a controversial but extensively considered answer, psalm by psalm, to the familiar question: 'So what did the music of the ancient psalms sound like?' This is a bold and engaging work."
+> — *Professor Susan Gillingham DD, Emeritus Professor of the Hebrew Bible, Worcester College, Oxford*
+
+## 📜 License
+This project is open-source. Please attribute data and musical reconstructions to the 18-volume series *The Music of the Bible* (Bob MacDonald, 2026).
+
 These pages contain a full concordance to the Tanach, the five books of Moses (torh) Instruction / Law, the prophets (nbiaim) from Joshua to Malachi, and the writings (ctubim) from Psalms to Chronicles. I update the pages occasionally. Updates are complete as of April 29, 2026.
 
 In these pages every word in the Tanach is present and every place that it used. In the full set of posts referenced on the Index page, each word is listed with:
