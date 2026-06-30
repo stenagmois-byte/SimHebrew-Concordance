@@ -8,23 +8,12 @@ echo ^<body^> >> index.html
 for %%I in (.) do set "CurrentDir=%%~nxI"
 echo ^<h1^>%CurrentDir%^</h1^> >> index.html
 
-echo ^<h2^>MSCZ^</h2^> >> index.html
+echo ^<h2^>Python scripts^</h2^> >> index.html
 echo ^<ul^> >> index.html
 
-for %%f in (*.mscz) do (
+for %%f in (*.py) do (
     set "name=%%~nf"
-    set "chap=!name:~-3!"
-    echo ^<li^>^<a href="%%f" download^>Chapter !chap!^</a^>^</li^> >> index.html
-)
-
-echo ^</ul^> >> index.html
-echo ^<h2^>MusicXML^</h2^> >> index.html
-echo ^<ul^> >> index.html
-
-for %%f in (*.xml) do (
-    set "name=%%~nf"
-    set "chap=!name:~-3!"
-    echo ^<li^>^<a href="%%f" download^>Chapter !chap!^</a^>^</li^> >> index.html
+    echo ^<li^>^<a href="%%f" download^>!name!^</a^>^</li^> >> index.html
 )
 
 echo ^</ul^> >> index.html
