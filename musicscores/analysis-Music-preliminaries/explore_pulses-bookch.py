@@ -1,123 +1,193 @@
 import os
-import pandas as pd
-from collections import defaultdict
-import argparse
+import re
+import zipfile
+import xml.etree.ElementTree as ET
+from pathlib import Path
 
-def find_data_file(filename="MUSICSTATS.xlsx"):
+def find_epub_directory():
     """
-    Dynamically hunts down the spreadsheet relative to where the user is executing the code,
-    ensuring full compatibility across different local environments and GitHub clones.
+    Dynamically scans the terminal execution workspace to locate your EPUB volumes,
+    ensuring it runs flawlessly on local systems or remote GitHub branches.
     """
-    if os.path.exists(filename):
-        return filename
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    script_neighbor = os.path.join(script_dir, filename)
-    if os.path.exists(script_neighbor):
+    # Check 1: Is there a 'musicscores' folder right where the terminal is sitting?
+    if Path("./musicscores").exists() and list(Path("./musicscores").glob("*.epub")):
+        return Path("./musicscores")
+        
+    # Check 2: Is there a 'musicscores' folder sitting next to the script file?
+    script_dir = Path(__file__).resolve().parent
+    script_neighbor = script_dir / "musicscores"
+    if script_neighbor.exists() and list(script_neighbor.glob("*.epub")):
         return script_neighbor
-    parent_dir = os.path.dirname(script_dir)
-    parent_neighbor = os.path.join(parent_dir, filename)
-    if os.path.exists(parent_neighbor):
-        return parent_neighbor
-    for root, dirs, files in os.walk(parent_dir if parent_dir else "."):
-        if filename in files:
-            return os.path.join(root, filename)
+        
+    # Check 3: Are the EPUB files sitting in the exact same directory as the script?
+    if list(script_dir.glob("*.epub")):
+        return script_dir
+        
+    # Check 4: Is there a folder containing epubs one level up (parent folder)?
+    if list(script_dir.parent.glob("*.epub")):
+        return script_dir.parent
+        
     return None
 
-def run_local_repo_analysis(phrase_length, target_book, target_chapter, max_results):
-    matrix_file_path = find_data_file("MUSICSTATS.xlsx")
+def strip_ns(tag):
+    return tag.split('}')[-1] if '}' in tag else tag
+
+def run_production_audit():
+    # Resolve directory target location-independently
+    target_dir = find_epub_directory()
     
-    # Establish text flags for the console printout
-    book_flag = "ALL BOOKS" if target_book == "ALL" else target_book
-    chap_flag = "ALL CHAPTERS" if target_chapter == 0 else f"CHAPTER {target_chapter}"
+    print("=" * 115)
+    print("💎 PRODUCTION GEOMETRIC AUDIT ENGINE ACTIVATED")
     
-    print("=" * 110)
-    print(f"MASTER TANAKH MUSIC ENGINE: RUNNING ANALYSIS ON [{book_flag}] [{chap_flag}] ({phrase_length}-PULSE WINDOW)")
-    
-    if not matrix_file_path:
-        print(f"[Critical Error] MUSICSTATS.xlsx could not be located anywhere in this repository branch!")
-        print("=" * 110)
+    if not target_dir:
+        print("❌ [CRITICAL ERROR] No folder containing .epub files could be located!")
+        print("   Please place this script inside or right next to your EPUB volumes folder.")
+        print("=" * 115)
         return
         
-    print(f"Data source resolved at: {os.path.abspath(matrix_file_path)}")
-    print("=" * 110)
+    print(f"📂 Successfully targeted volume source folder: {target_dir.resolve()}")
+    
+    epub_files = list(target_dir.glob("*.epub"))
+    print(f"📦 Found {len(epub_files)} volume(s) ready for production audit.")
+    print("=" * 115)
+    
+    total_books_audited = 0
+    total_issues_exposed = 0
+    
+    for epub_path in sorted(epub_files):
+        print(f"\n🚀 [STARTING AUDIT] Opening Volume Container: {epub_path.name}")
+        print("-" * 115)
+        total_books_audited += 1
+        book_has_issues = False
         
-    try:
-        print("Loading corpus database matrix sheet...")
-        df = pd.read_excel(matrix_file_path, header=None)
-    except Exception as e:
-        print(f"[Error] Failed to read Excel file: {e}")
-        return
-
-    clean_notes_tracker = defaultdict(list)
-    full_music_tracker = defaultdict(list)
-    verse_counter = 0
-
-    for idx, row in df.iterrows():
-        # Extracted parameters normalized from Row Data
-        row_book = str(row[3]).strip().upper()
-        row_chapter_str = str(row[4]).strip()
-        
-        # Guard clause: clean up chapter string formatting safely
         try:
-            row_chapter = int(float(row_chapter_str)) if row_chapter_str.replace('.','',1).isdigit() else 0
-        except ValueError:
-            row_chapter = 0
+            with zipfile.ZipFile(epub_path, 'r') as archive:
+                internal_files = archive.namelist()
+                html_files = [f for f in internal_files if f.lower().endswith(('.html', '.xhtml'))]
+                
+                narrative_files = [f for f in html_files if re.search(r'^\w+-\d+\.(html|xhtml)$', Path(f).name, re.IGNORECASE)]
+                if not narrative_files:
+                    print(f"   ⚠️  Skipping '{epub_path.name}': No standard canonical chapter files detected inside.")
+                    continue
+                
+                def extract_chap_num(f_path):
+                    m = re.search(r'-(\d+)\.', Path(f_path).name)
+                    return int(m.group(1)) if m else 0
+                max_chapter_file = max(narrative_files, key=extract_chap_num)
+                
+                for html_file in sorted(html_files):
+                    file_name = Path(html_file).name
+                    
+                    if not re.search(r'^\w+-\d+\.(html|xhtml)$', file_name, re.IGNORECASE):
+                        continue
+                    
+                    is_final_chapter_of_book = (html_file == max_chapter_file)
+                    
+                    with archive.open(html_file) as f_stream:
+                        content = f_stream.read().decode('utf-8', errors='ignore')
+                    
+                    img_blocks = re.findall(r'<img[^>]+alt=["\']([^"\']+)["\'][^>]+src=["\']([^"\']+)["\']', content)
+                    if not img_blocks:
+                        continue
+                        
+                    verse_groups = {}
+                    for alt_text, src_filename in img_blocks:
+                        verse_match = re.search(r':(\d+)$', alt_text.strip())
+                        if verse_match:
+                            v_num = verse_match.group(1)
+                            if v_num not in verse_groups:
+                                verse_groups[v_num] = []
+                            verse_groups[v_num].append(src_filename)
+                    
+                    sorted_verses = sorted(verse_groups.keys(), key=int)
+                    final_verse_of_chapter = sorted_verses[-1] if sorted_verses else None
+                    
+                    for v_num, svg_list in verse_groups.items():
+                        is_final_verse_of_chapter = (v_num == final_verse_of_chapter)
+                        
+                        for svg_idx, svg_filename in enumerate(svg_list):
+                            is_final_line_of_verse = (svg_idx == len(svg_list) - 1)
+                            
+                            base_dir_prefix = Path(html_file).parent
+                            resolved_path = (base_dir_prefix / svg_filename).as_posix()
+                            
+                            zip_target = resolved_path if resolved_path in internal_files else svg_filename
+                            if zip_target not in internal_files:
+                                continue
+                                
+                            with archive.open(zip_target) as svg_stream:
+                                svg_text = svg_stream.read().decode('utf-8', errors='ignore')
+                            
+                            try:
+                                root = ET.fromstring(svg_text)
+                            except ET.ParseError:
+                                print(f"   💥 [XML CORRUPTION] {file_name} -> File {svg_filename} contains broken SVG XML format.")
+                                total_issues_exposed += 1
+                                book_has_issues = True
+                                continue
+                            
+                            STAFF_RIGHT_MARGIN = 760 
+                            has_rest = False
+                            has_barline = False
+                            has_clef = False
+                            
+                            for elem in root.iter():
+                                tag = strip_ns(elem.tag)
+                                elem_class = elem.attrib.get('class', '')
+                                
+                                if 'Rest' in elem_class: has_rest = True
+                                if 'BarLine' in elem_class: has_barline = True
+                                if 'Clef' in elem_class: has_clef = True
+                                
+                                # Rule 1: Right Margin Hebrew Word Clipping Check
+                                if tag == 'text':
+                                    try:
+                                        x_coord = float(elem.attrib.get('x', 0))
+                                        if x_coord > STAFF_RIGHT_MARGIN:
+                                            print(f"   ⚠️  [MARGIN CLIPPING RISK] {file_name} -> Verse {v_num}:")
+                                            print(f"      -> Text element '{elem.text}' in asset '{svg_filename}' sits at x={x_coord} (Out of bounds).")
+                                            total_issues_exposed += 1
+                                            book_has_issues = True
+                                    except ValueError:
+                                        pass
 
-        # Dynamic Scope Logic:
-        # Match if target_book is 'ALL' OR matches row exactly
-        book_matches = (target_book == "ALL") or (row_book == target_book)
-        # Match if target_chapter is 0 (all chapters) OR matches row exactly
-        chapter_matches = (target_chapter == 0) or (row_chapter == target_chapter)
+                                # Rule 2: Slur Path Collision Check
+                                if tag == 'path' and 'Slur' in elem_class:
+                                    path_data = elem.attrib.get('d', '')
+                                    y_values = [float(y) for y in re.findall(r'[-+]?\d*\.\d+|\d+', path_data)[1::2]]
+                                    if y_values and max(y_values) > 120:  
+                                        print(f"   ⚠️  [COLLISION RISK] {file_name} -> Verse {v_num}:")
+                                        print(f"      -> Slur path in asset '{svg_filename}' dips into lyric line space (y={max(y_values)}).")
+                                        total_issues_exposed += 1
+                                        book_has_issues = True
+                            
+                            # Rule 3: Enforce No Rests Inside Mid-Verse Splitted Lines
+                            if not is_final_line_of_verse and has_rest:
+                                print(f"   💥 [PHANTOM LINE ERROR] {file_name} -> Verse {v_num}:")
+                                print(f"      -> Mid-Verse File '{svg_filename}' prematurely contains a structural closing rest.")
+                                total_issues_exposed += 1
+                                book_has_issues = True
 
-        if book_matches and chapter_matches:
-            verse_counter += 1
-            
-            # Format standard notation location stamp
-            verse_num = str(row[5]).strip() if pd.notna(row[5]) else f"v{verse_counter}"
-            location_label = f"{row_book} {row_chapter}:{verse_num}"
-            
-            # --- Parse Clean Equivalent Notes (Col 7 / H) ---
-            clean_notes_str = str(row[7]).strip()
-            clean_notes = [note for note in clean_notes_str.split() if note]
-            for i in range(len(clean_notes) - phrase_length + 1):
-                window = tuple(clean_notes[i : i + phrase_length])
-                clean_notes_tracker[window].append(location_label)
-
-            # --- Parse Full Accent Strings (Col 0 / A) ---
-            raw_music_str = str(row[0]).strip()
-            pure_music_notes = [token for token in raw_music_str.split() if not token.endswith(',')]
-            for i in range(len(pure_music_notes) - phrase_length + 1):
-                window = tuple(pure_music_notes[i : i + phrase_length])
-                full_music_tracker[window].append(location_label)
-
-    print(f"Successfully evaluated {verse_counter} total verses across chosen constraints.")
-
-    # Sort trackers based on maximum frequency match lists
-    sorted_clean = sorted(clean_notes_tracker.items(), key=lambda x: len(x[1]), reverse=True)
-    sorted_full = sorted(full_music_tracker.items(), key=lambda x: len(x[1]), reverse=True)
-
-    print("\n" + "-" * 110)
-    print(f"TOP REPEATING PHRASES IN CLEAN EQUIVALENT NOTES (Col H) WITH LOCATIONS")
-    print("-" * 110)
-    for phrase, locations in sorted_clean[:max_results]:
-        if len(locations) > 1:
-            print(f" [{' -> '.join(phrase):<24}] Matches: {len(locations):<3} | Locations: {', '.join(locations)}")
-
-    print("\n" + "-" * 110)
-    print(f"TOP REPEATING PHRASES WITH TRUE ACCIDENTALS (Col A) WITH LOCATIONS")
-    print("-" * 110)
-    for phrase, locations in sorted_full[:max_results]:
-        if len(locations) > 1:
-            print(f" [{' -> '.join(phrase):<24}] Matches: {len(locations):<3} | Locations: {', '.join(locations)}")
-        
-    print("\n" + "=" * 110)
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Analyze Hebrew Music Score Note Sequences dynamically across the entire Tanakh.")
-    parser.add_argument("--pulses", type=int, default=5, help="Length of sliding window")
-    parser.add_argument("--book", type=str, default="MICAH", help="Target book name in uppercase (Use 'ALL' to search everything)")
-    parser.add_argument("--chapter", type=int, default=5, help="Target chapter number (Use '0' to search all chapters in the book)")
-    parser.add_argument("--limit", type=int, default=10, help="Number of top repeating sequences to display in output logs")
-    
-    args = parser.parse_args()
-    run_local_repo_analysis(args.pulses, args.book.upper(), args.chapter, args.limit)
+                            # Rule 4: Enforce End Rests vs Chapter Closures
+                            if is_final_line_of_verse:
+                                if is_final_verse_of_chapter and is_final_chapter_of_book:
+                                    if has_rest:
+                                        print(f"   ⚠️  [CADENCE EXCEPTION VIOLATION] {file_name} -> Verse {v_num}:")
+                                        print(f"      -> The absolute final verse line of the book chapter ('{svg_filename}') must not contain a trailing rest.")
+                                        total_issues_exposed += 1
+                                        book_has_issues = True
+                                else:
+                                    if not (has_rest or has_barline or has_clef):
+                                        print(f"   ⚠️  [CADENCE ERROR] {file_name} -> Verse {v_num}:")
+                                        print(f"      -> Final Layout Asset: '{svg_filename}' terminates without structural rest/barline.")
+                                        total_issues_exposed += 1
+                                        book_has_issues = True
+                                        
+if not book_has_issues:
+print(f"   🟢 SUCCESS: '{epub_path.name}' parsed cleanly with perfect geometric alignment.")
+except 
+Exception as e:print(f"💥 Critical execution block failure processing {epub_path.name}: {e}")
+print("\n" + "=" * 115)
+print(f"AUDIT COMPLETE. Evaluated {total_books_audited} volumes. Total issues exposed: {total_issues_exposed}")
+print("=" * 115)
+if name == "main":run_production_audit()
