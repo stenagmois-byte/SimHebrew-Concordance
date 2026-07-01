@@ -3,7 +3,7 @@
 An open-source database and toolkit dedicated to reconstructing the comprehensive musical footprint of the Hebrew Bible text.
 
 ## 🚀 Getting Started
-1. **Browse the Concordance**: Open `index.html` via GitHub Pages to explore the [Letter-Pair Root Matrix](https://stenagmois-byte.github.io/SimHebrew-Concordance/).
+1. **Browse the Concordance**: Open `index.html` via GitHub Pages to explore the [Letter-Pair Root Matrix](https://stenagmois-byte.github.io/SimHebrew-Concordance/matrix.html).
 2. **Analyze the Melodies**: Clone the repository to access the full `/Music Scores` directory containing 929 chapter files in MuseScore (`.mscz`) and analysis-ready `.xml` formats.
 3. **Run Scripts**: Review the python workspace to experiment with sequence and motif parsing algorithms.
 
