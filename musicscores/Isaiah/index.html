@@ -19,4 +19,44 @@
 <li><a href="ISAIAH_001.json" download>1</a> &bull; <a href="ISAIAH_002.json" download>2</a> &bull; <a href="ISAIAH_003.json" download>3</a> &bull; <a href="ISAIAH_004.json" download>4</a> &bull; <a href="ISAIAH_005.json" download>5</a> &bull; <a href="ISAIAH_006.json" download>6</a> &bull; <a href="ISAIAH_007.json" download>7</a> &bull; <a href="ISAIAH_008.json" download>8</a> &bull; <a href="ISAIAH_009.json" download>9</a> &bull; <a href="ISAIAH_010.json" download>10</a> &bull; <a href="ISAIAH_011.json" download>11</a> &bull; <a href="ISAIAH_012.json" download>12</a> &bull; <a href="ISAIAH_013.json" download>13</a> &bull; <a href="ISAIAH_014.json" download>14</a> &bull; <a href="ISAIAH_015.json" download>15</a> &bull; <a href="ISAIAH_016.json" download>16</a> &bull; <a href="ISAIAH_017.json" download>17</a> &bull; <a href="ISAIAH_018.json" download>18</a> &bull; <a href="ISAIAH_019.json" download>19</a> &bull; <a href="ISAIAH_020.json" download>20</a> &bull; <a href="ISAIAH_021.json" download>21</a> &bull; <a href="ISAIAH_022.json" download>22</a> &bull; <a href="ISAIAH_023.json" download>23</a> &bull; <a href="ISAIAH_024.json" download>24</a> &bull; <a href="ISAIAH_025.json" download>25</a> &bull; <a href="ISAIAH_026.json" download>26</a> &bull; <a href="ISAIAH_027.json" download>27</a> &bull; <a href="ISAIAH_028.json" download>28</a> &bull; <a href="ISAIAH_029.json" download>29</a> &bull; <a href="ISAIAH_030.json" download>30</a> &bull; <a href="ISAIAH_031.json" download>31</a> &bull; <a href="ISAIAH_032.json" download>32</a> &bull; <a href="ISAIAH_033.json" download>33</a> &bull; <a href="ISAIAH_034.json" download>34</a> &bull; <a href="ISAIAH_035.json" download>35</a> &bull; <a href="ISAIAH_036.json" download>36</a> &bull; <a href="ISAIAH_037.json" download>37</a> &bull; <a href="ISAIAH_038.json" download>38</a> &bull; <a href="ISAIAH_039.json" download>39</a> &bull; <a href="ISAIAH_040.json" download>40</a> &bull; <a href="ISAIAH_041.json" download>41</a> &bull; <a href="ISAIAH_042.json" download>42</a> &bull; <a href="ISAIAH_043.json" download>43</a> &bull; <a href="ISAIAH_044.json" download>44</a> &bull; <a href="ISAIAH_045.json" download>45</a> &bull; <a href="ISAIAH_046.json" download>46</a> &bull; <a href="ISAIAH_047.json" download>47</a> &bull; <a href="ISAIAH_048.json" download>48</a> &bull; <a href="ISAIAH_049.json" download>49</a> &bull; <a href="ISAIAH_050.json" download>50</a> &bull; <a href="ISAIAH_051.json" download>51</a> &bull; <a href="ISAIAH_052.json" download>52</a> &bull; <a href="ISAIAH_053.json" download>53</a> &bull; <a href="ISAIAH_054.json" download>54</a> &bull; <a href="ISAIAH_055.json" download>55</a> &bull; <a href="ISAIAH_056.json" download>56</a> &bull; <a href="ISAIAH_057.json" download>57</a> &bull; <a href="ISAIAH_058.json" download>58</a> &bull; <a href="ISAIAH_059.json" download>59</a> &bull; <a href="ISAIAH_060.json" download>60</a> &bull; <a href="ISAIAH_061.json" download>61</a> &bull; <a href="ISAIAH_062.json" download>62</a> &bull; <a href="ISAIAH_063.json" download>63</a> &bull; <a href="ISAIAH_064.json" download>64</a> &bull; <a href="ISAIAH_065.json" download>65</a> &bull; <a href="ISAIAH_066.json" download>66</a></li> 
 </ul> 
 <p><a href="../index.html">Back</a></p> 
-</body></html> 
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const links = document.querySelectorAll("a");
+    links.forEach(link => {
+        const fileTarget = link.getAttribute("href") || "";
+        const lowerTarget = fileTarget.toLowerCase();
+        if (!lowerTarget.endsWith(".mscz") && !lowerTarget.endsWith(".json") && !lowerTarget.endsWith(".xml")) {
+            return;
+        }
+        let cleanName = fileTarget
+            .split('/').pop()
+            .split('\\').pop()
+            .replace(/\.(mscz|json|xml)$/i, "")
+            .replace(/[-_]/g, " ")
+            .trim();
+        const colorClass = getGematriaMenuClass(cleanName);
+        if (colorClass) {
+            link.classList.add(colorClass);
+            link.style.display = "inline-block";
+            link.style.padding = "2px 6px";
+            link.style.margin = "2px 1px";
+            link.style.borderRadius = "4px";
+            link.style.textDecoration = "none";
+        }
+    });
+});
+function getGematriaMenuClass(text) {
+    if (!text) return '';
+    let score = 0;
+    for (let i = 0; i < text.length; i++) { score += text.charCodeAt(i); }
+    const bucket = score % 5;
+    if (bucket === 0) return 'gem-low';
+    if (bucket === 1) return 'gem-mid-low';
+    if (bucket === 2) return 'gem-mid';
+    if (bucket === 3) return 'gem-mid-high';
+    return 'gem-high';
+}
+</script>
+</body>
+</html> 

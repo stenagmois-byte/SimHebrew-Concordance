@@ -18,4 +18,44 @@
 <li><a href="GENESIS-001.json" download>1</a> &bull; <a href="GENESIS-002.json" download>2</a> &bull; <a href="GENESIS-003.json" download>3</a> &bull; <a href="GENESIS-004.json" download>4</a> &bull; <a href="GENESIS-005.json" download>5</a> &bull; <a href="GENESIS-006.json" download>6</a> &bull; <a href="GENESIS-007.json" download>7</a> &bull; <a href="GENESIS-008.json" download>8</a> &bull; <a href="GENESIS-009.json" download>9</a> &bull; <a href="GENESIS-010.json" download>10</a> &bull; <a href="GENESIS-011.json" download>11</a> &bull; <a href="GENESIS-012.json" download>12</a> &bull; <a href="GENESIS-013.json" download>13</a> &bull; <a href="GENESIS-014.json" download>14</a> &bull; <a href="GENESIS-015.json" download>15</a> &bull; <a href="GENESIS-016.json" download>16</a> &bull; <a href="GENESIS-017.json" download>17</a> &bull; <a href="GENESIS-018.json" download>18</a> &bull; <a href="GENESIS-019.json" download>19</a> &bull; <a href="GENESIS-020.json" download>20</a> &bull; <a href="GENESIS-021.json" download>21</a> &bull; <a href="GENESIS-022.json" download>22</a> &bull; <a href="GENESIS-023.json" download>23</a> &bull; <a href="GENESIS-024.json" download>24</a> &bull; <a href="GENESIS-025.json" download>25</a> &bull; <a href="GENESIS-026.json" download>26</a> &bull; <a href="GENESIS-027.json" download>27</a> &bull; <a href="GENESIS-028.json" download>28</a> &bull; <a href="GENESIS-029.json" download>29</a> &bull; <a href="GENESIS-030.json" download>30</a> &bull; <a href="GENESIS-031.json" download>31</a> &bull; <a href="GENESIS-032.json" download>32</a> &bull; <a href="GENESIS-033.json" download>33</a> &bull; <a href="GENESIS-034.json" download>34</a> &bull; <a href="GENESIS-035.json" download>35</a> &bull; <a href="GENESIS-036.json" download>36</a> &bull; <a href="GENESIS-037.json" download>37</a> &bull; <a href="GENESIS-038.json" download>38</a> &bull; <a href="GENESIS-039.json" download>39</a> &bull; <a href="GENESIS-040.json" download>40</a> &bull; <a href="GENESIS-041.json" download>41</a> &bull; <a href="GENESIS-042.json" download>42</a> &bull; <a href="GENESIS-043.json" download>43</a> &bull; <a href="GENESIS-044.json" download>44</a> &bull; <a href="GENESIS-045.json" download>45</a> &bull; <a href="GENESIS-046.json" download>46</a> &bull; <a href="GENESIS-047.json" download>47</a> &bull; <a href="GENESIS-048.json" download>48</a> &bull; <a href="GENESIS-049.json" download>49</a> &bull; <a href="GENESIS-050.json" download>50</a></li> 
 </ul> 
 <p><a href="../index.html">Back</a></p> 
-</body></html> 
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const links = document.querySelectorAll("a");
+    links.forEach(link => {
+        const fileTarget = link.getAttribute("href") || "";
+        const lowerTarget = fileTarget.toLowerCase();
+        if (!lowerTarget.endsWith(".mscz") && !lowerTarget.endsWith(".json") && !lowerTarget.endsWith(".xml")) {
+            return;
+        }
+        let cleanName = fileTarget
+            .split('/').pop()
+            .split('\\').pop()
+            .replace(/\.(mscz|json|xml)$/i, "")
+            .replace(/[-_]/g, " ")
+            .trim();
+        const colorClass = getGematriaMenuClass(cleanName);
+        if (colorClass) {
+            link.classList.add(colorClass);
+            link.style.display = "inline-block";
+            link.style.padding = "2px 6px";
+            link.style.margin = "2px 1px";
+            link.style.borderRadius = "4px";
+            link.style.textDecoration = "none";
+        }
+    });
+});
+function getGematriaMenuClass(text) {
+    if (!text) return '';
+    let score = 0;
+    for (let i = 0; i < text.length; i++) { score += text.charCodeAt(i); }
+    const bucket = score % 5;
+    if (bucket === 0) return 'gem-low';
+    if (bucket === 1) return 'gem-mid-low';
+    if (bucket === 2) return 'gem-mid';
+    if (bucket === 3) return 'gem-mid-high';
+    return 'gem-high';
+}
+</script>
+</body>
+</html> 

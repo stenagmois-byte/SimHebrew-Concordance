@@ -19,4 +19,44 @@
 <li><a href="EZEKIEL_001.json" download>1</a> &bull; <a href="EZEKIEL_002.json" download> 2</a> &bull; <a href="EZEKIEL_003.json" download>3</a> &bull; <a href="EZEKIEL_004.json" download>4</a> &bull; <a href="EZEKIEL_005.json" download>5</a> &bull; <a href="EZEKIEL_006.json" download>6</a> &bull; <a href="EZEKIEL_007.json" download>7</a> &bull; <a href="EZEKIEL_008.json" download> &bull; 8</a> &bull; <a href="EZEKIEL_009.json" download> &bull; 9</a> &bull; <a href="EZEKIEL_010.json" download>10</a> &bull; <a href="EZEKIEL_011.json" download>11</a> &bull; <a href="EZEKIEL_012.json" download>12</a> &bull; <a href="EZEKIEL_013.json" download>13</a> &bull; <a href="EZEKIEL_014.json" download>14</a> &bull; <a href="EZEKIEL_015.json" download>15</a> &bull; <a href="EZEKIEL_016.json" download>16</a> &bull; <a href="EZEKIEL_017.json" download>17</a> &bull; <a href="EZEKIEL_018.json" download>18</a> &bull; <a href="EZEKIEL_019.json" download>19</a> &bull; <a href="EZEKIEL_020.json" download>20</a> &bull; <a href="EZEKIEL_021.json" download>21</a> &bull; <a href="EZEKIEL_022.json" download>22</a> &bull; <a href="EZEKIEL_023.json" download>23</a> &bull; <a href="EZEKIEL_024.json" download>24</a> &bull; <a href="EZEKIEL_025.json" download>25</a> &bull; <a href="EZEKIEL_026.json" download>26</a> &bull; <a href="EZEKIEL_027.json" download>27</a> &bull; <a href="EZEKIEL_028.json" download>28</a> &bull; <a href="EZEKIEL_029.json" download>29</a> &bull; <a href="EZEKIEL_030.json" download>30</a> &bull; <a href="EZEKIEL_031.json" download>31</a> &bull; <a href="EZEKIEL_032.json" download>32</a> &bull; <a href="EZEKIEL_033.json" download>33</a> &bull; <a href="EZEKIEL_034.json" download>34</a> &bull; <a href="EZEKIEL_035.json" download>35</a> &bull; <a href="EZEKIEL_036.json" download>36</a> &bull; <a href="EZEKIEL_037.json" download>37</a> &bull; <a href="EZEKIEL_038.json" download>38</a> &bull; <a href="EZEKIEL_039.json" download>39</a> &bull; <a href="EZEKIEL_040.json" download>40</a> &bull; <a href="EZEKIEL_041.json" download>41</a> &bull; <a href="EZEKIEL_042.json" download>42</a> &bull; <a href="EZEKIEL_043.json" download>43</a> &bull; <a href="EZEKIEL_044.json" download>44</a> &bull; <a href="EZEKIEL_045.json" download>45</a> &bull; <a href="EZEKIEL_046.json" download>46</a> &bull; <a href="EZEKIEL_047.json" download>47</a> &bull; <a href="EZEKIEL_048.json" download>48</a></li> 
 </ul> 
 <p><a href="../index.html">Back</a></p> 
-</body></html> 
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const links = document.querySelectorAll("a");
+    links.forEach(link => {
+        const fileTarget = link.getAttribute("href") || "";
+        const lowerTarget = fileTarget.toLowerCase();
+        if (!lowerTarget.endsWith(".mscz") && !lowerTarget.endsWith(".json") && !lowerTarget.endsWith(".xml")) {
+            return;
+        }
+        let cleanName = fileTarget
+            .split('/').pop()
+            .split('\\').pop()
+            .replace(/\.(mscz|json|xml)$/i, "")
+            .replace(/[-_]/g, " ")
+            .trim();
+        const colorClass = getGematriaMenuClass(cleanName);
+        if (colorClass) {
+            link.classList.add(colorClass);
+            link.style.display = "inline-block";
+            link.style.padding = "2px 6px";
+            link.style.margin = "2px 1px";
+            link.style.borderRadius = "4px";
+            link.style.textDecoration = "none";
+        }
+    });
+});
+function getGematriaMenuClass(text) {
+    if (!text) return '';
+    let score = 0;
+    for (let i = 0; i < text.length; i++) { score += text.charCodeAt(i); }
+    const bucket = score % 5;
+    if (bucket === 0) return 'gem-low';
+    if (bucket === 1) return 'gem-mid-low';
+    if (bucket === 2) return 'gem-mid';
+    if (bucket === 3) return 'gem-mid-high';
+    return 'gem-high';
+}
+</script>
+</body>
+</html> 

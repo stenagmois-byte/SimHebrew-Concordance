@@ -19,4 +19,45 @@
 <li><a href="1_KINGS_001.json" download>1 Kings 1</a> &bull; <a href="1_KINGS_002.json" download>2</a> &bull; <a href="1_KINGS_003.json" download>3</a> &bull; <a href="1_KINGS_004.json" download>4</a> &bull; <a href="1_KINGS_005.json" download>5</a> &bull; <a href="1_KINGS_006.json" download>6</a> &bull; <a href="1_KINGS_007.json" download>7</a> &bull; <a href="1_KINGS_008.json" download>8</a> &bull; <a href="1_KINGS_009.json" download>9</a> &bull; <a href="1_KINGS_010.json" download>10</a> &bull; <a href="1_KINGS_011.json" download>11</a> &bull; <a href="1_KINGS_012.json" download>12</a> &bull; <a href="1_KINGS_013.json" download>13</a> &bull; <a href="1_KINGS_014.json" download>14</a> &bull; <a href="1_KINGS_015.json" download>15</a> &bull; <a href="1_KINGS_016.json" download>16</a> &bull; <a href="1_KINGS_017.json" download>17</a> &bull; <a href="1_KINGS_018.json" download>18</a> &bull; <a href="1_KINGS_019.json" download>19</a> &bull; <a href="1_KINGS_020.json" download>20</a> &bull; <a href="1_KINGS_021.json" download>21</a> &bull; <a href="1_KINGS_022.json" download>22</a></li><li><a href="2_KINGS_001.json" download>2 Kings 1</a> &bull; <a href="2_KINGS_002.json" download>2</a> &bull; <a href="2_KINGS_003.json" download>3</a> &bull; <a href="2_KINGS_004.json" download>4</a> &bull; <a href="2_KINGS_005.json" download>5</a> &bull; <a href="2_KINGS_006.json" download>6</a> &bull; <a href="2_KINGS_007.json" download>7</a> &bull; <a href="2_KINGS_008.json" download>8</a> &bull; <a href="2_KINGS_009.json" download>9</a> &bull; <a href="2_KINGS_010.json" download>10</a> &bull; <a href="2_KINGS_011.json" download>11</a> &bull; <a href="2_KINGS_012.json" download>12</a> &bull; <a href="2_KINGS_013.json" download>13</a> &bull; <a href="2_KINGS_014.json" download>14</a> &bull; <a href="2_KINGS_015.json" download>15</a> &bull; <a href="2_KINGS_016.json" download>16</a> &bull; <a href="2_KINGS_017.json" download>17</a> &bull; <a href="2_KINGS_018.json" download>18</a> &bull; <a href="2_KINGS_019.json" download>19</a> &bull; <a href="2_KINGS_020.json" download>20</a> &bull; <a href="2_KINGS_021.json" download>21</a> &bull; <a href="2_KINGS_022.json" download>22</a> &bull; <a href="2_KINGS_023.json" download>23</a> &bull; <a href="2_KINGS_024.json" download>24</a> &bull; <a href="2_KINGS_025.json" download>25</a></li> 
 </ul> 
 <p><a href="../index.html">Back</a></p> 
-</body></html> 
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const links = document.querySelectorAll("a");
+    links.forEach(link => {
+        const fileTarget = link.getAttribute("href") || "";
+        const lowerTarget = fileTarget.toLowerCase();
+        if (!lowerTarget.endsWith(".mscz") && !lowerTarget.endsWith(".json") && !lowerTarget.endsWith(".xml")) {
+            return;
+        }
+        let cleanName = fileTarget
+            .split('/').pop()
+            .split('\\').pop()
+            .replace(/\.(mscz|json|xml)$/i, "")
+            .replace(/[-_]/g, " ")
+            .trim();
+        const colorClass = getGematriaMenuClass(cleanName);
+        if (colorClass) {
+            link.classList.add(colorClass);
+            link.style.display = "inline-block";
+            link.style.padding = "2px 6px";
+            link.style.margin = "2px 1px";
+            link.style.borderRadius = "4px";
+            link.style.textDecoration = "none";
+        }
+    });
+});
+function getGematriaMenuClass(text) {
+    if (!text) return '';
+    let score = 0;
+    for (let i = 0; i < text.length; i++) { score += text.charCodeAt(i); }
+    const bucket = score % 5;
+    if (bucket === 0) return 'gem-low';
+    if (bucket === 1) return 'gem-mid-low';
+    if (bucket === 2) return 'gem-mid';
+    if (bucket === 3) return 'gem-mid-high';
+    return 'gem-high';
+}
+</script>
+</body>
+</html> 

@@ -21,4 +21,44 @@
 <li><a href="read-me-2.html">Read me (AI)</a></li> 
 </ul> 
 <p><a href="../index.html">Back</a></p> 
-</body></html> 
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const links = document.querySelectorAll("a");
+    links.forEach(link => {
+        const fileTarget = link.getAttribute("href") || "";
+        const lowerTarget = fileTarget.toLowerCase();
+        if (!lowerTarget.endsWith(".mscz") && !lowerTarget.endsWith(".json") && !lowerTarget.endsWith(".xml")) {
+            return;
+        }
+        let cleanName = fileTarget
+            .split('/').pop()
+            .split('\\').pop()
+            .replace(/\.(mscz|json|xml)$/i, "")
+            .replace(/[-_]/g, " ")
+            .trim();
+        const colorClass = getGematriaMenuClass(cleanName);
+        if (colorClass) {
+            link.classList.add(colorClass);
+            link.style.display = "inline-block";
+            link.style.padding = "2px 6px";
+            link.style.margin = "2px 1px";
+            link.style.borderRadius = "4px";
+            link.style.textDecoration = "none";
+        }
+    });
+});
+function getGematriaMenuClass(text) {
+    if (!text) return '';
+    let score = 0;
+    for (let i = 0; i < text.length; i++) { score += text.charCodeAt(i); }
+    const bucket = score % 5;
+    if (bucket === 0) return 'gem-low';
+    if (bucket === 1) return 'gem-mid-low';
+    if (bucket === 2) return 'gem-mid';
+    if (bucket === 3) return 'gem-mid-high';
+    return 'gem-high';
+}
+</script>
+</body>
+</html> 

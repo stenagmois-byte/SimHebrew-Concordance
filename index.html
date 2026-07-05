@@ -72,6 +72,60 @@ Translation and music together are presented in the 18 volume series: The Music 
 <p>All volumes are complete in final print form. The process of publication is happening slowly. It is a large undertaking -- 6,600 pages. During this time, I am searching using this GitHub site and its Python scripts that search the music, for unique characteristics of the music presented in each book. If I find any, I will write them up either in the brief notes or on my SubStack, e.g. <a href="https://bobmacdonald1.substack.com/p/a-rare-verse-shape-in-hebrew-poetry">A Sample from Proverbs"</a>. The amazon site previews have several chapters you can browse. The Book of Job includes a 60-page appendix outlining the methodology and textual base for my work.</p>
 <p>Professor Susan Gillingham DD, 
 Emeritus Professor of the Hebrew Bible, Worcester College, Oxford, UK writes of the Psalms: <blockquote>Bob MacDonald offers us here a controversial but extensively considered answer, psalm by psalm, to the familiar question: ‘So what did the music of the ancient psalms sound like?’. This is a bold and engaging work. </blockquote></p>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. Grab all anchor links on your index page
+    const links = document.querySelectorAll("a");
+
+    links.forEach(link => {
+        // 2. Get the link text (e.g., "1 Chronicles 1" or " 2")
+        let linkText = link.textContent.trim();
+        
+        // If the link text is just a bare number (like " 2"), 
+        // we can grab the parent book title context to keep calculations accurate
+        if (!isNaN(linkText)) {
+            // Looks backward for the nearest full book name in the list element
+            const listText = link.closest('li')?.textContent || '';
+            const match = listText.match(/([0-9]?\s*[A-Za-z\s]+)\s*1/);
+            if (match) {
+                linkText = `${match[1]} ${linkText}`;
+            }
+        }
+
+        // 3. Compute a unique numeric hash based on the English/Hebrew string
+        const colorClass = getGematriaMenuClass(linkText);
+        
+        // 4. Apply the color pill styling directly to the link anchor
+        if (colorClass) {
+            link.classList.add(colorClass);
+            link.style.display = "inline-block";
+            link.style.padding = "2px 6px";
+            link.style.margin = "2px 1px";
+            link.style.borderRadius = "4px";
+            link.style.textDecoration = "none";
+        }
+    });
+});
+
+// A robust alphanumeric text mapping utility for the menu links
+function getGematriaMenuClass(text) {
+    if (!text) return '';
+    
+    // Sums the character codes to create a stable thematic color weight
+    let score = 0;
+    for (let i = 0; i < text.length; i++) {
+        score += text.charCodeAt(i);
+    }
+    
+    // Map the text footprint cleanly to your 5 core visual stylesheet states
+    const bucket = score % 5;
+    if (bucket === 0) return 'gem-low';
+    if (bucket === 1) return 'gem-mid-low';
+    if (bucket === 2) return 'gem-mid';
+    if (bucket === 3) return 'gem-mid-high';
+    return 'gem-high';
+}
+</script>
 
 </body>
 </html>
