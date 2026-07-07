@@ -121,7 +121,7 @@ def analyze_revia_mugrash(passage_df):
                 reciting_note = group['SYLL_NOTE'].iloc[idx]
                 syllable = group['LYRIC_SYLL'].iloc[idx]
                 print(f"🎭 Verse {ch}:{vs} contains a Revia-Mugrash on syllable '{syllable}'")
-                print(f"   Locked Reciting Pitch: {reciting_note} (Scale Degree: {POETIC_DICT.get(reciting_note, {}).get('degree', 'Unknown')})")
+                print(f"   Locked Reciting Pitch: {reciting_note} (Scale Degree: {POETIC_DICT.get(reciting_note, 'Unknown')})")
                 print(f"   Trajectory: Look at how this pitch functions as a specialized technical runway launching back to the tonic baseline.\n")
 
 # --------------------------------------------------------------------------------
@@ -161,19 +161,19 @@ def map_ornament_ideational_underscores(passage_df):
 # EXECUTION CONTROLLER: Run this block against your live export file
 # ================================================================================
 if __name__ == "__main__":
-    # 1. Load the massive master dataset
-    master_file = "complete_tanakh.json" 
+    # 1. Load the target dataset
+    master_file = "../The Psalms/PSALMS_078.json" 
     
     try:
         master_df = load_and_clean_data(master_file)
         
         # 2. Configure your precise evaluation coordinates using Routine 1
-        # Example: Let's extract exactly Psalm 29 from verse 1 to verse 11
+        # Example: 
         selected_passage = filter_passage(
             df=master_df, 
             book="PSALMS", 
-            ch_from=29, vs_from=1, 
-            ch_to=29, vs_to=11
+            ch_from=78, vs_from=1, 
+            ch_to=78, vs_to=72
         )
         
         print(f"\nSuccessfully loaded and isolated {len(selected_passage)} rows for analysis.")
@@ -181,7 +181,7 @@ if __name__ == "__main__":
         # 3. Fire up the independent evaluation engines on our slice
         detect_strophe_boundaries(selected_passage, genre="POETRY")
         trace_non_tonic_beginnings(selected_passage)
-        analyze_revia_mugrash(selected_passage)
+        # analyze_revia_mugrash(selected_passage)
         map_ornament_ideational_underscores(selected_passage)
         
     except FileNotFoundError:
