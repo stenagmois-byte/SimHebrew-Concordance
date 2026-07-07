@@ -1,0 +1,303 @@
+import os
+import json
+import html
+import pandas as pd
+
+# Define a distinct, vibrant color palette for each scale degree (Tonic E4 = 1)
+COLOR_PALETTE = {
+    "C4":  "#4A4A4A",  # Low Sixth (Dark Grey)
+    "D4":  "#FF851B",  # Sub-tonic / Springboard Vault (Coral)
+    "E4":  "#4A90E2",  # Tonic Baseline (Blue)
+    "F4":  "#F5A623",  # Prose Supertonic (Orange)
+    "F#4": "#D0021B",  # Poetic Supertonic / Sharp variant (Red)
+    "G4":  "#7ED321",  # Poetic Mediant / Recitation (Green)
+    "G#4": "#B8E986",  # Prose Mediant (Light Green)
+    "A4":  "#9B51E0",  # Subdominant / Caesura / Pivot (Purple)
+    "B4":  "#F8E71C",  # Dominant / Proclamation (Yellow)
+    "C5":  "#50E3C2",  # High Sixth / Appeal / Explosion (Teal)
+    "None": "#EEEEEE", # Empty / Spacer (Light Grey)
+    "UNKNOWN": "#FFFFFF"
+}
+
+def generate_html_matrix_payload(passage_df, book_id, chapter_id):
+    """
+    Processes the DataFrame and returns a string of HTML content.
+    """
+    # Defensive programming: Ensure chapter_id can be converted to integer safely
+    try:
+        clean_chapter_num = int(chapter_id)
+    except ValueError:
+        # Fallback if there is an unexpected alphanumeric string formatting
+        clean_chapter_num = chapter_id
+        
+    html_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{book_id} {clean_chapter_num} Music Shape</title>
+    <style>
+        body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #fdfdfd; color: #333; margin: 30px; }}
+        h1 {{ border-bottom: 2px solid #ccc; padding-bottom: 10px; }}
+        .legend {{ display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; background: #f5f5f5; padding: 15px; border-radius: 6px; }}
+        .legend-item {{ display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: bold; }}
+        .color-box {{ width: 20px; height: 20px; border-radius: 4px; border: 1px solid #999; }}
+        .matrix-table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
+        .verse-row {{ border-bottom: 1px solid #ddd; display: table-row; }}
+        .verse-label {{ width: 90px; font-weight: bold; font-size: 14px; padding: 12px 10px; background: #eaeaea; text-align: center; border-right: 2px solid #bbb; display: table-cell; vertical-align: middle; }}
+        .text-label {{ width: 240px; font-size: 13px; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; display: table-cell; vertical-align: middle; }}
+        .grid-cell {{ display: table-cell; vertical-align: middle; padding: 5px 10px; }}
+        .left-wing {{ display: flex; gap: 4px; justify-content: flex-end; min-width: 250px; border-right: 3px dashed #9B51E0; padding-right: 12px; }}
+        .right-wing {{ display: flex; gap: 4px; justify-content: flex-start; padding-left: 12px; align-items: center; width: auto; overflow: visible; }}
+        .pitch-cell {{ padding: 6px 10px; border-radius: 4px; color: #fff; font-weight: bold; font-size: 12px; text-shadow: 1px 1px 1px rgba(0,0,0,0.4); border: 1px solid rgba(0,0,0,0.1); text-align: center; min-width: 35px; flex-shrink: 0; }}
+        .pivot-marker {{ border: 2px solid #000; box-shadow: 0 0 5px rgba(155, 81, 224, 0.6); }}
+        .tuba-badge {{ background: #000; color: #fff; font-size: 10px; padding: 2px 5px; border-radius: 3px; margin-left: 20px; font-family: monospace; flex-shrink: 0; }}
+    </style>
+</head>
+<body>
+    <h1>🎼 SHV Aligned Melodic Matrix: {book_id} {clean_chapter_num}</h1>
+    <p><i>Rows are aligned directly after the main structural cadence. Vertical dashed line marks the hemistich divide.</i></p>
+    <h3>🎨 Color Mapping Legend (Tonic E4 = 1)</h3>
+    <div class="legend">
+    """
+    
+    for pitch, color in COLOR_PALETTE.items():
+        if pitch not in ["UNKNOWN", "None"]:
+            html_content += f'<div class="legend-item"><div class="color-box" style="background:{color};"></div><span>{pitch}</span></div>'
+    
+    html_content += """</div><table class="matrix-table">"""
+    
+    for (ch, vs), group in passage_df.groupby(['CHAPTER_CD', 'VERSE_CD'], sort=False):
+        group = group.reset_index(drop=True)
+        if group.empty: continue
+        
+        valid_rows = group[group['SYLL_NOTE'].astype(str).str.strip().isin(['None', '', 'nan']) == False].reset_index(drop=True)
+        if valid_rows.empty: continue
+        
+        raw_notes = valid_rows['SYLL_NOTE'].astype(str).str.strip().tolist()
+        syllables = valid_rows['LYRIC_SYLL'].astype(str).str.strip().tolist()
+        ornaments_raw = valid_rows['ORNAMENT_NAME'].astype(str).str.lower().str.strip().tolist()
+        
+        has_global_atnah = "A4" in raw_notes
+        has_global_ole = any("ole" in str(orn) for orn in ornaments_raw)
+        
+        pause_raw_idx = -1
+        pivot_pitch = None
+        
+        if has_global_atnah:
+            pivot_pitch = "A4"
+            first_target_idx = raw_notes.index("A4")
+            pause_raw_idx = first_target_idx
+            for idx in range(first_target_idx, len(syllables)):
+                pause_raw_idx = idx
+                if not syllables[idx].endswith('-'):
+                    break
+                    
+        elif has_global_ole and "F#4" in raw_notes:
+            ole_marker_idx = -1
+            for idx in range(len(ornaments_raw)):
+                if "ole" in ornaments_raw[idx]:
+                    ole_marker_idx = idx
+                    break
+            
+            target_fsharp_idx = -1
+            if ole_marker_idx != -1:
+                for idx in range(ole_marker_idx, len(raw_notes)):
+                    if raw_notes[idx] == "F#4":
+                        target_fsharp_idx = idx
+                        break
+            
+            if target_fsharp_idx != -1:
+                pivot_pitch = "F#4"
+                pause_raw_idx = target_fsharp_idx
+                for idx in range(target_fsharp_idx, len(syllables)):
+                    pause_raw_idx = idx
+                    if not syllables[idx].endswith('-'):
+                        break
+        
+        left_raw, right_raw, left_ornaments, right_ornaments = [], [], [], []
+        if pause_raw_idx != -1:
+            left_raw = raw_notes[:pause_raw_idx + 1]
+            right_raw = raw_notes[pause_raw_idx + 1:]
+            left_ornaments = ornaments_raw[:pause_raw_idx + 1]
+            right_ornaments = ornaments_raw[pause_raw_idx + 1:]
+        else:
+            left_raw = []
+            right_raw = raw_notes
+            left_ornaments = []
+            right_ornaments = ornaments_raw
+            
+        left_notes, left_has_ole, left_has_zaqef = [], [], []
+        for i, note in enumerate(left_raw):
+            orn_clean = str(left_ornaments[i]).lower().strip()
+            is_zaqef = 'zaq' in orn_clean or 'qat' in orn_clean
+            is_ole = 'ole' in orn_clean if not has_global_atnah else False
+            
+            if not left_notes or left_notes[-1] != note:
+                left_notes.append(note)
+                left_has_ole.append(is_ole)
+                left_has_zaqef.append(is_zaqef)
+            else:
+                if is_ole: left_has_ole[-1] = True
+                if is_zaqef: left_has_zaqef[-1] = True
+                
+        right_notes, right_has_zaqef = [], []
+        for i, note in enumerate(right_raw):
+            orn_clean_right = str(right_ornaments[i]).lower().strip()
+            is_right_zaqef = 'zaq' in orn_clean_right or 'qat' in orn_clean_right
+            
+            if not right_notes or right_notes[-1] != note:
+                right_notes.append(note)
+                right_has_zaqef.append(is_right_zaqef)
+            else:
+                if is_right_zaqef: right_has_zaqef[-1] = True
+
+        tuba_pitch = None
+        for idx in range(len(ornaments_raw)):
+            if ornaments_raw[idx] == 'geresh':
+                lookahead_limit = min(idx + 4, len(ornaments_raw))
+                for next_idx in range(idx + 1, lookahead_limit):
+                    if ornaments_raw[next_idx] == 'revia':
+                        tuba_pitch = raw_notes[next_idx]
+                        break
+                if tuba_pitch: break
+        
+        heb = ""
+        if 'HEB_TEXT' in group.columns:
+            valid_heb = group['HEB_TEXT'].dropna()
+            if not valid_heb.empty:
+                heb = html.unescape(str(valid_heb.iloc[0])).replace('\n', ' ').strip()
+                heb = (heb[:35] + '...') if len(heb) > 35 else heb
+
+        tuba_str = f'<span class="tuba-badge">📯 TUBA ({tuba_pitch})</span>' if tuba_pitch else ''
+        
+        html_content += f"""
+        <tr class="verse-row">
+            <td class="verse-label">Verse {vs}</td>
+            <td class="text-label" title="{heb}">{heb}</td>
+            <td class="grid-cell">
+                <div class="left-wing">
+        """
+        
+        if not left_notes:
+            html_content += '<div class="pitch-cell" style="background: transparent; border: none; color: transparent; visibility: hidden;">&nbsp;</div>'
+        else:
+            for i, pitch in enumerate(left_notes):
+                bg_color = COLOR_PALETTE.get(pitch, "#FFFFFF")
+                text_color = "#333" if pitch in ["B4", "G#4"] else "#fff"
+                is_edge = " pivot-marker" if i == len(left_notes) - 1 and pitch == pivot_pitch else ""
+                ole_symbol = "<sup>&lt;</sup>" if left_has_ole[i] else ""
+                zaqef_symbol = "<sup>:</sup>" if left_has_zaqef[i] else ""
+                html_content += f'<div class="pitch-cell{is_edge}" style="background:{bg_color}; color:{text_color};">{pitch}{ole_symbol}{zaqef_symbol}</div>'
+            
+        html_content += """</div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing">"""
+        
+        for i, pitch in enumerate(right_notes):
+            bg_color = COLOR_PALETTE.get(pitch, "#FFFFFF")
+            text_color = "#333" if pitch in ["B4", "G#4"] else "#fff"
+            zaqef_symbol = "<sup>:</sup>" if right_has_zaqef[i] else ""
+            html_content += f'<div class="pitch-cell" style="background:{bg_color}; color:{text_color};">{pitch}{zaqef_symbol}</div>'
+            
+        html_content += f"""{tuba_str}</div></td></tr>"""
+        
+    html_content += """</table></body></html>"""
+    return html_content
+
+
+if __name__ == "__main__":
+    ROOT_DIR = ".." 
+    
+    print(f"🚀 STARTING SYSTEM-WIDE MASS PRODUCTION GRID COMPILER")
+    print(f"Scanning from root base: {os.path.abspath(ROOT_DIR)}\n")
+    
+    success_count = 0
+    error_count = 0
+    
+    for current_dir, subfolders, files in os.walk(ROOT_DIR):
+        if "analysis_scripts" in current_dir or "Test-Scripts" in current_dir:
+            continue
+            
+        for file in files:
+            if file.upper().endswith(".JSON"):
+                json_path = os.path.join(current_dir, file)
+                
+                base_name, _ = os.path.splitext(file)
+                name_parts = base_name.split("_")
+                
+                # --- MUSICOLOGICAL STRING RE-ENGINEERING ---
+                # Safe allocation for numerical prefix books like 1_CHRONICLES or 2_SAMUEL
+                if len(name_parts) >= 2:
+                    chapter_id = name_parts[-1]       # Always pluck the absolute last element as the chapter
+                    book_id = "_".join(name_parts[:-1]) # Join all preceding fragments as the book identity
+                else:
+                    book_id = base_name
+                    chapter_id = "001"
+                
+                output_html_name = f"{base_name}_matrix.html"
+                output_html_path = os.path.join(current_dir, output_html_name)
+                
+                try:
+                    with open(json_path, "r", encoding="utf-8") as f:
+                        raw_data = json.load(f)
+                    
+                    # --- HARDEED PAYLOAD LOCATOR ENGINE ---
+                    items_list = None
+                    
+                    # Strategy A: Broad recursive-style fallback scanning
+                    if isinstance(raw_data, dict):
+                        if "items" in raw_data:
+                            items_list = raw_data["items"]
+                        elif "results" in raw_data:
+                            if isinstance(raw_data["results"], dict) and "items" in raw_data["results"]:
+                                items_list = raw_data["results"]["items"]
+                            elif isinstance(raw_data["results"], list) and len(raw_data["results"]) > 0:
+                                if isinstance(raw_data["results"][0], dict) and "items" in raw_data["results"][0]:
+                                    items_list = raw_data["results"][0]["items"]
+                                    
+                    elif isinstance(raw_data, list) and len(raw_data) > 0:
+                        # Strategy B: If Oracle wrapped the root object in an outer array wrapper
+                        first_item = raw_data[0]
+                        if isinstance(first_item, dict):
+                            if "items" in first_item:
+                                items_list = first_item["items"]
+                            elif "results" in first_item:
+                                if isinstance(first_item["results"], dict) and "items" in first_item["results"]:
+                                    items_list = first_item["results"]["items"]
+                                elif isinstance(first_item["results"], list) and len(first_item["results"]) > 0:
+                                    if "items" in first_item["results"][0]:
+                                        items_list = first_item["results"][0]["items"]
+
+                    # Strategy C: Absolute emergency fallback for key-flattened arrays
+                    if items_list is None and isinstance(raw_data, dict):
+                        for value in raw_data.values():
+                            if isinstance(value, dict) and "items" in value:
+                                items_list = value["items"]
+                                break
+                    
+                    if items_list is None:
+                        # Log the filename clearly so you can identify rogue non-concordance configurations
+                        print(f"⚠️  Skipping non-matrix file: {file}")
+                        continue
+                        
+                    # Create Pandas Dataframe and execute matrix building engine
+                    df = pd.DataFrame(items_list)
+                    df.columns = df.columns.str.upper()
+                    
+                    # Generate the page layout content via backend matrix engine
+                    page_html = generate_html_matrix_payload(df, book_id, chapter_id)
+                    
+                    # Save HTML file directly into the same subdirectory as the JSON source
+                    with open(output_html_path, "w", encoding="utf-8") as out_f:
+                        out_f.write(page_html)
+                        
+                    print(f"✅ Compiled: {os.path.basename(current_dir)} -> {output_html_name}")
+                    success_count += 1
+                    
+                except Exception as e:
+                    print(f"❌ Error processing file {file}: {str(e)}")
+                    error_count += 1
+
+    print(f"\n=======================================================")
+    print(f"🏭 MASS PRODUCTION BUILD COMPLETE")
+    print(f"   Successfully compiled: {success_count} HTML Matrices")
+    print(f"   Errors encountered:    {error_count}")
+    print(f"=======================================================")

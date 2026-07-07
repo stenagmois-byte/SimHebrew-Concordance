@@ -22,14 +22,18 @@ COLOR_PALETTE = {
 def generate_html_matrix(passage_df, book_id, chapter_id, output_html="matrix_visualization.html"):
     """
     Generates an HTML matrix that splits and aligns rows right AFTER the 
-    subdominant (A4). If recitation continues on A4 after the caesura, it is repeated.
+    subdominant (A4). Strips leading zeros from the chapter ID for a clean title display.
     """
+    # Convert chapter_id to an integer to cleanly strip high-order zeros (e.g., "001" -> 1)
+    clean_chapter_num = int(chapter_id)
+    
     html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SHV Post-A4 Aligned Matrix: {book_id} {chapter_id}</title>
+    <title>{book_id} {clean_chapter_num} Music Shape</title>
     <style>
+
         body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #fdfdfd; color: #333; margin: 30px; }}
         h1 {{ border-bottom: 2px solid #ccc; padding-bottom: 10px; }}
         .legend {{ display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; background: #f5f5f5; padding: 15px; border-radius: 6px; }}
@@ -54,7 +58,7 @@ def generate_html_matrix(passage_df, book_id, chapter_id, output_html="matrix_vi
     </style>
 </head>
 <body>
-    <h1>🎼 SHV Aligned Melodic Matrix: {book_id} (Chapter {chapter_id})</h1>
+    <h1>🎼 SHV Aligned Melodic Matrix: {book_id} (Chapter {clean_chapter_num})</h1>
     <p><i>Rows are structurally aligned directly to the right of the first Subdominant (A4) phrase boundary. The vertical dashed line marks the hemistich divide.</i></p>
     
     <h3>🎨 Color Mapping Legend (Tonic E4 = 1)</h3>
@@ -91,7 +95,6 @@ def generate_html_matrix(passage_df, book_id, chapter_id, output_html="matrix_vi
         
         # 2. MATCH AND CALCULATE PRECISE CADENCE PIVOT BOUNDARIES
         if has_global_atnah:
-            # Strategy A: Atnah always takes absolute main cadence priority
             pivot_pitch = "A4"
             first_target_idx = raw_notes.index("A4")
             pause_raw_idx = first_target_idx
@@ -101,15 +104,12 @@ def generate_html_matrix(passage_df, book_id, chapter_id, output_html="matrix_vi
                     break
                     
         elif has_global_ole and "F#4" in raw_notes:
-            # --- START OF NEW OLE-LOGIC ---
-            # Find the exact index where the 'ole' preparation tag occurs
             ole_marker_idx = -1
             for idx in range(len(ornaments_raw)):
                 if "ole" in ornaments_raw[idx]:
                     ole_marker_idx = idx
                     break
             
-            # Look forward from the 'ole' marker to find its corresponding F#4 cadence resolution
             target_fsharp_idx = -1
             if ole_marker_idx != -1:
                 for idx in range(ole_marker_idx, len(raw_notes)):
@@ -117,7 +117,6 @@ def generate_html_matrix(passage_df, book_id, chapter_id, output_html="matrix_vi
                         target_fsharp_idx = idx
                         break
             
-            # If a valid post-ole F#4 resolution is found, execute the word-boundary lookahead split
             if target_fsharp_idx != -1:
                 pivot_pitch = "F#4"
                 pause_raw_idx = target_fsharp_idx
@@ -125,49 +124,62 @@ def generate_html_matrix(passage_df, book_id, chapter_id, output_html="matrix_vi
                     pause_raw_idx = idx
                     if not syllables[idx].endswith('-'):
                         break
-            else:
-                pause_raw_idx = -1
-            # --- END OF NEW OLE-LOGIC ---
         
-        # 3. PARTITION MATRIX CONTAINERS
+        # 3. PARTITION MATRIX CONTAINERS (Unchanged from prior structural build)
         left_raw = []
         right_raw = []
         left_ornaments = []
         right_ornaments = []
         
         if pause_raw_idx != -1:
-            # Valid cadence split point locked down
             left_raw = raw_notes[:pause_raw_idx + 1]
             right_raw = raw_notes[pause_raw_idx + 1:]
             left_ornaments = ornaments_raw[:pause_raw_idx + 1]
             right_ornaments = ornaments_raw[pause_raw_idx + 1:]
         else:
-            # Coda Closure Rule: No Atnah or valid Ole tags found -> Whole line goes Right!
             left_raw = []
             right_raw = raw_notes
             left_ornaments = []
             right_ornaments = ornaments_raw
             
-        # 4. COLLAPSE DUPLICATES INDEPENDENTLY
+        # 4. GENRE-SPECIFIC ORNAMENT COMPRESSION (HARDENED STRING SCANNER)
         left_notes = []
         left_has_ole = []
+        left_has_zaqef = []
+        
         for i, note in enumerate(left_raw):
+            # Clean and normalize the ornament string to catch formatting variations
+            orn_clean = str(left_ornaments[i]).lower().strip()
+            
+            # Catch 'zaqef', 'qaton', 'zaq', or 'qat' anywhere in the tag
+            is_zaqef = 'zaq' in orn_clean or 'qat' in orn_clean
+            is_ole = 'ole' in orn_clean if not has_global_atnah else False
+            
             if not left_notes or left_notes[-1] != note:
+                # Fresh pitch block initialization
                 left_notes.append(note)
-                left_has_ole.append('ole' in left_ornaments[i])
+                left_has_ole.append(is_ole)
+                left_has_zaqef.append(is_zaqef)
             else:
-                if 'ole' in left_ornaments[i]:
+                # Continuation syllable scan
+                if is_ole:
                     left_has_ole[-1] = True
+                if is_zaqef:
+                    left_has_zaqef[-1] = True
                 
         right_notes = []
-        right_has_ole = []
+        right_has_zaqef = []
+        
         for i, note in enumerate(right_raw):
+            orn_clean_right = str(right_ornaments[i]).lower().strip()
+            is_right_zaqef = 'zaq' in orn_clean_right or 'qat' in orn_clean_right
+            
             if not right_notes or right_notes[-1] != note:
                 right_notes.append(note)
-                right_has_ole.append('ole' in right_ornaments[i])
+                right_has_zaqef.append(is_right_zaqef)
             else:
-                if 'ole' in right_ornaments[i]:
-                    right_has_ole[-1] = True
+                if is_right_zaqef:
+                    right_has_zaqef[-1] = True
 
         # 5. Check for Tuba (Geresh lookahead sequence)
         ornaments = group['ORNAMENT_NAME'].astype(str).str.lower().str.strip().tolist()
@@ -214,8 +226,13 @@ def generate_html_matrix(passage_df, book_id, chapter_id, output_html="matrix_vi
                 bg_color = COLOR_PALETTE.get(pitch, "#FFFFFF")
                 text_color = "#333" if pitch in ["B4", "G#4"] else "#fff"
                 is_edge = " pivot-marker" if i == len(left_notes) - 1 and pitch == pivot_pitch else ""
+                
+                # --- ADD THESE TWO LINES BACK IN ---
                 ole_symbol = "<sup>&lt;</sup>" if left_has_ole[i] else ""
-                html_content += f'<div class="pitch-cell{is_edge}" style="background:{bg_color}; color:{text_color};">{pitch}{ole_symbol}</div>'
+                zaqef_symbol = "<sup>:</sup>" if left_has_zaqef[i] else ""
+                
+                # --- UPDATE THIS STRING TO INCLUDE {zaqef_symbol} ---
+                html_content += f'<div class="pitch-cell{is_edge}" style="background:{bg_color}; color:{text_color};">{pitch}{ole_symbol}{zaqef_symbol}</div>'
             
         html_content += """
                 </div>
@@ -224,13 +241,16 @@ def generate_html_matrix(passage_df, book_id, chapter_id, output_html="matrix_vi
                 <div class="right-wing">
         """
         
-        # Draw Right Wing cells
+        # Draw Right Wing cells safely
         for i, pitch in enumerate(right_notes):
             bg_color = COLOR_PALETTE.get(pitch, "#FFFFFF")
             text_color = "#333" if pitch in ["B4", "G#4"] else "#fff"
-            ole_symbol = "<sup>&lt;</sup>" if right_has_ole[i] else ""
-            html_content += f'<div class="pitch-cell" style="background:{bg_color}; color:{text_color};">{pitch}{ole_symbol}</div>'
             
+            # Right wing only renders prose zaqef-qaton markers; ole is omitted entirely
+            zaqef_symbol = "<sup>:</sup>" if right_has_zaqef[i] else ""
+            
+            html_content += f'<div class="pitch-cell" style="background:{bg_color}; color:{text_color};">{pitch}{zaqef_symbol}</div>'
+           
         html_content += f"""
                     {tuba_str}
                 </div>
@@ -250,8 +270,8 @@ def generate_html_matrix(passage_df, book_id, chapter_id, output_html="matrix_vi
 
 if __name__ == "__main__":
     # --- VARIABLE INPUT SECTION ---
-    TARGET_BOOK = "PSALMS"        # Change to "PSALMS", "GENESIS", "PROVERBS", etc.
-    TARGET_CHAPTER = "096"         # Always ensure 3 digits ("001", "015", "136")
+    TARGET_BOOK = "ISAIAH"        # Change to "PSALMS", "GENESIS", "PROVERBS", etc.
+    TARGET_CHAPTER = "039"         # Always ensure 3 digits ("001", "015", "136")
     
     # 1. Standardise the filename based on your export pattern (BOOK_CHAP.json)
     file_name = f"{TARGET_BOOK}_{TARGET_CHAPTER.zfill(3)}.json"
