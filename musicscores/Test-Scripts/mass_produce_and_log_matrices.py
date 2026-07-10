@@ -20,25 +20,44 @@ COLOR_PALETTE = {
     "UNKNOWN": "#FFFFFF"
 }
 
-def generate_html_matrix_payload(passage_df, book_id, chapter_id):
+def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
     """
-    Processes the DataFrame and returns a string of HTML content.
+    Processes the DataFrame and returns a string of HTML content with dynamic navigation.
     """
-    # Defensive programming: Ensure chapter_id can be converted to integer safely
     try:
-        clean_chapter_num = int(chapter_id)
+        current_ch = int(chapter_id)
     except ValueError:
-        # Fallback if there is an unexpected alphanumeric string formatting
-        clean_chapter_num = chapter_id
+        current_ch = 1
         
+    # Calculate previous and next filenames matching your naming convention
+    prev_ch_str = f"{current_ch - 1:03d}"
+    next_ch_str = f"{current_ch + 1:03d}"
+    
+    prev_file = f"{book_id}_{prev_ch_str}_matrix.html"
+    next_file = f"{book_id}_{next_ch_str}_matrix.html"
+    
+    # HTML Button Assembly (Now including the Index Home Link)
+    prev_button = f'<a href="{prev_file}" class="nav-btn">◀ Prev</a>' if current_ch > 1 else '<span class="nav-btn disabled">◀ Prev</span>'
+    home_button = '<a href="../index.html" class="nav-btn home-btn">📁 Index</a>'
+    next_button = f'<a href="{next_file}" class="nav-btn">Next ▶</a>' if current_ch < max_chapter else '<span class="nav-btn disabled">Next ▶</span>'
+
     html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{book_id} {clean_chapter_num} Music Shape</title>
+    <title>{book_id} {current_ch:03d} Music Shape</title>
     <style>
-        body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #fdfdfd; color: #333; margin: 30px; }}
-        h1 {{ border-bottom: 2px solid #ccc; padding-bottom: 10px; }}
+        body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #fdfdfd; color: #333; margin: 30px; padding-top: 50px; }}
+        
+        /* Sticky Top Navigation Bar Styles */
+        .nav-bar {{ position: fixed; top: 0; left: 0; width: 100%; background: #ffffff; border-bottom: 2px solid #eaeaea; display: flex; justify-content: space-between; align-items: center; padding: 10px 30px; box-sizing: border-box; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }}
+        .nav-title {{ font-weight: bold; font-size: 16px; color: #4A4A4A; }}
+        .nav-cluster {{ display: flex; gap: 15px; }}
+        .nav-btn {{ display: inline-block; padding: 6px 14px; background: #4A90E2; color: white; text-decoration: none; border-radius: 4px; font-size: 13px; font-weight: bold; transition: background 0.2s; }}
+        .nav-btn:hover {{ background: #357ABD; }}
+        .nav-btn.disabled {{ background: #dddddd; color: #888888; cursor: not-allowed; pointer-events: none; }}
+        
+        h1 {{ border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-top: 20px; }}
         .legend {{ display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; background: #f5f5f5; padding: 15px; border-radius: 6px; }}
         .legend-item {{ display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: bold; }}
         .color-box {{ width: 20px; height: 20px; border-radius: 4px; border: 1px solid #999; }}
@@ -52,11 +71,22 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id):
         .pitch-cell {{ padding: 6px 10px; border-radius: 4px; color: #fff; font-weight: bold; font-size: 12px; text-shadow: 1px 1px 1px rgba(0,0,0,0.4); border: 1px solid rgba(0,0,0,0.1); text-align: center; min-width: 35px; flex-shrink: 0; }}
         .pivot-marker {{ border: 2px solid #000; box-shadow: 0 0 5px rgba(155, 81, 224, 0.6); }}
         .tuba-badge {{ background: #000; color: #fff; font-size: 10px; padding: 2px 5px; border-radius: 3px; margin-left: 20px; font-family: monospace; flex-shrink: 0; }}
-    </style>
+        .nav-btn.home-btn {{ background: #4A4A4A; }}
+        .nav-btn.home-btn:hover {{ background: #333333; }}    </style>
 </head>
 <body>
-    <h1>🎼 SHV Deciphering Key Melody: {book_id} {clean_chapter_num}</h1>
-    <p><i>Rows are aligned directly after the main structural cadence. Vertical dashed line marks the hemistich divide.</i></p>
+    <!-- Sticky Header Navigation -->
+    <div class="nav-bar">
+        <div class="nav-title">📖 {book_id.replace('_', ' ')} — Chapter {current_ch}</div>
+        <div class="nav-cluster">
+            {prev_button}
+            {home_button}
+            {next_button}
+        </div>
+    </div>
+
+    <h1>🎼 SHV Aligned Melodic Matrix: {book_id} {current_ch}</h1>
+    <p><i>Rows are aligned directly after the main structural cadence.</i></p>
     <h3>🎨 Color Mapping Legend (Tonic E4)</h3>
     <div class="legend">
     """
@@ -109,8 +139,7 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id):
         has_global_atnah = "A4" in raw_notes
         has_global_ole = any("ole" in str(orn) for orn in ornaments_raw)
         
-        if any("F#4" in str(n).lower() for n in raw_notes):
-            poetic_fsharp4_total += 1
+        left_raw, right_raw, left_ornaments, right_ornaments = [], [], [], []
         
         pause_raw_idx = -1
         pivot_pitch = None
@@ -146,7 +175,6 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id):
                     if not syllables[idx].endswith('-'):
                         break
         
-        left_raw, right_raw, left_ornaments, right_ornaments = [], [], [], []
         if pause_raw_idx != -1:
             left_raw = raw_notes[:pause_raw_idx + 1]
             right_raw = raw_notes[pause_raw_idx + 1:]
@@ -158,6 +186,9 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id):
             left_ornaments = []
             right_ornaments = ornaments_raw
             
+        #if "F#4" in left_raw or "F#4" in right_raw:
+            #poetic_fsharp4_total += 1
+
         left_notes, left_has_ole, left_has_zaqef = [], [], []
         left_has_zarqa, left_has_revia, left_has_telisha, left_has_pazer = [], [], [], []
         
@@ -305,10 +336,28 @@ if __name__ == "__main__":
     master_sequence_log = []  # Caches structural records across all 929 chapters
     
     STOP_AFTER_FIRST_FILE = False  # Toggle to False when ready for mass production
+            
+    # --- DYNAMIC CHAPTER MAPPER ---
+    # Tracks the highest chapter number found for each book in the directory
+    book_max_chapters = {}
+    
     for current_dir, subfolders, files in os.walk(ROOT_DIR):
         if "analysis_scripts" in current_dir or "Test-Scripts" in current_dir:
             continue
-            
+        for file in files:
+            if file.upper().endswith(".JSON"):
+                base_name, _ = os.path.splitext(file)
+                name_parts = base_name.split("_")
+                if len(name_parts) >= 2:
+                    try:
+                        ch_num = int(name_parts[-1])
+                        b_id = "_".join(name_parts[:-1])
+                        # Keep track of the highest integer chapter seen for this book
+                        if b_id not in book_max_chapters or ch_num > book_max_chapters[b_id]:
+                            book_max_chapters[b_id] = ch_num
+                    except ValueError:
+                        pass
+
         # Flag to signal the outer directory loop to stop
         break_outer_loop = False
         for file in files:
@@ -377,8 +426,11 @@ if __name__ == "__main__":
                     df = pd.DataFrame(items_list)
                     df.columns = df.columns.str.upper()
                     
+                    # Determine the maximum chapter for this book (default to 150 if not found)
+                    max_chapter = book_max_chapters.get(book_id, 150)
+
                     # Generate the page layout content via backend matrix engine
-                    page_html = generate_html_matrix_payload(df, book_id, chapter_id)
+                    page_html = generate_html_matrix_payload(df, book_id, chapter_id, max_chapter)
                     
                     # Loop through the parsed verses in the active dataframe to steal the compiled vectors
                     for (ch, vs), group in df.groupby(['CHAPTER_CD', 'VERSE_CD'], sort=False):
