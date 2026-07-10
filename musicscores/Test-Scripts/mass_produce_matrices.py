@@ -2,6 +2,7 @@ import os
 import json
 import html
 import pandas as pd
+from collections import Counter
 
 # Define a distinct, vibrant color palette for each scale degree (Tonic E4 = 1)
 COLOR_PALETTE = {
@@ -127,29 +128,56 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id):
             right_ornaments = ornaments_raw
             
         left_notes, left_has_ole, left_has_zaqef = [], [], []
+        left_has_zarqa, left_has_revia, left_has_telisha, left_has_pazer = [], [], [], []
+        
         for i, note in enumerate(left_raw):
             orn_clean = str(left_ornaments[i]).lower().strip()
             is_zaqef = 'zaq' in orn_clean or 'qat' in orn_clean
             is_ole = 'ole' in orn_clean if not has_global_atnah else False
+            is_zarqa = 'zar' in orn_clean or 'tsi' in orn_clean
+            is_revia = 'rev' in orn_clean
+            is_telisha = 'tel' in orn_clean
+            is_pazer = 'paz' in orn_clean
             
             if not left_notes or left_notes[-1] != note:
                 left_notes.append(note)
                 left_has_ole.append(is_ole)
                 left_has_zaqef.append(is_zaqef)
+                left_has_zarqa.append(is_zarqa)
+                left_has_revia.append(is_revia)
+                left_has_telisha.append(is_telisha)
+                left_has_pazer.append(is_pazer)
             else:
                 if is_ole: left_has_ole[-1] = True
                 if is_zaqef: left_has_zaqef[-1] = True
-                
+                if is_zarqa: left_has_zarqa[-1] = True
+                if is_revia: left_has_revia[-1] = True
+                if is_telisha: left_has_telisha[-1] = True
+                if is_pazer: left_has_pazer[-1] = True
         right_notes, right_has_zaqef = [], []
+        right_has_zarqa, right_has_revia, right_has_telisha, right_has_pazer = [], [], [], []
+        
         for i, note in enumerate(right_raw):
             orn_clean_right = str(right_ornaments[i]).lower().strip()
             is_right_zaqef = 'zaq' in orn_clean_right or 'qat' in orn_clean_right
+            is_right_zarqa = 'zar' in orn_clean_right or 'tsi' in orn_clean_right
+            is_right_revia = 'rev' in orn_clean_right
+            is_right_telisha = 'tel' in orn_clean_right
+            is_right_pazer = 'paz' in orn_clean_right
             
             if not right_notes or right_notes[-1] != note:
                 right_notes.append(note)
                 right_has_zaqef.append(is_right_zaqef)
+                right_has_zarqa.append(is_right_zarqa)
+                right_has_revia.append(is_right_revia)
+                right_has_telisha.append(is_right_telisha)
+                right_has_pazer.append(is_right_pazer)
             else:
                 if is_right_zaqef: right_has_zaqef[-1] = True
+                if is_right_zarqa: right_has_zarqa[-1] = True
+                if is_right_revia: right_has_revia[-1] = True
+                if is_right_telisha: right_has_telisha[-1] = True
+                if is_right_pazer: right_has_pazer[-1] = True
 
         tuba_pitch = None
         for idx in range(len(ornaments_raw)):
@@ -185,18 +213,29 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id):
                 bg_color = COLOR_PALETTE.get(pitch, "#FFFFFF")
                 text_color = "#333" if pitch in ["B4", "G#4"] else "#fff"
                 is_edge = " pivot-marker" if i == len(left_notes) - 1 and pitch == pivot_pitch else ""
+                
                 ole_symbol = "<sup>&lt;</sup>" if left_has_ole[i] else ""
                 zaqef_symbol = "<sup>:</sup>" if left_has_zaqef[i] else ""
-                html_content += f'<div class="pitch-cell{is_edge}" style="background:{bg_color}; color:{text_color};">{pitch}{ole_symbol}{zaqef_symbol}</div>'
+                zarqa_symbol = "<sup>&#x223E;</sup>" if left_has_zarqa[i] else ""
+                revia_symbol = "<sup>&#x25C6;</sup>" if left_has_revia[i] else ""
+                telisha_symbol = "<sup>&#x26B2;</sup>" if left_has_telisha[i] else ""
+                pazer_symbol = "<sup>~</sup>" if left_has_pazer[i] else ""
+                
+                html_content += f'<div class="pitch-cell{is_edge}" style="background:{bg_color}; color:{text_color};">{pitch}{ole_symbol}{zaqef_symbol}{zarqa_symbol}{revia_symbol}{telisha_symbol}{pazer_symbol}</div>'
             
         html_content += """</div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing">"""
         
         for i, pitch in enumerate(right_notes):
             bg_color = COLOR_PALETTE.get(pitch, "#FFFFFF")
             text_color = "#333" if pitch in ["B4", "G#4"] else "#fff"
+            is_edge = "" 
             zaqef_symbol = "<sup>:</sup>" if right_has_zaqef[i] else ""
-            html_content += f'<div class="pitch-cell" style="background:{bg_color}; color:{text_color};">{pitch}{zaqef_symbol}</div>'
-            
+            zarqa_symbol = "<sup>&#x223E;</sup>" if right_has_zarqa[i] else ""
+            revia_symbol = "<sup>&#x25C6;</sup>" if right_has_revia[i] else ""
+            telisha_symbol = "<sup>&#x26B2;</sup>" if right_has_telisha[i] else ""
+            pazer_symbol = "<sup>~</sup>" if right_has_pazer[i] else ""
+            html_content += f'<div class="pitch-cell{is_edge}" style="background:{bg_color}; color:{text_color};">{pitch}{zaqef_symbol}{revia_symbol}{telisha_symbol}{pazer_symbol}</div>'
+           
         html_content += f"""{tuba_str}</div></td></tr>"""
         
     html_content += """</table></body></html>"""
@@ -212,9 +251,11 @@ if __name__ == "__main__":
     success_count = 0
     error_count = 0
     
+    STOP_AFTER_FIRST_FILE = True  # Toggle to False when ready for mass production
     for current_dir, subfolders, files in os.walk(ROOT_DIR):
         if "analysis_scripts" in current_dir or "Test-Scripts" in current_dir:
             continue
+        break_outer_loop = False
             
         for file in files:
             if file.upper().endswith(".JSON"):
@@ -295,6 +336,15 @@ if __name__ == "__main__":
                 except Exception as e:
                     print(f"❌ Error processing file {file}: {str(e)}")
                     error_count += 1
+                if STOP_AFTER_FIRST_FILE and success_count >= 1:
+                    print("\n🛑 Test Mode Active: Halting processing after the first successful file.")
+                    break_outer_loop = True
+                    break  # This breaks the inner 'files' loop
+                    
+        # Check if the inner loop signaled an exit to break the outer directory crawler
+        if break_outer_loop:
+            break                    
+
 
     print(f"\n=======================================================")
     print(f"🏭 MASS PRODUCTION BUILD COMPLETE")
