@@ -20,10 +20,12 @@ COLOR_PALETTE = {
     "UNKNOWN": "#FFFFFF"
 }
 
-def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
+def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter, is_poetry_flag):
     """
-    Processes the DataFrame and returns a string of HTML content with dynamic navigation.
+    Processes the DataFrame and returns a string of HTML content.
     """
+    # Convert string flag to a clean boolean
+    is_poetic_file = (is_poetry_flag == "1")
     try:
         current_ch = int(chapter_id)
     except ValueError:
@@ -61,15 +63,43 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         .legend {{ display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; background: #f5f5f5; padding: 15px; border-radius: 6px; }}
         .legend-item {{ display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: bold; }}
         .color-box {{ width: 20px; height: 20px; border-radius: 4px; border: 1px solid #999; }}
-        .matrix-table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
+        .matrix-table {{ width: 100%; border-collapse: collapse; margin-top: 20px; table-layout: fixed;}}
         .verse-row {{ border-bottom: 1px solid #ddd; display: table-row; }}
-        .verse-label {{ width: 90px; font-weight: bold; font-size: 14px; padding: 12px 10px; background: #eaeaea; text-align: center; border-right: 2px solid #bbb; display: table-cell; vertical-align: middle; }}
-        .text-label {{ width: 240px; font-size: 13px; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; display: table-cell; vertical-align: middle; }}
-        .grid-cell {{ display: table-cell; vertical-align: middle; padding: 5px 10px; }}
+        .verse-label {{ font-weight: bold; font-size: 14px; padding: 12px 5px; background: #eaeaea; text-align: center; border-right: 2px solid #bbb; display: table-cell; vertical-align: middle; }}
+        .text-label {{ font-size: 16px; font-weight: bold; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; display: table-cell; vertical-align: middle; }}
+        .grid-cell {{ display: table-cell; vertical-align: middle; padding: 5px 0px; }}
+        /* Assign explicit, fixed widths to the two musical columns to hold the straight vertical axis */
+        /* --- PROVEN 3-DIGIT HIGH-DENSITY COLUMN MATH --- */
+        /* Column 1: Accommodates up to verse 176 on a single line safely */
+        td.grid-cell:nth-of-type(1), td.verse-label {{ 
+            width: 3%; 
+        }}
+        
+        /* Column 2: Hebrew Text - Safe, wide allocation to prevent overwrite */
+        td.grid-cell:nth-of-type(2), td.text-label {{ 
+            width: 15%; 
+        }}
+        
+        /* Column 3: Left-Wing Musical Grid (Locks the center axis) */
+        td.grid-cell:nth-of-type(3) {{ 
+            width: 47%; 
+        }}
+        
+        /* Column 4: Right-Wing Musical Grid (Locks the center axis) */
+        td.grid-cell:nth-of-type(4) {{ 
+            width: 35%; 
+        }}
         .left-wing {{ display: flex; gap: 4px; justify-content: flex-end; min-width: 250px; border-right: 3px dashed #9B51E0; padding-right: 12px; }}
         .right-wing {{ display: flex; gap: 4px; justify-content: flex-start; padding-left: 12px; align-items: center; width: auto; overflow: visible; }}
-        .pitch-cell {{ padding: 6px 10px; border-radius: 4px; color: #fff; font-weight: bold; font-size: 12px; text-shadow: 1px 1px 1px rgba(0,0,0,0.4); border: 1px solid rgba(0,0,0,0.1); text-align: center; min-width: 35px; flex-shrink: 0; }}
-        .pivot-marker {{ border: 2px solid #000; box-shadow: 0 0 5px rgba(155, 81, 224, 0.6); }}
+        .pitch-cell {{ position: relative; padding: 4px 6px; border-radius: 4px; color: #fff; font-weight: bold; font-size: 11px; text-shadow: 1px 1px 1px rgba(0,0,0,0.4); border: 1px solid rgba(0,0,0,0.1); text-align: center; min-width: 28px; flex-shrink: 0; }}
+        .pitch-cell sup {{ 
+            position: absolute;  /* Takes the symbol completely out of the normal layout flow */
+            top: -2px;          /* Slides the symbol up right to the top inside edge of the box */
+            right: 2px;         /* Tucks it cleanly into the top-right corner */
+            font-size: 8px;     /* Keeps the ancient accent mark tiny and non-intrusive */
+            line-height: 1; 
+            vertical-align: baseline; /* Cancels out the browser's native text-shifting math */
+        }}        .pivot-marker {{ border: 2px solid #000; box-shadow: 0 0 5px rgba(155, 81, 224, 0.6); }}
         .tuba-badge {{ background: #000; color: #fff; font-size: 10px; padding: 2px 5px; border-radius: 3px; margin-left: 20px; font-family: monospace; flex-shrink: 0; }}
         .nav-btn.home-btn {{ background: #4A4A4A; }}
         .nav-btn.home-btn:hover {{ background: #333333; }}    </style>
@@ -251,12 +281,50 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
                         break
                 if tuba_pitch: break
         
+        # --- DYNAMIC TEXT EXTRACTION & POETRY LOOKUP ---
+        heb = ""
+        is_poetic_row = False
+        
+        # --- MUSICOLOGICAL STRING RE-ENGINEERING ---
+        if len(name_parts) >= 2:
+            chapter_id = name_parts[-1]       
+            book_id = "_".join(name_parts[:-1]) 
+        else:
+            book_id = base_name
+            chapter_id = "001"
+        
+        # --- THE LAZY POETRY LOOKUP ENGINE ---
+        # Completely independent block to prevent syntax errors
+        is_poetry_flag = "0"
+        
+        if book_id.upper() in ["PSALMS", "PROVERBS"]:
+            is_poetry_flag = "1"
+            
+        elif book_id.upper() == "JOB":
+            try:
+                ch_num = int(chapter_id)
+                # Job chapters 3 through 41 are the poetic core
+                if 3 <= ch_num <= 41:
+                    is_poetry_flag = "1"
+            except ValueError:
+                pass
+        # Check if this specific row is flagged as poetry by your DRM_POETRY logic
+        if 'IS_POETRY' in group.columns:
+            is_poetic_row = str(group['IS_POETRY'].iloc[0]).strip() == '1'
+
         heb = ""
         if 'HEB_TEXT' in group.columns:
             valid_heb = group['HEB_TEXT'].dropna()
             if not valid_heb.empty:
                 heb = html.unescape(str(valid_heb.iloc[0])).replace('\n', ' ').strip()
-                heb = (heb[:35] + '...') if len(heb) > 35 else heb
+                
+                # --- POETIC VISUAL UN-TRUNCATION ---
+                if is_poetic_file:
+                    # Let the full text line layout wrap naturally for Wisdom's stage
+                    pass 
+                else:
+                    # Maintain high-density trimming for massive prose rosters
+                    heb = (heb[:35] + '...') if len(heb) > 35 else heb
 
         tuba_str = f'<span class="tuba-badge">📯 TUBA ({tuba_pitch})</span>' if tuba_pitch else ''
         
@@ -300,7 +368,7 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
                     
                 html_content += f'<div class="pitch-cell{is_edge}" style="background:{bg_color}; color:{text_color};">{ornament_string}{ole_symbol}{zaqef_symbol}{pitch}</div>'
             
-        html_content += f"""</div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing">"""
+        html_content += f"""</div></td><td class="grid-cell"><div class="right-wing">"""
         
         for i, pitch in enumerate(right_notes):
             bg_color = COLOR_PALETTE.get(pitch, "#FFFFFF")
@@ -316,7 +384,7 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
                 
             html_content += f'<div class="pitch-cell" style="background:{bg_color}; color:{text_color};">{right_ornament_string}{zaqef_symbol}{pitch}</div>'
             
-        html_content += f"""{tuba_str}{right_badge}</div></td></tr>"""
+        html_content += f"{tuba_str}{right_badge}</div></td></tr>"
         
     footer_tally_str = f'<div class="poetic-footer-tally">Poetic Structural Summary: {poetic_fsharp4_total} verses carry F#4 accents in this score.</div>' if poetic_fsharp4_total > 0 else ''
     
@@ -430,7 +498,7 @@ if __name__ == "__main__":
                     max_chapter = book_max_chapters.get(book_id, 150)
 
                     # Generate the page layout content via backend matrix engine
-                    page_html = generate_html_matrix_payload(df, book_id, chapter_id, max_chapter)
+                    page_html = generate_html_matrix_payload(df, book_id, chapter_id, max_chapter, is_poetry_flag)
                     
                     # Loop through the parsed verses in the active dataframe to steal the compiled vectors
                     for (ch, vs), group in df.groupby(['CHAPTER_CD', 'VERSE_CD'], sort=False):

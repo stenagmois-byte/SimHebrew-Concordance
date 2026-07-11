@@ -18,15 +18,43 @@
         .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; background: #f5f5f5; padding: 15px; border-radius: 6px; }
         .legend-item { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: bold; }
         .color-box { width: 20px; height: 20px; border-radius: 4px; border: 1px solid #999; }
-        .matrix-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .matrix-table { width: 100%; border-collapse: collapse; margin-top: 20px; table-layout: fixed;}
         .verse-row { border-bottom: 1px solid #ddd; display: table-row; }
-        .verse-label { width: 90px; font-weight: bold; font-size: 14px; padding: 12px 10px; background: #eaeaea; text-align: center; border-right: 2px solid #bbb; display: table-cell; vertical-align: middle; }
-        .text-label { width: 240px; font-size: 13px; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; display: table-cell; vertical-align: middle; }
-        .grid-cell { display: table-cell; vertical-align: middle; padding: 5px 10px; }
+        .verse-label { font-weight: bold; font-size: 14px; padding: 12px 5px; background: #eaeaea; text-align: center; border-right: 2px solid #bbb; display: table-cell; vertical-align: middle; }
+        .text-label { font-size: 16px; font-weight: bold; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; display: table-cell; vertical-align: middle; }
+        .grid-cell { display: table-cell; vertical-align: middle; padding: 5px 0px; }
+        /* Assign explicit, fixed widths to the two musical columns to hold the straight vertical axis */
+        /* --- PROVEN 3-DIGIT HIGH-DENSITY COLUMN MATH --- */
+        /* Column 1: Accommodates up to verse 176 on a single line safely */
+        td.grid-cell:nth-of-type(1), td.verse-label { 
+            width: 3%; 
+        }
+        
+        /* Column 2: Hebrew Text - Safe, wide allocation to prevent overwrite */
+        td.grid-cell:nth-of-type(2), td.text-label { 
+            width: 15%; 
+        }
+        
+        /* Column 3: Left-Wing Musical Grid (Locks the center axis) */
+        td.grid-cell:nth-of-type(3) { 
+            width: 47%; 
+        }
+        
+        /* Column 4: Right-Wing Musical Grid (Locks the center axis) */
+        td.grid-cell:nth-of-type(4) { 
+            width: 35%; 
+        }
         .left-wing { display: flex; gap: 4px; justify-content: flex-end; min-width: 250px; border-right: 3px dashed #9B51E0; padding-right: 12px; }
         .right-wing { display: flex; gap: 4px; justify-content: flex-start; padding-left: 12px; align-items: center; width: auto; overflow: visible; }
-        .pitch-cell { padding: 6px 10px; border-radius: 4px; color: #fff; font-weight: bold; font-size: 12px; text-shadow: 1px 1px 1px rgba(0,0,0,0.4); border: 1px solid rgba(0,0,0,0.1); text-align: center; min-width: 35px; flex-shrink: 0; }
-        .pivot-marker { border: 2px solid #000; box-shadow: 0 0 5px rgba(155, 81, 224, 0.6); }
+        .pitch-cell { position: relative; padding: 4px 6px; border-radius: 4px; color: #fff; font-weight: bold; font-size: 11px; text-shadow: 1px 1px 1px rgba(0,0,0,0.4); border: 1px solid rgba(0,0,0,0.1); text-align: center; min-width: 28px; flex-shrink: 0; }
+        .pitch-cell sup { 
+            position: absolute;  /* Takes the symbol completely out of the normal layout flow */
+            top: -2px;          /* Slides the symbol up right to the top inside edge of the box */
+            right: 2px;         /* Tucks it cleanly into the top-right corner */
+            font-size: 8px;     /* Keeps the ancient accent mark tiny and non-intrusive */
+            line-height: 1; 
+            vertical-align: baseline; /* Cancels out the browser's native text-shifting math */
+        }        .pivot-marker { border: 2px solid #000; box-shadow: 0 0 5px rgba(155, 81, 224, 0.6); }
         .tuba-badge { background: #000; color: #fff; font-size: 10px; padding: 2px 5px; border-radius: 3px; margin-left: 20px; font-family: monospace; flex-shrink: 0; }
         .nav-btn.home-btn { background: #4A4A4A; }
         .nav-btn.home-btn:hover { background: #333333; }    </style>
@@ -53,256 +81,256 @@
             <td class="grid-cell">
                 <div class="left-wing">
                     
-        <div class="pitch-cell" style="background: transparent; border: none; color: transparent; visibility: hidden;">&nbsp;</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></td></tr>
+        <div class="pitch-cell" style="background: transparent; border: none; color: transparent; visibility: hidden;">&nbsp;</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">2</td>
             <td class="text-label" title="שִׁמְע֣וּ חֲכָמִ֣ים מִלָּ֑י וְ֝יֹדְ...">שִׁמְע֣וּ חֲכָמִ֣ים מִלָּ֑י וְ֝יֹדְ...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x9</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x9</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x9</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">3</td>
             <td class="text-label" title="כִּי־אֹ֭זֶן מִלִּ֣ין תִּבְחָ֑ן וְ֝ח...">כִּי־אֹ֭זֶן מִלִּ֣ין תִּבְחָ֑ן וְ֝ח...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x4</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x9</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x9</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">4</td>
             <td class="text-label" title="מִשְׁפָּ֥ט נִבְחֲרָה־לָּ֑נוּ נֵדְעָ...">מִשְׁפָּ֥ט נִבְחֲרָה־לָּ֑נוּ נֵדְעָ...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x4</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x7</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x7</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">5</td>
             <td class="text-label" title="כִּֽי־אָ֭מַר אִיּ֣וֹב צָדַ֑קְתִּי ו...">כִּֽי־אָ֭מַר אִיּ֣וֹב צָדַ֑קְתִּי ו...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x4</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x9</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x9</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">6</td>
             <td class="text-label" title="עַל־מִשְׁפָּטִ֥י אֲכַזֵּ֑ב אָנ֖וּשׁ...">עַל־מִשְׁפָּטִ֥י אֲכַזֵּ֑ב אָנ֖וּשׁ...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x4</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x7</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x7</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">7</td>
             <td class="text-label" title="מִי־גֶ֥בֶר כְּאִיּ֑וֹב יִֽשְׁתֶּה־ל...">מִי־גֶ֥בֶר כְּאִיּ֑וֹב יִֽשְׁתֶּה־ל...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x4</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x4</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x4</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">8</td>
             <td class="text-label" title="וְאָרַ֣ח לְ֭חֶבְרָה עִם־פֹּ֣עֲלֵי א...">וְאָרַ֣ח לְ֭חֶבְרָה עִם־פֹּ֣עֲלֵי א...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x4</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x4</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x4</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">9</td>
             <td class="text-label" title="כִּֽי־אָ֭מַר לֹ֣א יִסְכָּן־גָּ֑בֶר ...">כִּֽי־אָ֭מַר לֹ֣א יִסְכָּן־גָּ֑בֶר ...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x4</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x4</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x4</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">10</td>
             <td class="text-label" title="לָכֵ֤ן ׀ אַ֥נֲשֵׁ֥י‬ לֵבָ֗ב שִׁמְע֫...">לָכֵ֤ן ׀ אַ֥נֲשֵׁ֥י‬ לֵבָ֗ב שִׁמְע֫...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;">C5</div><div class="pitch-cell pivot-marker" style="background:#D0021B; color:#fff;"><sup>&lt;</sup>F#4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;">C5</div><div class="pitch-cell pivot-marker" style="background:#D0021B; color:#fff;"><sup>&lt;</sup>F#4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">11</td>
             <td class="text-label" title="כִּ֤י פֹ֣עַל אָ֭דָם יְשַׁלֶּם־ל֑וֹ ...">כִּ֤י פֹ֣עַל אָ֭דָם יְשַׁלֶּם־ל֑וֹ ...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="entry-glyph-anchor">★</span>
-        <div class="pitch-cell" style="background:#50E3C2; color:#fff;">C5</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x4</span></div></td></tr>
+        <div class="pitch-cell" style="background:#50E3C2; color:#fff;">C5</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x4</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">12</td>
             <td class="text-label" title="אַף־אָמְנָ֗ם אֵ֥ל לֹֽא־יַרְשִׁ֑יעַ ...">אַף־אָמְנָ֗ם אֵ֥ל לֹֽא־יַרְשִׁ֑יעַ ...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;"><sup>&#x25C6;</sup>E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;"><sup>&#x25C6;</sup>E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">13</td>
             <td class="text-label" title="מִֽי־פָקַ֣ד עָלָ֣יו אָ֑רְצָה וּמִ֥י...">מִֽי־פָקַ֣ד עָלָ֣יו אָ֑רְצָה וּמִ֥י...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x9</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x9</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x9</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">14</td>
             <td class="text-label" title="אִם־יָשִׂ֣ים אֵלָ֣יו לִבּ֑וֹ רוּח֥ו...">אִם־יָשִׂ֣ים אֵלָ֣יו לִבּ֑וֹ רוּח֥ו...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x9</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (F#4)</span><span class="motif-count-badge">x9</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (F#4)</span><span class="motif-count-badge">x9</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">15</td>
             <td class="text-label" title="יִגְוַ֣ע כָּל־בָּשָׂ֣ר יָ֑חַד וְ֝אָ...">יִגְוַ֣ע כָּל־בָּשָׂ֣ר יָ֑חַד וְ֝אָ...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x9</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x9</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x9</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">16</td>
             <td class="text-label" title="וְאִם־בִּ֥ינָה שִׁמְעָה־זֹּ֑את הַ֝א...">וְאִם־בִּ֥ינָה שִׁמְעָה־זֹּ֑את הַ֝א...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x4</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x3</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x3</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">17</td>
             <td class="text-label" title="הַאַ֬ף שׂוֹנֵ֣א מִשְׁפָּ֣ט יַחֲב֑וֹ...">הַאַ֬ף שׂוֹנֵ֣א מִשְׁפָּ֣ט יַחֲב֑וֹ...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x9</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x7</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x7</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">18</td>
             <td class="text-label" title="הַאֲמֹ֣ר לְמֶ֣לֶךְ בְּלִיָּ֑עַל רָ֝...">הַאֲמֹ֣ר לְמֶ֣לֶךְ בְּלִיָּ֑עַל רָ֝...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x9</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x4</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x4</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">19</td>
             <td class="text-label" title="אֲשֶׁ֤ר לֹֽא־נָשָׂ֨א ׀ פְּנֵ֥י שָׂר...">אֲשֶׁ֤ר לֹֽא־נָשָׂ֨א ׀ פְּנֵ֥י שָׂר...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;">C5</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;">C5</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">20</td>
             <td class="text-label" title="רֶ֤גַע ׀ יָמֻתוּ֮ וַחֲצ֪וֹת לָ֥יְלָ...">רֶ֤גַע ׀ יָמֻתוּ֮ וַחֲצ֪וֹת לָ֥יְלָ...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="entry-glyph-anchor">★</span>
-        <div class="pitch-cell" style="background:#50E3C2; color:#fff;"><sup>&#x223E;</sup>C5</div><div class="pitch-cell" style="background:#FF851B; color:#fff;">D4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (F#4)</span><span class="motif-count-badge">x2</span></div></td></tr>
+        <div class="pitch-cell" style="background:#50E3C2; color:#fff;"><sup>&#x223E;</sup>C5</div><div class="pitch-cell" style="background:#FF851B; color:#fff;">D4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (F#4)</span><span class="motif-count-badge">x2</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">21</td>
             <td class="text-label" title="כִּי־עֵ֭ינָיו עַל־דַּרְכֵי־אִ֑ישׁ ו...">כִּי־עֵ֭ינָיו עַל־דַּרְכֵי־אִ֑ישׁ ו...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x2</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x4</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x4</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">22</td>
             <td class="text-label" title="אֵֽין־חֹ֭שֶׁךְ‬ וְאֵ֣ין צַלְמָ֑וֶת ...">אֵֽין־חֹ֭שֶׁךְ‬ וְאֵ֣ין צַלְמָ֑וֶת ...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x4</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x2</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x2</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">23</td>
             <td class="text-label" title="כִּ֤י לֹ֣א עַל־אִ֭ישׁ יָשִׂ֣ים ע֑וֹ...">כִּ֤י לֹ֣א עַל־אִ֭ישׁ יָשִׂ֣ים ע֑וֹ...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="entry-glyph-anchor">★</span>
-        <div class="pitch-cell" style="background:#50E3C2; color:#fff;">C5</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x9</span></div></td></tr>
+        <div class="pitch-cell" style="background:#50E3C2; color:#fff;">C5</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x9</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">24</td>
             <td class="text-label" title="יָרֹ֣עַ כַּבִּירִ֣ים לֹא־חֵ֑קֶר וַי...">יָרֹ֣עַ כַּבִּירִ֣ים לֹא־חֵ֑קֶר וַי...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x9</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x7</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x7</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">25</td>
             <td class="text-label" title="לָכֵ֗ן יַ֭כִּיר מַעְבָּדֵיהֶ֑ם וְהָ...">לָכֵ֗ן יַ֭כִּיר מַעְבָּדֵיהֶ֑ם וְהָ...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x2</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;"><sup>&#x25C6;</sup>E4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x9</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;"><sup>&#x25C6;</sup>E4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x9</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">26</td>
             <td class="text-label" title="תַּֽחַת־רְשָׁעִ֥ים סְפָקָ֗ם בִּמְק֥...">תַּֽחַת־רְשָׁעִ֥ים סְפָקָ֗ם בִּמְק֥...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     
-        <div class="pitch-cell" style="background: transparent; border: none; color: transparent; visibility: hidden;">&nbsp;</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x4</span></div></td></tr>
+        <div class="pitch-cell" style="background: transparent; border: none; color: transparent; visibility: hidden;">&nbsp;</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x4</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">27</td>
             <td class="text-label" title="אֲשֶׁ֣ר עַל־כֵּ֭ן סָ֣רוּ מֵאַחֲרָ֑י...">אֲשֶׁ֣ר עַל־כֵּ֭ן סָ֣רוּ מֵאַחֲרָ֑י...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x4</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x3</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x3</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">28</td>
             <td class="text-label" title="לְהָבִ֣יא עָ֭לָיו צַעֲקַת־דָּ֑ל וְצ...">לְהָבִ֣יא עָ֭לָיו צַעֲקַת־דָּ֑ל וְצ...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x7</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x7</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">29</td>
             <td class="text-label" title="וְה֤וּא יַשְׁקִ֨ט ׀ וּמִ֥י יַרְשִׁ֗...">וְה֤וּא יַשְׁקִ֨ט ׀ וּמִ֥י יַרְשִׁ֗...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;">C5</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x7</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;">C5</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x7</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">30</td>
             <td class="text-label" title="מִ֭מְּלֹךְ אָדָ֥ם חָנֵ֗ף מִמֹּ֥קְשׁ...">מִ֭מְּלֹךְ אָדָ֥ם חָנֵ֗ף מִמֹּ֥קְשׁ...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="entry-glyph-anchor">★</span>
-        <div class="pitch-cell" style="background: transparent; border: none; color: transparent; visibility: hidden;">&nbsp;</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></td></tr>
+        <div class="pitch-cell" style="background: transparent; border: none; color: transparent; visibility: hidden;">&nbsp;</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">31</td>
             <td class="text-label" title="כִּֽי־אֶל־אֵ֭ל הֶאָמַ֥ר נָשָׂ֗אתִי ...">כִּֽי־אֶל־אֵ֭ל הֶאָמַ֥ר נָשָׂ֗אתִי ...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     
-        <div class="pitch-cell" style="background: transparent; border: none; color: transparent; visibility: hidden;">&nbsp;</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></td></tr>
+        <div class="pitch-cell" style="background: transparent; border: none; color: transparent; visibility: hidden;">&nbsp;</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">32</td>
             <td class="text-label" title="בִּלְעֲדֵ֣י אֶ֭חֱזֶה אַתָּ֣ה הֹרֵ֑נ...">בִּלְעֲדֵ֣י אֶ֭חֱזֶה אַתָּ֣ה הֹרֵ֑נ...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x4</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (F#4)</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (F#4)</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">33</td>
             <td class="text-label" title="הַֽמֵעִמְּךָ֬ יְשַׁלְמֶ֨נָּה כִּֽי־...">הַֽמֵעִמְּךָ֬ יְשַׁלְמֶ֨נָּה כִּֽי־...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x9</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;"><sup>&#x25C6;</sup>E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x4</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;"><sup>&#x25C6;</sup>E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x4</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">34</td>
             <td class="text-label" title="אַנְשֵׁ֣י לֵ֭בָב יֹ֣אמְרוּ לִ֑י וְג...">אַנְשֵׁ֣י לֵ֭בָב יֹ֣אמְרוּ לִ֑י וְג...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x4</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (F#4)</span><span class="motif-count-badge">x9</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (F#4)</span><span class="motif-count-badge">x9</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">35</td>
             <td class="text-label" title="אִ֭יּוֹב לֹא־בְדַ֣עַת יְדַבֵּ֑ר וּ֝...">אִ֭יּוֹב לֹא־בְדַ֣עַת יְדַבֵּ֑ר וּ֝...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="entry-glyph-anchor">★</span>
-        <div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x3</span></div></td></tr>
+        <div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x3</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">36</td>
             <td class="text-label" title="אָבִ֗י יִבָּחֵ֣ן אִיּ֣וֹב עַד־נֶ֑צַ...">אָבִ֗י יִבָּחֵ֣ן אִיּ֣וֹב עַד־נֶ֑צַ...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="motif-count-badge">x9</span>
-        <div class="pitch-cell" style="background:#4A90E2; color:#fff;"><sup>&#x25C6;</sup>E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x4</span></div></td></tr>
+        <div class="pitch-cell" style="background:#4A90E2; color:#fff;"><sup>&#x25C6;</sup>E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x4</span></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">37</td>
             <td class="text-label" title="כִּ֥י יֹ֘סִ֤יף עַֽל־חַטָּאת֣וֹ פֶ֭ש...">כִּ֥י יֹ֘סִ֤יף עַֽל־חַטָּאת֣וֹ פֶ֭ש...</td>
             <td class="grid-cell">
                 <div class="left-wing">
                     <span class="entry-glyph-anchor">★</span>
-        <div class="pitch-cell" style="background:#D0021B; color:#fff;"><sup>&#x223E;</sup>F#4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;">C5</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell" style="width: 100%;"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x7</span></div></td></tr></table></body></html>
+        <div class="pitch-cell" style="background:#D0021B; color:#fff;"><sup>&#x223E;</sup>F#4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;">C5</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell pivot-marker" style="background:#9B51E0; color:#fff;">A4</div></div></td><td class="grid-cell"><div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x7</span></div></td></tr></table></body></html>
