@@ -20,12 +20,36 @@ COLOR_PALETTE = {
     "UNKNOWN": "#FFFFFF"
 }
 
-def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter, is_poetry_flag):
+def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
     """
     Processes the DataFrame and returns a string of HTML content.
     """
-    # Convert string flag to a clean boolean
-    is_poetic_file = (is_poetry_flag == "1")
+
+    w_col1 = "3%"   # Compressed number space
+    w_col2 = "27%"  # Snug text space for trimmed names
+    w_col3 = "40%"  # Wide Left-Wing grid for long note paths
+    w_col4 = "30%"  # Wide Right-Wing grid for long note paths
+    is_poetry_flag = "0"
+    clean_book = str(book_id).upper().strip()
+    if clean_book in ["PSALMS", "PROVERBS"]:
+        is_poetry_flag = "1"
+            
+    elif clean_book == "JOB":
+        try:
+            ch_num = int(chapter_id)
+            # Job chapters 3 through 41 are the poetic core
+            if 3 <= ch_num <= 41:
+                is_poetry_flag = "1"
+        except ValueError:
+            pass
+
+    # --- DYNAMIC FLUID GRID PERCENTAGE MAPPER ---
+    if is_poetry_flag == "1":
+        # Poetic Canvas: Give the expanded Hebrew text plenty of room, balancing the wings
+        w_col1 = "5%"   # Verse number
+        w_col2 = "30%"  # Expanded Hebrew text (Breathing room for full lines)
+        w_col3 = "35%"  # Left-Wing Musical Grid
+        w_col4 = "30%"  # Right-Wing Musical Grid
     try:
         current_ch = int(chapter_id)
     except ValueError:
@@ -66,28 +90,28 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter, i
         .matrix-table {{ width: 100%; border-collapse: collapse; margin-top: 20px; table-layout: fixed;}}
         .verse-row {{ border-bottom: 1px solid #ddd; display: table-row; }}
         .verse-label {{ font-weight: bold; font-size: 14px; padding: 12px 5px; background: #eaeaea; text-align: center; border-right: 2px solid #bbb; display: table-cell; vertical-align: middle; }}
-        .text-label {{ font-size: 16px; font-weight: bold; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; display: table-cell; vertical-align: middle; }}
+        .text-label {{ font-size: 16px; font-weight: bold; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; text-overflow: ellipsis; white-space: normal; direction: rtl; display: table-cell; vertical-align: middle; }}
         .grid-cell {{ display: table-cell; vertical-align: middle; padding: 5px 0px; }}
         /* Assign explicit, fixed widths to the two musical columns to hold the straight vertical axis */
         /* --- PROVEN 3-DIGIT HIGH-DENSITY COLUMN MATH --- */
         /* Column 1: Accommodates up to verse 176 on a single line safely */
         td.grid-cell:nth-of-type(1), td.verse-label {{ 
-            width: 3%; 
+            width: {w_col1}; 
         }}
         
         /* Column 2: Hebrew Text - Safe, wide allocation to prevent overwrite */
         td.grid-cell:nth-of-type(2), td.text-label {{ 
-            width: 15%; 
+            width: {w_col2}; 
         }}
         
         /* Column 3: Left-Wing Musical Grid (Locks the center axis) */
         td.grid-cell:nth-of-type(3) {{ 
-            width: 47%; 
+            width: {w_col3}; 
         }}
         
         /* Column 4: Right-Wing Musical Grid (Locks the center axis) */
         td.grid-cell:nth-of-type(4) {{ 
-            width: 35%; 
+            width: {w_col4}; 
         }}
         .left-wing {{ display: flex; gap: 4px; justify-content: flex-end; min-width: 250px; border-right: 3px dashed #9B51E0; padding-right: 12px; }}
         .right-wing {{ display: flex; gap: 4px; justify-content: flex-start; padding-left: 12px; align-items: center; width: auto; overflow: visible; }}
@@ -281,11 +305,8 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter, i
                         break
                 if tuba_pitch: break
         
-        # --- DYNAMIC TEXT EXTRACTION & POETRY LOOKUP ---
-        heb = ""
-        is_poetic_row = False
+        # --- DYNAMIC TEXT EXTRACTION & POETRY ADJUSTMENT ---
         
-        # --- MUSICOLOGICAL STRING RE-ENGINEERING ---
         if len(name_parts) >= 2:
             chapter_id = name_parts[-1]       
             book_id = "_".join(name_parts[:-1]) 
@@ -293,39 +314,20 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter, i
             book_id = base_name
             chapter_id = "001"
         
-        # --- THE LAZY POETRY LOOKUP ENGINE ---
-        # Completely independent block to prevent syntax errors
-        is_poetry_flag = "0"
-        
-        if book_id.upper() in ["PSALMS", "PROVERBS"]:
-            is_poetry_flag = "1"
-            
-        elif book_id.upper() == "JOB":
-            try:
-                ch_num = int(chapter_id)
-                # Job chapters 3 through 41 are the poetic core
-                if 3 <= ch_num <= 41:
-                    is_poetry_flag = "1"
-            except ValueError:
-                pass
-        # Check if this specific row is flagged as poetry by your DRM_POETRY logic
-        if 'IS_POETRY' in group.columns:
-            is_poetic_row = str(group['IS_POETRY'].iloc[0]).strip() == '1'
-
         heb = ""
         if 'HEB_TEXT' in group.columns:
             valid_heb = group['HEB_TEXT'].dropna()
             if not valid_heb.empty:
                 heb = html.unescape(str(valid_heb.iloc[0])).replace('\n', ' ').strip()
                 
-                # --- POETIC VISUAL UN-TRUNCATION ---
-                if is_poetic_file:
-                    # Let the full text line layout wrap naturally for Wisdom's stage
-                    pass 
-                else:
-                    # Maintain high-density trimming for massive prose rosters
-                    heb = (heb[:35] + '...') if len(heb) > 35 else heb
-
+            # --- POETIC VISUAL UN-TRUNCATION ---
+            if is_poetry_flag == "1":
+                # Let the full text line layout wrap naturally for Wisdom's stage
+                pass 
+            else:
+                # Maintain high-density trimming for massive prose rosters
+                # heb = (heb[:160] + '...') if len(heb) > 160 else heb
+                pass
         tuba_str = f'<span class="tuba-badge">📯 TUBA ({tuba_pitch})</span>' if tuba_pitch else ''
         
         left_key = " ".join(left_notes)
@@ -498,7 +500,7 @@ if __name__ == "__main__":
                     max_chapter = book_max_chapters.get(book_id, 150)
 
                     # Generate the page layout content via backend matrix engine
-                    page_html = generate_html_matrix_payload(df, book_id, chapter_id, max_chapter, is_poetry_flag)
+                    page_html = generate_html_matrix_payload(df, book_id, chapter_id, max_chapter)
                     
                     # Loop through the parsed verses in the active dataframe to steal the compiled vectors
                     for (ch, vs), group in df.groupby(['CHAPTER_CD', 'VERSE_CD'], sort=False):
