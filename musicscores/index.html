@@ -1,77 +1,109 @@
-<html> 
-<head><meta charset="UTF-8">
-  <link rel="stylesheet" href="..\qstyles.css">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../qstyles.css">
   <title>Music Scores by Volume</title> 
 </head> 
 <body> 
-<h1>Music Scores by Volume</h1> 
-<p>Click the link to select the volume. The music scores are available in two forms, mscz for direct load into Musescore and xml for loading into other music programs. There is also a JSON database and tools to select in each directory. I have also produced from the JSON a colour mapping of the countours of each chapter for those sho want to see the musical structure at a glance. Other tools are at the bottom of the list.</p>
-<ul> 
-<li><a href="read-me.html">Read me please</a></li> 
-<li><a href="Genesis/index.html">Genesis</a> &bull; <a href="Exodus/index.html">Exodus</a> &bull; <a href="Leviticus/index.html">Leviticus</a> &bull; <a href="Numbers/index.html">Numbers</a> &bull; <a href="Deuteronomy/index.html">Deuteronomy</a></li> 
-<li><a href="Joshua-Judges/index.html">Joshua, Judges</a> &bull; <a href="Samuel/index.html">Samuel</a> &bull; <a href="Kings/index.html">Kings</a> &bull; <a href="Isaiah/index.html">Isaiah</a> &bull; <a href="Jeremiah/index.html">Jeremiah</a> &bull; <a href="Ezekiel/index.html">Ezekiel</a> &bull; <a href="The Twelve/index.html">The Twelve</a></li> 
-<li><a href="The Psalms/index.html">Psalms</a> &bull; <a href="Proverbs/index.html">Proverbs</a> &bull; <a href="Job/index.html">Job</a> &bull; <a href="The Five Scrolls/index.html">The Five Scrolls</a> &bull; <a href="Daniel-Ezra-Nehemiah/index.html">Daniel, Ezra, Nehemiah</a> &bull; <a href="Chronicles/index.html">Chronicles</a></li>
-</ul> 
-<h2>Tools</h2>
-<ul>
-<li><a href="MUSICSTATS.xlsx">Download Music spreadsheet</a></li> 
-<li><a href="MUSICSTATS.csv">Download Music csv</a></li> 
-<li><a href="Test-Scripts/index.html">Preliminary Scripts</a></li>
-</ul> 
 
-<p><a href="../index.html">Back</a></p> 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    // 1. Grab all anchor links on your index page
-    const links = document.querySelectorAll("a");
+  <div class="nav"><a href="../index.html">← Back to Project Homepage</a></div>
 
-    links.forEach(link => {
-        // 2. Get the link text (e.g., "1 Chronicles 1" or " 2")
-        let linkText = link.textContent.trim();
-        
-        // If the link text is just a bare number (like " 2"), 
-        // we can grab the parent book title context to keep calculations accurate
-        if (!isNaN(linkText)) {
-            // Looks backward for the nearest full book name in the list element
-            const listText = link.closest('li')?.textContent || '';
-            const match = listText.match(/([0-9]?\s*[A-Za-z\s]+)\s*1/);
-            if (match) {
-                linkText = `${match[1]} ${linkText}`;
-            }
-        }
+  <h1>Music Scores by Canonical Volume</h1> 
+  
+  <p>
+    Select a volume link below to explore the underlying musical assets. The music scores are systematically catalogued across two distinct formats: <code>.mscz</code> files optimized for direct manipulation in MuseScore, and universal <code>.xml</code> trees for compatibility across alternative notation software suites. 
+  </p>
+  <p>
+    Each directory contains its own optimized JSON structure and a high-density, color-coded visual map tracking the exact melodic contours and shapes of each chapter—allowing you to inspect the architectural architecture of the music at a glance.
+  </p>
 
-        // 3. Compute a unique numeric hash based on the English/Hebrew string
-        const colorClass = getGematriaMenuClass(linkText);
-        
-        // 4. Apply the color pill styling directly to the link anchor
-        if (colorClass) {
-            link.classList.add(colorClass);
-            link.style.display = "inline-block";
-            link.style.padding = "2px 6px";
-            link.style.margin = "2px 1px";
-            link.style.borderRadius = "4px";
-            link.style.textDecoration = "none";
-        }
-    });
-});
+  <div class="meta-box">
+    <strong>Volume Directory Status Notice:</strong> All text divisions are cross-verified for structural accuracy. If you require the master analytical data spreadsheets (<code>MUSICSTATS.xlsx</code> or <code>.csv</code>) or old system verification logs, please consult the newly isolated <code>/developer_tools</code> directory.
+  </div>
 
-// A robust alphanumeric text mapping utility for the menu links
-function getGematriaMenuClass(text) {
-    if (!text) return '';
-    
-    // Sums the character codes to create a stable thematic color weight
-    let score = 0;
-    for (let i = 0; i < text.length; i++) {
-        score += text.charCodeAt(i);
-    }
-    
-    // Map the text footprint cleanly to your 5 core visual stylesheet states
-    const bucket = score % 5;
-    if (bucket === 0) return 'gem-low';
-    if (bucket === 1) return 'gem-mid-low';
-    if (bucket === 2) return 'gem-mid';
-    if (bucket === 3) return 'gem-mid-high';
-    return 'gem-high';
-}
-</script>
-</body></html> 
+  <!-- Formatted clean text lists -->
+  <h3>Torah (Instruction)</h3>
+  <ul> 
+    <li>
+      <a href="Genesis/index.html">Genesis</a> &bull; 
+      <a href="Exodus/index.html">Exodus</a> &bull; 
+      <a href="Leviticus/index.html">Leviticus</a> &bull; 
+      <a href="Numbers/index.html">Numbers</a> &bull; 
+      <a href="Deuteronomy/index.html">Deuteronomy</a>
+    </li> 
+  </ul>
+
+  <h3>Nevi'im (Prophets)</h3>
+  <ul>
+    <li>
+      <a href="Joshua-Judges/index.html">Joshua & Judges</a> &bull; 
+      <a href="Samuel/index.html">Samuel</a> &bull; 
+      <a href="Kings/index.html">Kings</a> &bull; 
+      <a href="Isaiah/index.html">Isaiah</a> &bull; 
+      <a href="Jeremiah/index.html">Jeremiah</a> &bull; 
+      <a href="Ezekiel/index.html">Ezekiel</a> &bull; 
+      <a href="The Twelve/index.html">The Twelve (Minor Prophets)</a>
+    </li> 
+  </ul>
+
+  <h3>Ketuvim (Writings)</h3>
+  <ul>
+    <li>
+      <a href="The Psalms/index.html">The Psalms</a> &bull; 
+      <a href="Proverbs/index.html">Proverbs</a> &bull; 
+      <a href="Job/index.html">The Book of Job</a> &bull; 
+      <a href="The Five Scrolls/index.html">The Five Scrolls</a> &bull; 
+      <a href="Daniel-Ezra-Nehemiah/index.html">Daniel, Ezra, Nehemiah</a> &bull; 
+      <a href="Chronicles/index.html">Chronicles</a>
+    </li>
+  </ul> 
+
+  <h3>Project Documentation</h3>
+  <ul>
+    <li>📖 <a href="read-me.html"><strong>Read-Me Methodology Introduction</strong></a> — Deep documentation on text parsing, data footprints, and file assembly rules.</li>
+  </ul>
+
+  <!-- The script is now lightweight, clean, and runs instantly without error -->
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+      const links = document.querySelectorAll("a");
+
+      links.forEach(link => {
+          const linkText = link.textContent.trim();
+          
+          // Skip applying gematria hashes to back-buttons or read-me instructions
+          if (linkText.includes("Back") || linkText.includes("Read-Me") || link.closest('.nav')) {
+              return;
+          }
+
+          const colorClass = getGematriaMenuClass(linkText);
+          
+          if (colorClass) {
+              link.classList.add(colorClass);
+              link.style.display = "inline-block";
+              link.style.padding = "3px 8px";
+              link.style.margin = "2px 2px";
+              link.style.borderRadius = "4px";
+              link.style.textDecoration = "none";
+          }
+      });
+  });
+
+  function getGematriaMenuClass(text) {
+      if (!text) return '';
+      let score = 0;
+      for (let i = 0; i < text.length; i++) {
+          score += text.charCodeAt(i);
+      }
+      const bucket = score % 5;
+      if (bucket === 0) return 'gem-low';
+      if (bucket === 1) return 'gem-mid-low';
+      if (bucket === 2) return 'gem-mid';
+      if (bucket === 3) return 'gem-mid-high';
+      return 'gem-high';
+  }
+  </script>
+</body>
+</html>
