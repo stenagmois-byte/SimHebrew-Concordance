@@ -162,15 +162,50 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         r_notes = v_rows['SYLL_NOTE'].astype(str).str.strip().tolist()
         s_tokens = v_rows['LYRIC_SYLL'].astype(str).str.strip().tolist()
         
+        # Locate your critical baseline Atnah marker
         p_idx = r_notes.index("A4") if "A4" in r_notes else -1
+        
         if p_idx != -1:
+            # --- CATEGORIES 1 & 2: VERSE CONTAINS AN ATNAH ---
             for idx in range(p_idx, len(s_tokens)):
                 p_idx = idx
                 if not s_tokens[idx].endswith('-'): break
+                
             l_str = " ".join([r_notes[x] for x in range(p_idx + 1) if x == 0 or r_notes[x] != r_notes[x-1]])
             r_str = " ".join([r_notes[x] for x in range(p_idx + 1, len(r_notes)) if x == p_idx + 1 or r_notes[x] != r_notes[x-1]])
+            
+            # Keep your original individual chapter printing lines exactly as they are
             if l_str: left_chapter_pool.append(l_str)
             if r_str: right_chapter_pool.append(r_str)
+            
+            # PINPOINT MASTER LOG ENTRY: Track left and right segments separately with your poetry flag
+            if l_str:
+                master_sequence_log.append({
+                    "book": book_id, "chapter": int(chapter_id), "verse": int(vs),
+                    "sequence_pattern": l_str,
+                    "type": "Left Approach",
+                    "is_poetry": is_poetry_flag
+                })
+            if r_str:
+                master_sequence_log.append({
+                    "book": book_id, "chapter": int(chapter_id), "verse": int(vs),
+                    "sequence_pattern": r_str,
+                    "type": "Right Resolution",
+                    "is_poetry": is_poetry_flag
+                })
+        else:
+            # --- CATEGORY 3: VERSE HAS NO ATNAH ---
+            # Collapse the entire verse down to its true melodic skeleton
+            no_atnah_notes = [r_notes[x] for x in range(len(r_notes)) if x == 0 or r_notes[x] != r_notes[x-1]]
+            no_atnah_str = " ".join(no_atnah_notes)
+            
+            if no_atnah_str:
+                master_sequence_log.append({
+                    "book": book_id, "chapter": int(chapter_id), "verse": int(vs),
+                    "sequence_pattern": no_atnah_str,
+                    "type": "No Atnah",
+                    "is_poetry": is_poetry_flag
+                })
             
     left_global_counts = Counter(left_chapter_pool)
     right_global_counts = Counter(right_chapter_pool)
@@ -515,20 +550,6 @@ if __name__ == "__main__":
                                     if not compressed_melody or compressed_melody[-1] != note:
                                         compressed_melody.append(note)
                                 
-                                if "A4" in compressed_melody:
-                                    a_idx = compressed_melody.index("A4")
-                                    
-                                    # 2. DITCH THE 4-NOTE LIMIT: Grab the absolute entire phrase leading to A4
-                                    approach = compressed_melody[0 : a_idx + 1]
-                                    
-                                    master_sequence_log.append({
-                                        "book": book_id,
-                                        "chapter": int(chapter_id),
-                                        "verse": int(vs),
-                                        "atnah_approach": " -> ".join(approach)
-                                    })
-
-
                     # Save HTML file directly into the same subdirectory as the JSON source
                     with open(output_html_path, "w", encoding="utf-8") as out_f:
                         out_f.write(page_html)
@@ -558,32 +579,49 @@ if __name__ == "__main__":
     # --- MASTER SEQUENCE EXTRACER WRITER ---
     if master_sequence_log:
         from collections import Counter
-        sequence_report_path = "global_atnah_approaches.txt"
-        
-        # Convert log to a processing dataframe
+        sequence_report_path = "global_approaches.txt"
         analysis_df = pd.DataFrame(master_sequence_log)
         
         with open(sequence_report_path, "w", encoding="utf-8") as rep_f:
             rep_f.write("========================================================================\n")
-            rep_f.write("          TANACH COGNITIVE PATTERN & ATNAH CADENCE REPORT              \n")
+            rep_f.write("          TANACH CALIBRATED MELODIC STRUCTURAL REPORT                   \n")
             rep_f.write("========================================================================\n\n")
+            rep_f.write(f"Total Structural Cadence Elements Logged: {len(analysis_df)}\n\n")
             
-            # Tally occurrences across all processed books natively
-            counts = Counter(analysis_df["atnah_approach"])
-            total_cadences = len(analysis_df)
-            total_atnahs = total_cadences  # Because every item in the log is an Atnah approach
+            # --- SECTION 1: POETIC SYSTEM (is_poetry_flag == "1") ---
+            rep_f.write("=== [ SECTION I: POETIC ACCENT SYSTEM (Job, Proverbs, Psalms) ] ===\n\n")
+            poet_df = analysis_df[analysis_df["is_poetry"] == "1"]
             
-            rep_f.write(f"Total Structural Cadences Logged: {total_cadences}\n\n")
-            rep_f.write("--- RANKED APPROACH PATTERNS TO THE MAIN REST POINT ---\n\n")
-            
-            for pattern, count in counts.most_common():
-                pct = (count / total_atnahs) * 100 if total_cadences > 0 else 0
-                rep_f.write(f"🎵 Pattern: [ {pattern} ] -> Used {count} times ({pct:.1f}%)\n")
+            for sub_type in ["Left Approach", "Right Resolution", "No Atnah"]:
+                sub_df = poet_df[poet_df["type"] == sub_type]
+                counts = Counter(sub_df["sequence_pattern"])
+                rep_f.write(f"--- Ranked Patterns: Poetic {sub_type} (Total: {len(sub_df)}) ---\n")
                 
-                # Isolate sample verses using this signature
-                sample_verses = analysis_df[analysis_df["atnah_approach"] == pattern].head(5)
-                v_list = [f"{r['book']} {r['chapter']}:{r['verse']}" for _, r in sample_verses.iterrows()]
-                rep_f.write(f"   Sample Occurrences: {', '.join(v_list)}\n")
-                rep_f.write("-" * 70 + "\n")
+                for pattern, count in counts.most_common(15): # Displays top 15 trends
+                    pct = (count / len(sub_df)) * 100 if len(sub_df) > 0 else 0
+                    rep_f.write(f" 🎵 [ {pattern} ] -> Used {count} times ({pct:.1f}%)\n")
+                rep_f.write("\n")
                 
-        print(f"📊 Global structural pattern report saved safely to: {os.path.abspath(sequence_report_path)}")
+            rep_f.write("\n" + "="*72 + "\n\n")
+            
+            # --- SECTION 2: PROSE SYSTEM (is_poetry_flag == "0") ---
+            rep_f.write("=== [ SECTION II: PROSE ACCENT SYSTEM (The 21 Books) ] ===\n\n")
+            prose_df = analysis_df[analysis_df["is_poetry"] == "0"]
+            
+            for sub_type in ["Left Approach", "Right Resolution", "No Atnah"]:
+                sub_df = prose_df[prose_df["type"] == sub_type]
+                counts = Counter(sub_df["sequence_pattern"])
+                rep_f.write(f"--- Ranked Patterns: Prose {sub_type} (Total: {len(sub_df)}) ---\n")
+                
+                for pattern, count in counts.most_common(15):
+                    pct = (count / len(sub_df)) * 100 if len(sub_df) > 0 else 0
+                    rep_f.write(f" 📖 [ {pattern} ] -> Used {count} times ({pct:.1f}%)\n")
+                rep_f.write("\n")
+                
+        print(f"📊 Success! Detailed structural report saved to: {sequence_report_path}")
+        # --- THIS IS THE CALL TO YOUR NEW DASHBOARD MATRIX ---
+        # Import your standalone visualization engine file
+        import generate_reconciliation_matrix as grm
+        
+        # Execute the HTML builder by passing it your master log array
+        grm.build_reconciliation_matrix(master_sequence_log)
