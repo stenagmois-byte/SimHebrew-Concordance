@@ -3,18 +3,11 @@ import pandas as pd
 from collections import Counter
 
 def build_reconciliation_matrix(master_sequence_log):
-    print("🚀 Initializing Calibrated Modal Reconciliation Matrix...")
+    print("🚀 Initializing Comparative Matrix with Reference Mapping...")
     
     if not master_sequence_log:
         print("❌ Error: master_sequence_log is empty.")
         return
-
-    # THE VALUE LOCATION: Safely nested right after the return checkpoint
-    DEGREE_MAP = {
-        'D5':'7', 'C5':'6', 'B4':'5', 'A4':'4', 'G4':'3', 'F4':'2',
-        'E4':'1',
-        'D4':'-1', 'C4':'-2'
-    }
 
     df = pd.DataFrame(master_sequence_log)
     
@@ -28,68 +21,28 @@ def build_reconciliation_matrix(master_sequence_log):
     reconciled_verses_prose = total_left_prose + total_no_atnah_prose
     grand_total_verses = reconciled_verses_poetry + reconciled_verses_prose
 
-    # 2. Independent Helper Functions
+    # 2. Extract Clean Diatonic Shapes (Strips sharps)
     def get_diatonic_shape(row):
         raw_pattern = str(row.get("sequence_pattern", "")).strip()
         return " ".join(raw_pattern.replace("#", "").split())
 
-    def get_modal_shorthand(row):
-        raw_pattern = str(row.get("sequence_pattern", "")).strip()
-        clean_notes = raw_pattern.replace("#", "").split()
-        
-        if not clean_notes:
-            return ""
-            
-        shorthand_steps = []
-        for note in clean_notes:
-            pitch_token = note.upper().strip()
-            # Grabs values natively from the map definition above
-            step_num = DEGREE_MAP.get(pitch_token, '?')
-            shorthand_steps.append(step_num)
-            
-        return " ".join(shorthand_steps)
-
-    # 3. Apply the mappings one-by-one to prevent ValueError conflicts
     df["diatonic_shape"] = df.apply(get_diatonic_shape, axis=1)
-    df["shorthand"] = df.apply(get_modal_shorthand, axis=1)
-    # ==========================================================================
-    # 4. FUNCTIONAL CONTEXT GROUPING DEFINITIONS (Independent Multi-Tier Fix)
-    # ==========================================================================
-    
+
+    # 3. Apply Functional Context Grouping Tiers
     def get_sort_tier(row):
         orig_type = row.get("type", "")
-        shorthand = str(row.get("shorthand", "")).strip()
-        
-        # Highlight critical 1-2-1 supertonic cadences in poetry explicitly
-        if row.get("is_poetry") == "1" and (shorthand.endswith("1 2 1") or shorthand == "1 2 1"):
-            return 1.5
-            
-        if orig_type == "Left Approach":
-            return 1
-        elif orig_type == "Right Resolution":
-            return 2
-        else:
-            return 3
+        if orig_type == "Left Approach": return 1
+        elif orig_type == "Right Resolution": return 2
+        else: return 3
 
     def get_functional_context(row):
         orig_type = row.get("type", "")
-        shorthand = str(row.get("shorthand", "")).strip()
-        
-        # Highlight label for 1-2-1 supertonic cadences
-        if row.get("is_poetry") == "1" and (shorthand.endswith("1 2 1") or shorthand == "1 2 1"):
-            return "Poetic Cadence on Supertonic (1 2 1)"
-            
-        if orig_type == "Left Approach":
-            return "Approaching the subdominant"
-        elif orig_type == "Right Resolution":
-            return "Returning to the tonic"
-        else:
-            return "No subdominant"
+        if orig_type == "Left Approach": return "Approaching the subdominant"
+        elif orig_type == "Right Resolution": return "Returning to the tonic"
+        else: return "No subdominant"
 
-    # Apply calculations independently to completely eliminate packing errors
     df["sort_tier"] = df.apply(get_sort_tier, axis=1)
     df["functional_context"] = df.apply(get_functional_context, axis=1)
-
 
     # 4. Compile Split Counter Subsets
     poetry_subset = df[df["is_poetry"] == "1"]
@@ -98,7 +51,7 @@ def build_reconciliation_matrix(master_sequence_log):
     poetry_totals = len(poetry_subset)
     prose_totals = len(prose_subset)
 
-    # 5. Extract Unique Keys and Sort strictly by your 3 custom structural categories
+    # 5. Extract Unique Keys Sorted by Tier and Shape Structure
     unique_rows = df.drop_duplicates(subset=["diatonic_shape", "functional_context"])
     unique_rows = unique_rows.sort_values(by=["sort_tier", "diatonic_shape"])
 
@@ -116,10 +69,10 @@ def build_reconciliation_matrix(master_sequence_log):
     .matrix-table { width: 100%; border-collapse: collapse; font-family: 'Georgia', serif; margin: 25px 0; }
     .matrix-table td { padding: 12px; border: 1px solid #ddd; vertical-align: middle; }
     .matrix-hdr { background-color: #f3f0e8; color: #800000; font-weight: bold; text-align: center; }
-    .section-divider { background-color: #eaeaea; color: #222; font-weight: bold; padding: 8px 12px; font-size: 1.05rem; }
-    .supertonic-row { background-color: #fff4f4 !important; border-left: 5px solid #d35400; }
+    .section-divider { background-color: #eaeaea; color: #222; font-weight: bold; padding: 10px 12px; font-size: 1.1rem; border-top: 3px solid #800000; }
     .blank-cell { background-color: #fafafa; font-style: italic; color: #aaa; text-align: center; }
     .num-col { text-align: right; font-variant-numeric: tabular-nums; padding-right: 15px; }
+    .sample-text { font-size: 0.85rem; color: #666; font-family: sans-serif; line-height: 1.4; display: block; max-width: 280px; word-wrap: break-word; }
     .reconcile-box { background-color: #fffcf4; border: 2px solid #800000; padding: 20px; margin-top: 40px; border-radius: 6px; }
     .reconcile-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
     .reconcile-table td { padding: 8px; border-bottom: 1px solid #e1e4e6; }
@@ -127,17 +80,17 @@ def build_reconciliation_matrix(master_sequence_log):
 </head>
 <body>
 
-  <div class="nav"><a href="index.html">← Back to Volume Directory</a></div>
+  <div class="nav"><a href="musicscores\index.html">← Back to Volume Directory</a></div>
 
   <h1>Diatonic Alignment & Reconciliation Matrix</h1>
-  <p>Isolated structural note paths compared by stripping accidentals. Grouped functionally to map out the foundational syntax of biblical modality.</p>
+  <p>Isolated structural note paths compared by stripping accidentals. Grouped functionally to track occurrences and reference locations side-by-side.</p>
 
   <table class="matrix-table">
     <thead>
       <tr>
         <td class="matrix-hdr" style="width: 25%;">Prose Diatonic Phrase</td>
         <td class="matrix-hdr" style="width: 25%;">Poetic Diatonic Phrase</td>
-        <td class="matrix-hdr" style="width: 15%;">Shorthand</td>
+        <td class="matrix-hdr" style="width: 25%;">Sample Text Reference Occurrences</td>
         <td class="matrix-hdr" class="num-col">Prose Count</td>
         <td class="matrix-hdr" class="num-col">Prose %</td>
         <td class="matrix-hdr" class="num-col">Poetry Count</td>
@@ -151,20 +104,17 @@ def build_reconciliation_matrix(master_sequence_log):
     for _, row in unique_rows.iterrows():
         shape = row["diatonic_shape"]
         context_label = row["functional_context"]
-        shorthand = row["shorthand"]
-        tier = row["sort_tier"]
         
-        # Inject bold horizontal headings when moving between your 3 functional tiers
         if context_label != current_group:
             current_group = context_label
             html += f"      <tr><td colspan=\"7\" class=\"section-divider\">Structural Tier: {context_label}</td></tr>\n"
 
-        # Apply specific visual highlight rows for your critical 1-2-1 poetic supertonic cadences
-        row_class = " class=\"supertonic-row\"" if tier == 1.5 else ""
-
-        # Query counts safely out of our split data dataframes
-        prose_cnt = len(prose_subset[(prose_subset["diatonic_shape"] == shape) & (prose_subset["functional_context"] == context_label)])
-        poetry_cnt = len(poetry_subset[(poetry_subset["diatonic_shape"] == shape) & (poetry_subset["functional_context"] == context_label)])
+        # Query dynamic matching frames out of our split data sub-pools
+        matching_prose = prose_subset[(prose_subset["diatonic_shape"] == shape) & (prose_subset["functional_context"] == context_label)]
+        matching_poetry = poetry_subset[(poetry_subset["diatonic_shape"] == shape) & (poetry_subset["functional_context"] == context_label)]
+        
+        prose_cnt = len(matching_prose)
+        poetry_cnt = len(matching_poetry)
         
         if prose_cnt == 0 and poetry_cnt == 0:
             continue
@@ -172,7 +122,26 @@ def build_reconciliation_matrix(master_sequence_log):
         prose_pct = (prose_cnt / prose_totals) * 100 if prose_totals > 0 else 0
         poetry_pct = (poetry_cnt / poetry_totals) * 100 if poetry_totals > 0 else 0
 
-        html += f"      <tr{row_class}>\n"
+        # PINPOINT FIX: Gather the first 5 sample verse tokens into a clean text block
+        samples_list = []
+        
+        # Pull up to 3 samples from the prose side if available
+        if not matching_prose.empty:
+            for _, r in matching_prose.head(3).iterrows():
+                # Format book codes nicely (e.g., 1_SAMUEL -> 1 Samuel)
+                b_name = str(r['book']).replace('_', ' ').title()
+                samples_list.append(f"{b_name} {r['chapter']}:{r['verse']}")
+                
+        # Pull up to 3 samples from the poetic side if available
+        if not matching_poetry.empty:
+            for _, r in matching_poetry.head(3).iterrows():
+                b_name = str(r['book']).replace('_', ' ').title()
+                samples_list.append(f"{b_name} {r['chapter']}:{r['verse']}")
+
+        # Join the references with a comma separator inside a compact string container
+        samples_display_str = ", ".join(samples_list)
+
+        html += "      <tr>\n"
         
         # COLUMN 1: PROSE DISPLAY
         if prose_cnt > 0:
@@ -186,8 +155,10 @@ def build_reconciliation_matrix(master_sequence_log):
         else:
             html += "        <td class=\"blank-cell\">— Not used in poetry —</td>\n"
             
+        # COLUMN 3: REFERENCE DATA SAMPLES (Replaces the scale degrees shorthand)
+        html += f"        <td><span class=\"sample-text\">{samples_display_str}</span></td>\n"
+        
         # FREQUENCY METRIC DATA COLUMNS
-        html += f"        <td style=\"color: #555; font-weight: bold;\">{shorthand}</td>\n"
         html += f"        <td class=\"num-col\">{prose_cnt if prose_cnt > 0 else '-'}</td>\n"
         html += f"        <td class=\"num-col\">{f'{prose_pct:.2f}%' if prose_cnt > 0 else '-'}</td>\n"
         html += f"        <td class=\"num-col\">{poetry_cnt if poetry_cnt > 0 else '-'}</td>\n"
@@ -241,4 +212,4 @@ def build_reconciliation_matrix(master_sequence_log):
 
     with open(html_path, "w", encoding="utf-8") as f:
         f.write(html)
-    print(f"📊 Alignment dashboard matrix generated successfully: {os.path.abspath(html_path)}")
+    print(f"✅ Success! Matrix generated with literal chapter-verse text references: {html_path}")
