@@ -9,8 +9,14 @@ def build_reconciliation_matrix(master_sequence_log):
         print("❌ Error: master_sequence_log is empty.")
         return
 
+    # Initialize the DataFrame
     df = pd.DataFrame(master_sequence_log)
     
+    # Pre-initialize target columns as empty strings to guarantee they exist in the index layout
+    df["diatonic_shape"] = ""
+    df["sort_tier"] = 3
+    df["functional_context"] = "No subdominant"
+
     # 1. Global Verse Ledger Reconciliation Calculations
     total_left_poetry = len(df[(df["is_poetry"] == "1") & (df["type"] == "Left Approach")])
     total_left_prose = len(df[(df["is_poetry"] == "0") & (df["type"] == "Left Approach")])
@@ -21,11 +27,12 @@ def build_reconciliation_matrix(master_sequence_log):
     reconciled_verses_prose = total_left_prose + total_no_atnah_prose
     grand_total_verses = reconciled_verses_poetry + reconciled_verses_prose
 
-    # 2. Extract Clean Diatonic Shapes (Strips sharps)
+    # 2. Extract Clean Diatonic Shapes (Strips accidentals)
     def get_diatonic_shape(row):
         raw_pattern = str(row.get("sequence_pattern", "")).strip()
         return " ".join(raw_pattern.replace("#", "").split())
 
+    # Map directly to fill the pre-initialized column field
     df["diatonic_shape"] = df.apply(get_diatonic_shape, axis=1)
 
     # 3. Apply Functional Context Grouping Tiers
@@ -51,7 +58,7 @@ def build_reconciliation_matrix(master_sequence_log):
     poetry_totals = len(poetry_subset)
     prose_totals = len(prose_subset)
 
-    # 5. Extract Unique Keys Sorted by Tier and Shape Structure
+    # 5. Extract Unique Keys Sorted by Tier and Shape Structure (Now perfectly safe from KeyError)
     unique_rows = df.drop_duplicates(subset=["diatonic_shape", "functional_context"])
     unique_rows = unique_rows.sort_values(by=["sort_tier", "diatonic_shape"])
 
@@ -80,7 +87,8 @@ def build_reconciliation_matrix(master_sequence_log):
 </head>
 <body>
 
-  <div class="nav"><a href="musicscores\index.html">← Back to Volume Directory</a></div>
+  <!-- RESOLVED WARNING PATH: Fixed backslash to web forward slash -->
+  <div class="nav"><a href="musicscores/index.html">← Back to Volume Directory</a></div>
 
   <h1>Diatonic Alignment & Reconciliation Matrix</h1>
   <p>Isolated structural note paths compared by stripping accidentals. Grouped functionally to track occurrences and reference locations side-by-side.</p>
@@ -122,40 +130,35 @@ def build_reconciliation_matrix(master_sequence_log):
         prose_pct = (prose_cnt / prose_totals) * 100 if prose_totals > 0 else 0
         poetry_pct = (poetry_cnt / poetry_totals) * 100 if poetry_totals > 0 else 0
 
-        # PINPOINT FIX: Gather the first 5 sample verse tokens into a clean text block
+        # Gather sample references
         samples_list = []
-        
-        # Pull up to 3 samples from the prose side if available
         if not matching_prose.empty:
             for _, r in matching_prose.head(3).iterrows():
-                # Format book codes nicely (e.g., 1_SAMUEL -> 1 Samuel)
                 b_name = str(r['book']).replace('_', ' ').title()
                 samples_list.append(f"{b_name} {r['chapter']}:{r['verse']}")
                 
-        # Pull up to 3 samples from the poetic side if available
         if not matching_poetry.empty:
             for _, r in matching_poetry.head(3).iterrows():
                 b_name = str(r['book']).replace('_', ' ').title()
                 samples_list.append(f"{b_name} {r['chapter']}:{r['verse']}")
 
-        # Join the references with a comma separator inside a compact string container
         samples_display_str = ", ".join(samples_list)
 
         html += "      <tr>\n"
         
-        # COLUMN 1: PROSE DISPLAY
+        # PROSE VIEW
         if prose_cnt > 0:
             html += f"        <td><strong>[ {shape} ]</strong></td>\n"
         else:
             html += "        <td class=\"blank-cell\">— Not used in prose —</td>\n"
             
-        # COLUMN 2: POETRY DISPLAY
+        # POETRY VIEW
         if poetry_cnt > 0:
             html += f"        <td><strong>[ {shape} ]</strong></td>\n"
         else:
             html += "        <td class=\"blank-cell\">— Not used in poetry —</td>\n"
             
-        # COLUMN 3: REFERENCE DATA SAMPLES (Replaces the scale degrees shorthand)
+        # REFERENCE CODES
         html += f"        <td><span class=\"sample-text\">{samples_display_str}</span></td>\n"
         
         # FREQUENCY METRIC DATA COLUMNS
@@ -212,4 +215,4 @@ def build_reconciliation_matrix(master_sequence_log):
 
     with open(html_path, "w", encoding="utf-8") as f:
         f.write(html)
-    print(f"✅ Success! Matrix generated with literal chapter-verse text references: {html_path}")
+    print(f"✅ Success! Matrix compiled with explicit index instantiation and proper slash targets: {html_path}")
