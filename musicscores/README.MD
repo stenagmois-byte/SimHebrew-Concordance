@@ -54,4 +54,4 @@ This framework is a stimulus designed to spark cross-disciplinary research:
 ## ✍️ Dive Deeper
 * **Read the Commentary**: For deep thematic breakdowns, musicological analysis, and historical context, follow the ongoing publication journey at [Bob MacDonald’s Substack](https://substack.com).
 * **Academic Reference**: This digital laboratory serves as the computational companion to the 18-volume print research corpus prepared for publication.
-* **See also our 20-year computational pipeline, [Project Music Overview](./PROJECT-MUSIC-OVERVIEW.md).
+* **See also [Project Music Overview](./PROJECT-MUSIC-OVERVIEW.md).
