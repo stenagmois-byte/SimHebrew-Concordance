@@ -2,7 +2,7 @@ import os, re, zipfile
 from pathlib import Path
 from bs4 import BeautifulSoup
 
-INPUT_DIR = Path("./musicscores")
+INPUT_DIR = Path("./Input")
 
 def run_production_audit():
     for epub_path in sorted(INPUT_DIR.glob("*.epub")):
