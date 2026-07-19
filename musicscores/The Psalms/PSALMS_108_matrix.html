@@ -21,7 +21,16 @@
         .matrix-table { width: 100%; border-collapse: collapse; margin-top: 20px;}
         .verse-row { border-bottom: 1px solid #ddd; display: table-row; }
         .verse-label { font-weight: bold; font-size: 14px; padding: 12px 5px; background: #eaeaea; text-align: center; border-right: 2px solid #bbb; display: table-cell; vertical-align: middle; }
-        .text-label { font-size: 16px; font-weight: bold; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; white-space: normal; direction: rtl; display: table-cell; vertical-align: middle; }
+        .text-label { font-size: 13px; font-weight: bold; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; white-space: normal; direction: rtl; display: table-cell; vertical-align: middle; }
+        /* 📱 RESPONSIVE TABLET ENGINE: Triggers on iPad screen widths and below */
+        @media (max-width: 1024px) {
+            .text-label {
+                max-width: 250px;           /* Clamp the width window */
+                white-space: nowrap;        /* Force text to stay on a single row */
+                overflow: hidden;           /* Hide the overflow text characters */
+                text-overflow: ellipsis;    /* Append clean three-dot ... marking */
+            }
+        }
         .grid-cell { display: table-cell; vertical-align: middle; padding: 5px 0px; }
         /* Assign explicit, fixed widths to the two musical columns to hold the straight vertical axis */
         /* --- PROVEN 3-DIGIT HIGH-DENSITY COLUMN MATH --- */
@@ -50,7 +59,7 @@
         
         /* Interactive Highlight Enclosures */
         .half-verse-container { cursor: pointer; display: block; border-radius: 6px; padding: 4px; transition: all 0.15s ease; }
-        /*.half-verse-container:hover { background-color: rgba(0, 0, 0, 0.04); } */
+        .half-verse-container:hover { background-color: rgba(0, 0, 0, 0.04); } 
         .half-verse-container.highlighted-verse { background-color: #fff176 !important; box-shadow: 0 0 0 2px #fbc02d; }
         .pitch-cell sup { 
             position: absolute;  /* Takes the symbol completely out of the normal layout flow */
@@ -96,7 +105,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">2</td>
-            <td class="text-label" title="נָכ֣וֹן לִבִּ֣י אֱלֹהִ֑ים אָשִׁ֥ירָה וַ֝אֲזַמְּרָ֗ה אַף־כְּבוֹדִֽי">נָכ֣וֹן לִבִּ֣י אֱלֹהִ֑ים אָשִׁ֥ירָה וַ֝אֲזַמְּרָ֗ה אַף־כְּבוֹדִֽי</td>
+            <td class="text-label" title="נָכ֣וֹן לִבִּ֣י אֱלֹהִ֑ים<br>אָשִׁ֥ירָה וַ֝אֲזַמְּרָ֗ה אַף־כְּבוֹדִֽי">נָכ֣וֹן לִבִּ֣י אֱלֹהִ֑ים<br>אָשִׁ֥ירָה וַ֝אֲזַמְּרָ֗ה אַף־כְּבוֹדִֽי</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-A4">
                     <div class="left-wing">
@@ -124,7 +133,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">4</td>
-            <td class="text-label" title="אוֹדְךָ֖ בָעַמִּ֥ים ׀ יְהוָ֑ה וַ֝אֲזַמֶּרְךָ֗ בַּלאֻמִּֽים">אוֹדְךָ֖ בָעַמִּ֥ים ׀ יְהוָ֑ה וַ֝אֲזַמֶּרְךָ֗ בַּלאֻמִּֽים</td>
+            <td class="text-label" title="אוֹדְךָ֖ בָעַמִּ֥ים ׀<br>יְהוָ֑ה וַ֝אֲזַמֶּרְךָ֗ בַּלאֻמִּֽים">אוֹדְךָ֖ בָעַמִּ֥ים ׀<br>יְהוָ֑ה וַ֝אֲזַמֶּרְךָ֗ בַּלאֻמִּֽים</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-G4-F#4-A4">
                     <div class="left-wing">
@@ -138,7 +147,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x3</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">5</td>
-            <td class="text-label" title="כִּֽי־גָד֣וֹל מֵעַל־שָׁמַ֣יִם חַסְדֶּ֑ךָ וְֽעַד־שְׁחָקִ֥ים אֲמִתֶּֽךָ">כִּֽי־גָד֣וֹל מֵעַל־שָׁמַ֣יִם חַסְדֶּ֑ךָ וְֽעַד־שְׁחָקִ֥ים אֲמִתֶּֽךָ</td>
+            <td class="text-label" title="כִּֽי־גָד֣וֹל מֵעַל־שָׁמַ֣יִם<br>חַסְדֶּ֑ךָ וְֽעַד־שְׁחָקִ֥ים אֲמִתֶּֽךָ">כִּֽי־גָד֣וֹל מֵעַל־שָׁמַ֣יִם<br>חַסְדֶּ֑ךָ וְֽעַד־שְׁחָקִ֥ים אֲמִתֶּֽךָ</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-A4">
                     <div class="left-wing">
@@ -152,7 +161,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x2</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">6</td>
-            <td class="text-label" title="ר֣וּמָה עַל־שָׁמַ֣יִם אֱלֹהִ֑ים וְעַ֖ל כָּל־הָאָ֣רֶץ כְּבוֹדֶֽךָ">ר֣וּמָה עַל־שָׁמַ֣יִם אֱלֹהִ֑ים וְעַ֖ל כָּל־הָאָ֣רֶץ כְּבוֹדֶֽךָ</td>
+            <td class="text-label" title="ר֣וּמָה עַל־שָׁמַ֣יִם אֱלֹהִ֑ים וְעַ֖ל<br>כָּל־הָאָ֣רֶץ כְּבוֹדֶֽךָ">ר֣וּמָה עַל־שָׁמַ֣יִם אֱלֹהִ֑ים וְעַ֖ל<br>כָּל־הָאָ֣רֶץ כְּבוֹדֶֽךָ</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="B4-A4">
                     <div class="left-wing">
@@ -166,7 +175,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x2</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">7</td>
-            <td class="text-label" title="לְ֭מַעַן יֵחָלְצ֣וּן יְדִידֶ֑יךָ הוֹשִׁ֖יעָה יְמִֽינְךָ֣ וַעֲנֵֽנִי">לְ֭מַעַן יֵחָלְצ֣וּן יְדִידֶ֑יךָ הוֹשִׁ֖יעָה יְמִֽינְךָ֣ וַעֲנֵֽנִי</td>
+            <td class="text-label" title="לְ֭מַעַן יֵחָלְצ֣וּן יְדִידֶ֑יךָ<br>הוֹשִׁ֖יעָה יְמִֽינְךָ֣ וַעֲנֵֽנִי">לְ֭מַעַן יֵחָלְצ֣וּן יְדִידֶ֑יךָ<br>הוֹשִׁ֖יעָה יְמִֽינְךָ֣ וַעֲנֵֽנִי</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="G4-B4-A4">
                     <div class="left-wing">
@@ -180,7 +189,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">8</td>
-            <td class="text-label" title="אֱלֹהִ֤ים ׀ דִּבֶּ֥ר בְּקָדְשׁ֗וֹ אֶעְלֹ֥זָה אֲחַלְּקָ֥ה שְׁכֶ֑ם וְעֵ֖מֶק סֻכּ֣וֹת אֲמַדֵּֽד">אֱלֹהִ֤ים ׀ דִּבֶּ֥ר בְּקָדְשׁ֗וֹ אֶעְלֹ֥זָה אֲחַלְּקָ֥ה שְׁכֶ֑ם וְעֵ֖מֶק סֻכּ֣וֹת אֲמַדֵּֽד</td>
+            <td class="text-label" title="אֱלֹהִ֤ים ׀ דִּבֶּ֥ר בְּקָדְשׁ֗וֹ אֶעְלֹ֥זָה אֲחַלְּקָ֥ה<br>שְׁכֶ֑ם וְעֵ֖מֶק סֻכּ֣וֹת אֲמַדֵּֽד">אֱלֹהִ֤ים ׀ דִּבֶּ֥ר בְּקָדְשׁ֗וֹ אֶעְלֹ֥זָה אֲחַלְּקָ֥ה<br>שְׁכֶ֑ם וְעֵ֖מֶק סֻכּ֣וֹת אֲמַדֵּֽד</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-C5-F#4-A4">
                     <div class="left-wing">
@@ -194,7 +203,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x2</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">9</td>
-            <td class="text-label" title="לִ֤י גִלְעָ֨ד ׀ לִ֤י מְנַשֶּׁ֗ה וְ֭אֶפְרַיִם מָע֣וֹז רֹאשִׁ֑י יְ֝הוּדָ֗ה מְחֹקְקִֽי">לִ֤י גִלְעָ֨ד ׀ לִ֤י מְנַשֶּׁ֗ה וְ֭אֶפְרַיִם מָע֣וֹז רֹאשִׁ֑י יְ֝הוּדָ֗ה מְחֹקְקִֽי</td>
+            <td class="text-label" title="לִ֤י גִלְעָ֨ד ׀ לִ֤י מְנַשֶּׁ֗ה וְ֭אֶפְרַיִם מָע֣וֹז<br>רֹאשִׁ֑י יְ֝הוּדָ֗ה מְחֹקְקִֽי">לִ֤י גִלְעָ֨ד ׀ לִ֤י מְנַשֶּׁ֗ה וְ֭אֶפְרַיִם מָע֣וֹז<br>רֹאשִׁ֑י יְ֝הוּדָ֗ה מְחֹקְקִֽי</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="C5-G4-B4-A4">
                     <div class="left-wing">
@@ -208,7 +217,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x3</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">10</td>
-            <td class="text-label" title="מוֹאָ֤ב ׀ סִ֬יר רַחְצִ֗י עַל־אֱ֭דוֹם אַשְׁלִ֣יךְ נַעֲלִ֑י עֲלֵי־פְ֝לֶ֗שֶׁת אֶתְרוֹעָֽע">מוֹאָ֤ב ׀ סִ֬יר רַחְצִ֗י עַל־אֱ֭דוֹם אַשְׁלִ֣יךְ נַעֲלִ֑י עֲלֵי־פְ֝לֶ֗שֶׁת אֶתְרוֹעָֽע</td>
+            <td class="text-label" title="מוֹאָ֤ב ׀ סִ֬יר רַחְצִ֗י עַל־אֱ֭דוֹם אַשְׁלִ֣יךְ נַעֲלִ֑י<br>עֲלֵי־פְ֝לֶ֗שֶׁת אֶתְרוֹעָֽע">מוֹאָ֤ב ׀ סִ֬יר רַחְצִ֗י עַל־אֱ֭דוֹם אַשְׁלִ֣יךְ נַעֲלִ֑י<br>עֲלֵי־פְ֝לֶ֗שֶׁת אֶתְרוֹעָֽע</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-C5-G4-B4-A4">
                     <div class="left-wing">
@@ -222,7 +231,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x3</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">11</td>
-            <td class="text-label" title="מִ֣י יֹ֭בִלֵנִי עִ֣יר מִבְצָ֑ר מִ֖י נָחַ֣נִי עַד־אֱדֽוֹם">מִ֣י יֹ֭בִלֵנִי עִ֣יר מִבְצָ֑ר מִ֖י נָחַ֣נִי עַד־אֱדֽוֹם</td>
+            <td class="text-label" title="מִ֣י יֹ֭בִלֵנִי עִ֣יר מִבְצָ֑ר<br>מִ֖י נָחַ֣נִי עַד־אֱדֽוֹם">מִ֣י יֹ֭בִלֵנִי עִ֣יר מִבְצָ֑ר<br>מִ֖י נָחַ֣נִי עַד־אֱדֽוֹם</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="B4-G4-B4-A4">
                     <div class="left-wing">
@@ -236,7 +245,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#7ED321; color:#fff;">G4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">12</td>
-            <td class="text-label" title="הֲלֹֽא־אֱלֹהִ֥ים זְנַחְתָּ֑נוּ וְֽלֹא־תֵצֵ֥א אֱ֝לֹהִ֗ים בְּצִבְאֹתֵֽינוּ">הֲלֹֽא־אֱלֹהִ֥ים זְנַחְתָּ֑נוּ וְֽלֹא־תֵצֵ֥א אֱ֝לֹהִ֗ים בְּצִבְאֹתֵֽינוּ</td>
+            <td class="text-label" title="הֲלֹֽא־אֱלֹהִ֥ים זְנַחְתָּ֑נוּ וְֽלֹא־תֵצֵ֥א<br>אֱ֝לֹהִ֗ים בְּצִבְאֹתֵֽינוּ">הֲלֹֽא־אֱלֹהִ֥ים זְנַחְתָּ֑נוּ וְֽלֹא־תֵצֵ֥א<br>אֱ֝לֹהִ֗ים בְּצִבְאֹתֵֽינוּ</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-F#4-A4">
                     <div class="left-wing">
@@ -250,7 +259,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (F#4)</span><span class="motif-count-badge">x2</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">13</td>
-            <td class="text-label" title="הָֽבָה־לָּ֣נוּ עֶזְרָ֣ת מִצָּ֑ר וְ֝שָׁ֗וְא תְּשׁוּעַ֥ת אָדָֽם">הָֽבָה־לָּ֣נוּ עֶזְרָ֣ת מִצָּ֑ר וְ֝שָׁ֗וְא תְּשׁוּעַ֥ת אָדָֽם</td>
+            <td class="text-label" title="הָֽבָה־לָּ֣נוּ עֶזְרָ֣ת מִצָּ֑ר וְ֝שָׁ֗וְא<br>תְּשׁוּעַ֥ת אָדָֽם">הָֽבָה־לָּ֣נוּ עֶזְרָ֣ת מִצָּ֑ר וְ֝שָׁ֗וְא<br>תְּשׁוּעַ֥ת אָדָֽם</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-A4">
                     <div class="left-wing">
@@ -264,7 +273,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x3</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">14</td>
-            <td class="text-label" title="בֵּֽאלֹהִ֥ים נַעֲשֶׂה־חָ֑יִל וְ֝ה֗וּא יָב֥וּס צָרֵֽינוּ">בֵּֽאלֹהִ֥ים נַעֲשֶׂה־חָ֑יִל וְ֝ה֗וּא יָב֥וּס צָרֵֽינוּ</td>
+            <td class="text-label" title="בֵּֽאלֹהִ֥ים נַעֲשֶׂה־חָ֑יִל וְ֝ה֗וּא<br>יָב֥וּס צָרֵֽינוּ">בֵּֽאלֹהִ֥ים נַעֲשֶׂה־חָ֑יִל וְ֝ה֗וּא<br>יָב֥וּס צָרֵֽינוּ</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-F#4-A4">
                     <div class="left-wing">

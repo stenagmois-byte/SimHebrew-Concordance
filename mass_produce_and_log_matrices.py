@@ -90,7 +90,16 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         .matrix-table {{ width: 100%; border-collapse: collapse; margin-top: 20px;}}
         .verse-row {{ border-bottom: 1px solid #ddd; display: table-row; }}
         .verse-label {{ font-weight: bold; font-size: 14px; padding: 12px 5px; background: #eaeaea; text-align: center; border-right: 2px solid #bbb; display: table-cell; vertical-align: middle; }}
-        .text-label {{ font-size: 16px; font-weight: bold; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; white-space: normal; direction: rtl; display: table-cell; vertical-align: middle; }}
+        .text-label {{ font-size: 13px; font-weight: bold; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; white-space: normal; direction: rtl; display: table-cell; vertical-align: middle; }}
+        /* 📱 RESPONSIVE TABLET ENGINE: Triggers on iPad screen widths and below */
+        @media (max-width: 1024px) {{
+            .text-label {{
+                max-width: 250px;           /* Clamp the width window */
+                white-space: nowrap;        /* Force text to stay on a single row */
+                overflow: hidden;           /* Hide the overflow text characters */
+                text-overflow: ellipsis;    /* Append clean three-dot ... marking */
+            }}
+        }}
         .grid-cell {{ display: table-cell; vertical-align: middle; padding: 5px 0px; }}
         /* Assign explicit, fixed widths to the two musical columns to hold the straight vertical axis */
         /* --- PROVEN 3-DIGIT HIGH-DENSITY COLUMN MATH --- */
@@ -119,7 +128,7 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         
         /* Interactive Highlight Enclosures */
         .half-verse-container {{ cursor: pointer; display: block; border-radius: 6px; padding: 4px; transition: all 0.15s ease; }}
-        /*.half-verse-container:hover {{ background-color: rgba(0, 0, 0, 0.04); }} */
+        .half-verse-container:hover {{ background-color: rgba(0, 0, 0, 0.04); }} 
         .half-verse-container.highlighted-verse {{ background-color: #fff176 !important; box-shadow: 0 0 0 2px #fbc02d; }}
         .pitch-cell sup {{ 
             position: absolute;  /* Takes the symbol completely out of the normal layout flow */
@@ -358,16 +367,31 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         if 'HEB_TEXT' in group.columns:
             valid_heb = group['HEB_TEXT'].dropna()
             if not valid_heb.empty:
-                heb = html.unescape(str(valid_heb.iloc[0])).replace('\n', ' ').strip()
+                # 1. Clean the raw string from the JSON column
+                raw_heb_string = html.unescape(str(valid_heb.iloc[0])).replace('\n', ' ').strip()
                 
-            # --- POETIC VISUAL UN-TRUNCATION ---
-            if is_poetry_flag == "1":
-                # Let the full text line layout wrap naturally for Wisdom's stage
-                pass 
-            else:
-                # Maintain high-density trimming for massive prose rosters
-                # heb = (heb[:160] + '...') if len(heb) > 160 else heb
-                pass
+                # 2. If a structural cadence divide exists, execute a precision split
+                if pause_raw_idx != -1:
+                    heb_words = raw_heb_string.split()
+                    
+                    # Count how many individual word-boundaries exist in the left wing.
+                    # We map this by looking at how many syllable segments fall up to the pause index
+                    # that do not contain a trailing hyphen separator.
+                    left_word_count = len([s for s in syllables[:pause_raw_idx + 1] if not str(s).endswith('-')])
+                    
+                    # Safe boundary guard: Ensure the calculated split index makes logical sense
+                    if 0 < left_word_count < len(heb_words):
+                        # Combine left and right parts cleanly separated by a line break
+                        left_text_part = " ".join(heb_words[:left_word_count])
+                        right_text_part = " ".join(heb_words[left_word_count:])
+                        heb = f"{left_text_part}<br>{right_text_part}"
+                    else:
+                        # Fallback to absolute center split if string mapping is anomalous
+                        mid_pt = len(heb_words) // 2
+                        heb = f"{' '.join(heb_words[:mid_pt])}<br>{' '.join(heb_words[mid_pt:])}"
+                else:
+                    # Fallback if there is no structural divide (e.g. verse has no Atnah/Oleh)
+                    heb = raw_heb_string
         tuba_str = f'<span class="tuba-badge">📯 TUBA ({tuba_pitch})</span>' if tuba_pitch else ''
         
         left_key = " ".join(left_notes)
