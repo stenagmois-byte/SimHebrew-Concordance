@@ -26,9 +26,9 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
     """
 
     w_col1 = "3%"   # Compressed number space
-    w_col2 = "27%"  # Snug text space for trimmed names
-    w_col3 = "40%"  # Wide Left-Wing grid for long note paths
-    w_col4 = "30%"  # Wide Right-Wing grid for long note paths
+    w_col2 = "40%"  # Maximum space for full Hebrew lines
+    w_col3 = "32%"  # Snug Left-Wing grid path
+    w_col4 = "25%"  # Snug Right-Wing grid path
     is_poetry_flag = "0"
     clean_book = str(book_id).upper().strip()
     if clean_book in ["PSALMS", "PROVERBS"]:
@@ -87,10 +87,10 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         .legend {{ display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; background: #f5f5f5; padding: 15px; border-radius: 6px; }}
         .legend-item {{ display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: bold; }}
         .color-box {{ width: 20px; height: 20px; border-radius: 4px; border: 1px solid #999; }}
-        .matrix-table {{ width: 100%; border-collapse: collapse; margin-top: 20px; table-layout: fixed;}}
+        .matrix-table {{ width: 100%; border-collapse: collapse; margin-top: 20px;}}
         .verse-row {{ border-bottom: 1px solid #ddd; display: table-row; }}
         .verse-label {{ font-weight: bold; font-size: 14px; padding: 12px 5px; background: #eaeaea; text-align: center; border-right: 2px solid #bbb; display: table-cell; vertical-align: middle; }}
-        .text-label {{ font-size: 16px; font-weight: bold; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; text-overflow: ellipsis; white-space: normal; direction: rtl; display: table-cell; vertical-align: middle; }}
+        .text-label {{ font-size: 16px; font-weight: bold; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; white-space: normal; direction: rtl; display: table-cell; vertical-align: middle; }}
         .grid-cell {{ display: table-cell; vertical-align: middle; padding: 5px 0px; }}
         /* Assign explicit, fixed widths to the two musical columns to hold the straight vertical axis */
         /* --- PROVEN 3-DIGIT HIGH-DENSITY COLUMN MATH --- */
@@ -119,7 +119,7 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         
         /* Interactive Highlight Enclosures */
         .half-verse-container {{ cursor: pointer; display: block; border-radius: 6px; padding: 4px; transition: all 0.15s ease; }}
-        .half-verse-container:hover {{ background-color: rgba(0, 0, 0, 0.04); }}
+        /*.half-verse-container:hover {{ background-color: rgba(0, 0, 0, 0.04); }} */
         .half-verse-container.highlighted-verse {{ background-color: #fff176 !important; box-shadow: 0 0 0 2px #fbc02d; }}
         .pitch-cell sup {{ 
             position: absolute;  /* Takes the symbol completely out of the normal layout flow */
@@ -419,7 +419,7 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
                     </div>
                 </div>
             </td>
-            <td class="grid-cell" style="width: 100%;">
+            <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="{right_id_signature}">
                     <div class="right-wing">"""
         
