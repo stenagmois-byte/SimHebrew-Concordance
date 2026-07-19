@@ -116,6 +116,11 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         .left-wing {{ display: flex; gap: 4px; justify-content: flex-end; min-width: 250px; border-right: 3px dashed #9B51E0; padding-right: 12px; }}
         .right-wing {{ display: flex; gap: 4px; justify-content: flex-start; padding-left: 12px; align-items: center; width: auto; overflow: visible; }}
         .pitch-cell {{ position: relative; padding: 4px 6px; border-radius: 4px; color: #fff; font-weight: bold; font-size: 11px; text-shadow: 1px 1px 1px rgba(0,0,0,0.4); border: 1px solid rgba(0,0,0,0.1); text-align: center; min-width: 28px; flex-shrink: 0; }}
+        
+        /* Interactive Highlight Enclosures */
+        .half-verse-container {{ cursor: pointer; display: block; border-radius: 6px; padding: 4px; transition: all 0.15s ease; }}
+        .half-verse-container:hover {{ background-color: rgba(0, 0, 0, 0.04); }}
+        .half-verse-container.highlighted-verse {{ background-color: #fff176 !important; box-shadow: 0 0 0 2px #fbc02d; }}
         .pitch-cell sup {{ 
             position: absolute;  /* Takes the symbol completely out of the normal layout flow */
             top: -2px;          /* Slides the symbol up right to the top inside edge of the box */
@@ -377,13 +382,18 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         first_pitch = left_notes[0] if left_notes else (right_notes[0] if right_notes else "E4")
         bridge_marker = '<span class="entry-glyph-anchor">★</span>' if first_pitch != "E4" else ''
         
+        # Calculate distinct sequence identifiers based on note combinations
+        left_id_signature = "-".join(left_notes) if left_notes else "empty-left"
+        right_id_signature = "-".join(right_notes) if right_notes else "empty-right"
+                        
         html_content += f"""
         <tr class="verse-row">
             <td class="verse-label">{clean_verse_display}</td>
             <td class="text-label" title="{heb}">{heb}</td>
             <td class="grid-cell">
-                <div class="left-wing">
-                    {bridge_marker}{left_badge}
+                <div class="half-verse-container" data-half-verse-id="{left_id_signature}">
+                    <div class="left-wing">
+                        {bridge_marker}{left_badge}
         """
         
         if not left_notes:
@@ -405,7 +415,13 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
                     
                 html_content += f'<div class="pitch-cell{is_edge}" style="background:{bg_color}; color:{text_color};">{ornament_string}{ole_symbol}{zaqef_symbol}{pitch}</div>'
             
-        html_content += f"""</div></td><td class="grid-cell"><div class="right-wing">"""
+        html_content += f"""
+                    </div>
+                </div>
+            </td>
+            <td class="grid-cell" style="width: 100%;">
+                <div class="half-verse-container" data-half-verse-id="{right_id_signature}">
+                    <div class="right-wing">"""
         
         for i, pitch in enumerate(right_notes):
             bg_color = COLOR_PALETTE.get(pitch, "#FFFFFF")
@@ -421,11 +437,36 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
                 
             html_content += f'<div class="pitch-cell" style="background:{bg_color}; color:{text_color};">{right_ornament_string}{zaqef_symbol}{pitch}</div>'
             
-        html_content += f"{tuba_str}{right_badge}</div></td></tr>"
+        # FIX: Added </div> right after right_badge to safely close the half-verse container wrapper
+        html_content += f"{tuba_str}{right_badge}</div></div></td></tr>"
         
     footer_tally_str = f'<div class="poetic-footer-tally">Poetic Structural Summary: {poetic_fsharp4_total} verses carry F#4 accents in this score.</div>' if poetic_fsharp4_total > 0 else ''
     
-    html_content += f"""</table>{footer_tally_str}</body></html>"""
+    html_content += """
+    </table>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const structuralBlocks = document.querySelectorAll('.half-verse-container');
+        structuralBlocks.forEach(element => {
+            element.addEventListener('click', (event) => {
+                const identifier = element.getAttribute('data-half-verse-id');
+                if(identifier === "empty-left" || identifier === "empty-right") return;
+                
+                const isAlreadySelected = element.classList.contains('highlighted-verse');
+                structuralBlocks.forEach(el => el.classList.remove('highlighted-verse'));
+                
+                if(!isAlreadySelected) {
+                    // TRIPLE UP the braces so Python leaves the JavaScript variable intact
+                    const structuralMatches = document.querySelectorAll(`[data-half-verse-id="${identifier}"]`);
+                    structuralMatches.forEach(el => el.classList.add('highlighted-verse'));
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html>"""
     return html_content
     
 
