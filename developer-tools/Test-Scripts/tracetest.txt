@@ -1,0 +1,55 @@
+ Verse Content: אִם־יֹאמְרוּ֮ לְכָ֪ה אִ֫תָּ֥נוּ נֶאֶרְבָ֥ה לְדָ֑ם נִצְפְּנָ֖ה לְנָקִ֣י חִנָּֽם
+📊 Ole detected in string:
+📊 ole_split_idx value calculated: 3
+📊 atnah_split_idx value calculated: 5
+🔗 Test Split Part 1: אִם־יֹאמְרוּ֮ לְכָ֪ה אִ֫תָּ֥נוּ
+🔗 Test Split Part 2: נֶאֶרְבָ֥ה לְדָ֑ם נִצְפְּנָ֖ה לְנָקִ֣י חִנָּֽם
+🔗 Test Split Part 3: נִצְפְּנָ֖ה לְנָקִ֣י חִנָּֽם
+📄 Verse Content: בְּרֹ֥אשׁ הֹמִיּ֗וֹת תִּ֫קְרָ֥א בְּפִתְחֵ֖י שְׁעָרִ֥ים בָּעִ֗יר אֲמָרֶ֥יהָ תֹאמֵֽר
+📊 Ole detected in string:
+📊 ole_split_idx value calculated: 3
+📊 atnah_split_idx value calculated: -1
+🔗 Test Split Part 1: בְּרֹ֥אשׁ הֹמִיּ֗וֹת תִּ֫קְרָ֥א
+🔗 Test Split Part 2: בְּפִתְחֵ֖י שְׁעָרִ֥ים בָּעִ֗יר אֲמָרֶ֥יהָ תֹאמֵֽר
+❌ ERROR: Ole found in verse string but loop failed to match it!
+📄 Verse Content: עַד־מָתַ֣י ׀ פְּתָיִם֮ תְּֽאֵהֲב֫וּ פֶ֥תִי וְלֵצִ֗ים לָ֭צוֹן חָמְד֣וּ לָהֶ֑ם וּ֝כְסִילִ֗ים יִשְׂנְאוּ־דָֽעַת
+📊 Ole detected in string:
+📊 ole_split_idx value calculated: 5
+📊 atnah_split_idx value calculated: 9
+🔗 Test Split Part 1: עַד־מָתַ֣י ׀ פְּתָיִם֮ תְּֽאֵהֲב֫וּ פֶ֥תִי
+🔗 Test Split Part 2: וְלֵצִ֗ים לָ֭צוֹן חָמְד֣וּ לָהֶ֑ם וּ֝כְסִילִ֗ים יִשְׂנְאוּ־דָֽעַת
+🔗 Test Split Part 3: וּ֝כְסִילִ֗ים יִשְׂנְאוּ־דָֽעַת
+📄 Verse Content: תָּשׁ֗וּבוּ לְֽת֫וֹכַחְתִּ֥י הִנֵּ֤ה אַבִּ֣יעָה לָכֶ֣ם רוּחִ֑י אוֹדִ֖יעָה דְבָרַ֣י אֶתְכֶֽם
+📊 Ole detected in string:
+📊 ole_split_idx value calculated: 2
+📊 atnah_split_idx value calculated: 6
+🔗 Test Split Part 1: תָּשׁ֗וּבוּ לְֽת֫וֹכַחְתִּ֥י
+🔗 Test Split Part 2: הִנֵּ֤ה אַבִּ֣יעָה לָכֶ֣ם רוּחִ֑י אוֹדִ֖יעָה דְבָרַ֣י אֶתְכֶֽם
+🔗 Test Split Part 3: אוֹדִ֖יעָה דְבָרַ֣י אֶתְכֶֽם
+✅ Compiled: Proverbs -> PROVERBS_001_matrix.html
+
+        # ====================================================================
+        # 🔍 LOUD CONSOLE TRACE FOR OLE-VEYORED DIAGNOSIS
+        # ====================================================================
+        if found_ole_marker:
+            print(f"📄 Verse Content: {raw_heb_string}")
+            print(f"📊 Ole detected in string:")
+            print(f"📊 ole_split_idx value calculated: {ole_split_idx}")
+            print(f"📊 atnah_split_idx value calculated: {atnah_split_idx}")
+            
+            # Test if the string replacement block is executing
+            if ole_split_idx != -1:
+                test_part1 = " ".join(processed_words[:ole_split_idx])
+                test_part2 = " ".join(processed_words[ole_split_idx:])
+                print(f"🔗 Test Split Part 1: {test_part1}")
+                print(f"🔗 Test Split Part 2: {test_part2}")
+            else:
+                print("❌ ERROR: Ole found in verse string but loop failed to match it!")
+            # Test if the string replacement block is executing
+            if atnah_split_idx != -1:
+                test_part3 = " ".join(processed_words[atnah_split_idx:])
+                print(f"🔗 Test Split Part 3: {test_part3}")
+            else:
+                print("❌ ERROR: Ole found in verse string but loop failed to match it!")
+
+        # ====================================================================

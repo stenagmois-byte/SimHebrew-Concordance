@@ -46,8 +46,8 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
     # --- DYNAMIC FLUID GRID PERCENTAGE MAPPER ---
     if is_poetry_flag == "1":
         # Poetic Canvas: Give the expanded Hebrew text plenty of room, balancing the wings
-        w_col1 = "5%"   # Verse number
-        w_col2 = "30%"  # Expanded Hebrew text (Breathing room for full lines)
+        w_col1 = "3%"   # Verse number
+        w_col2 = "32%"  # Expanded Hebrew text (Breathing room for full lines)
         w_col3 = "35%"  # Left-Wing Musical Grid
         w_col4 = "30%"  # Right-Wing Musical Grid
     try:
@@ -260,11 +260,14 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         has_global_ole = any("ole" in str(orn) for orn in ornaments_raw)
         
         left_raw, right_raw, left_ornaments, right_ornaments = [], [], [], []
-        
-        pause_raw_idx = -1
         pivot_pitch = None
         
-        if has_global_atnah:
+        # 1. INITIALIZE SAFELY: Ensure pause_raw_idx starts at -1 (the absolute null/no-cadence state)
+        pause_raw_idx = -1
+        ole_marker_idx = -1
+
+        # RULE A: ATNAH TAKES PRIMACY (Break at the A4 word boundary)
+        if has_global_atnah and "A4" in raw_notes:
             pivot_pitch = "A4"
             first_target_idx = raw_notes.index("A4")
             pause_raw_idx = first_target_idx
@@ -273,28 +276,39 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
                 if not syllables[idx].endswith('-'):
                     break
                     
+        # RULE B: OLE-VEYORED IS THE ALTERNATIVE PIVOT (Break at the F#4 following the Ole)
         elif has_global_ole and "F#4" in raw_notes:
-            ole_marker_idx = -1
             for idx in range(len(ornaments_raw)):
                 if "ole" in ornaments_raw[idx]:
                     ole_marker_idx = idx
                     break
             
-            target_fsharp_idx = -1
             if ole_marker_idx != -1:
+                target_fsharp_idx = -1
                 for idx in range(ole_marker_idx, len(raw_notes)):
                     if raw_notes[idx] == "F#4":
                         target_fsharp_idx = idx
                         break
-            
-            if target_fsharp_idx != -1:
-                pivot_pitch = "F#4"
-                pause_raw_idx = target_fsharp_idx
-                for idx in range(target_fsharp_idx, len(syllables)):
-                    pause_raw_idx = idx
-                    if not syllables[idx].endswith('-'):
-                        break
-        
+                
+                if target_fsharp_idx != -1:
+                    pivot_pitch = "F#4"
+                    pause_raw_idx = target_fsharp_idx
+                    for idx in range(target_fsharp_idx, len(syllables)):
+                        pause_raw_idx = idx
+                        if not syllables[idx].endswith('-'):
+                            break
+
+        # RULE C: CRUCIAL FALLBACK FOR NO-CADENCE VERSES
+        else:
+            # Leave pause_raw_idx at -1 so the entire note block triggers the right-wing branch below!
+            pause_raw_idx = -1
+
+        # Initialize default layout states
+        left_raw, right_raw = [], []
+        left_ornaments, right_ornaments = [], []
+        cadence_layout_mode = "standard_split" # Options: "standard_split", "merged_phrase", "refrain_right"
+
+        # 4. EXPLICIT VECTOR SPLITTING ENGINE
         if pause_raw_idx != -1:
             left_raw = raw_notes[:pause_raw_idx + 1]
             right_raw = raw_notes[pause_raw_idx + 1:]
@@ -305,7 +319,7 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
             right_raw = raw_notes
             left_ornaments = []
             right_ornaments = ornaments_raw
-            
+
         #if "F#4" in left_raw or "F#4" in right_raw:
             #poetic_fsharp4_total += 1
 
@@ -314,8 +328,8 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         
         for i, note in enumerate(left_raw):
             orn_clean = str(left_ornaments[i]).lower().strip()
-            is_zaqef = 'zaq' in orn_clean or 'qat' in orn_clean
-            is_ole = 'ole' in orn_clean if not has_global_atnah else False
+            is_zaqef = 'zaq' in orn_clean and 'qat' in orn_clean
+            is_ole = 'ole' in orn_clean
             is_zarqa = 'zar' in orn_clean or 'tsi' in orn_clean
             is_revia = 'rev' in orn_clean
             is_telisha = 'tel' in orn_clean
@@ -341,7 +355,7 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         
         for i, note in enumerate(right_raw):
             orn_clean_right = str(right_ornaments[i]).lower().strip()
-            is_right_zaqef = 'zaq' in orn_clean_right or 'qat' in orn_clean_right
+            is_right_zaqef = 'zaq' in orn_clean_right and 'qat' in orn_clean_right
             is_right_zarqa = 'zar' in orn_clean_right or 'tsi' in orn_clean_right
             is_right_revia = 'rev' in orn_clean_right
             is_right_telisha = 'tel' in orn_clean_right
@@ -385,58 +399,120 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         if 'HEB_TEXT' in group.columns:
             valid_heb = group['HEB_TEXT'].dropna()
             if not valid_heb.empty:
-                # 1. Pull the 100% clean, original text value directly out of the row cell
+                # 1. SET THE POETRY FLAG: Dynamically inspect the JSON column inside this verse group
+
+                is_poetry_flag = False
+                if 'POETRY' in group.columns:
+                    is_poetry_flag = bool(group['POETRY'].iloc[0] == 1 or str(group['POETRY'].iloc[0]).strip().lower() in ['1', 'true', 'p'])
+                else:
+                    # Robust fallback to your script's native music loop conditions
+                    is_poetry_flag = has_global_ole
+
+                # 1. Pull the clean, original Hebrew string out of the cell
                 raw_heb_string = html.unescape(str(valid_heb.iloc[0])).replace('\n', ' ').strip()
                 
-                # 2. Define the absolute Unicode character for the Atnah (Etnachta) accent mark
-                ATNAH_CHAR = "\u0591"
+                # 2. DEFINITIONS: Using your exact, verified decimal notation values
+                # 1425 = Atnah
+                # 1428 = Zaqef-Qatan
+                # 1451 = Ole (Caret accent above text)
+                # 1445 = Mercha / Yored (Accent below text following the Ole)
+                ATNAH_CHAR = chr(1425)       
+                ZAQEF_QATAN_CHAR = chr(1428) 
+                OLE_CHAR = chr(1451)
+                MERCHA_CHAR = chr(1445)
                 
-                # 3. Dynamic Semantic Split: Look for the accent marker natively inside the Hebrew words
-                if ATNAH_CHAR in raw_heb_string:
-                    heb_words = raw_heb_string.split()
-                    split_index = -1
+                # Process the text word-by-word to inject structural commas safely
+                heb_words = raw_heb_string.split()
+                processed_words = []
+                
+                for idx, word in enumerate(heb_words):
+                    modified_word = word
+                    if ZAQEF_QATAN_CHAR in word:
+                        modified_word = modified_word + ","
+                    processed_words.append(modified_word)
+                
+                # 3. Precision Multi-Cadence Split Engine (Enforces your Absolute Musicological Rule)
+                ole_split_idx = -1
+                atnah_split_idx = -1
+                
+                # A: Scan for the specific 1445 Mercha that resolves a preceding or co-occurring 1451 Ole
+                found_ole_marker = False
+                if is_poetry_flag:
+                    for idx, word in enumerate(processed_words):
+                        # The cadence always resolves precisely where the 1445 Mercha lands!
+                        # This safely captures compound words like חֶ֫פְצ֥וֹ and cross-word pairs
+                        if MERCHA_CHAR in word:
+                            # Verify this isn't an ordinary conjunctive Mercha by checking 
+                            # for any upper poetic markers in this word or the previous word
+                            has_upper_poetic_marker = False
+                            words_to_check = [word]
+                            if idx > 0:
+                                words_to_check.append(processed_words[idx - 1])
+                                
+                            for w in words_to_check:
+                                # Look for common poetic accents above the text (Decimal 1451, 1429, etc.)
+                                if OLE_CHAR in w or chr(1429) in w or chr(1430) in w:
+                                    has_upper_poetic_marker = True
+                                    
+                            # If it's a true poetic cadence close, lock in the split index
+                            if has_upper_poetic_marker or OLE_CHAR in word:
+                                ole_split_idx = idx + 1
+                                break
+                            
+                # B: Scan for Atnah boundary independently (Decimal 1425)
+                for idx, word in enumerate(processed_words):
+                    if ATNAH_CHAR in word:
+                        atnah_split_idx = idx + 1
+                        break
+
+                # 4. Musicological Layout Construction (Handles coexisting or isolated cadences safely)
+                # Scenario A: Both Ole-Veyored and Atnah are present (True Poetic Tricolon -> 3 Lines)
+                if ole_split_idx != -1 and atnah_split_idx != -1:
+                    part1 = " ".join(processed_words[:ole_split_idx])
+                    part2 = " ".join(processed_words[ole_split_idx:atnah_split_idx])
+                    part3 = " ".join(processed_words[atnah_split_idx:])
+                    heb = f"{part1}<br>{part2}<br>{part3}"
                     
-                    # Search through the words to locate exactly where the wishbone mark rests
-                    for idx, word in enumerate(heb_words):
-                        if ATNAH_CHAR in word:
-                            split_index = idx + 1 # Set the cut boundary exactly after this word ends
-                            break
+                # Scenario B: ONLY Ole-Veyored is present (1-2-1 verses lacking Atnah -> 2 Lines)
+                elif ole_split_idx != -1:
+                    part1 = " ".join(processed_words[:ole_split_idx])
+                    part2 = " ".join(processed_words[ole_split_idx:])
+                    heb = f"{part1}<br>{part2}"
                     
-                    if split_index != -1 and split_index < len(heb_words):
-                        left_part = " ".join(heb_words[:split_index])
-                        right_part = " ".join(heb_words[split_index:])
-                        heb = f"{left_part}<br>{right_part}"
-                    else:
-                        heb = raw_heb_string
+                # Scenario C: ONLY Atnah is present (Standard Prose or Poetic Bicolon -> 2 Lines)
+                elif atnah_split_idx != -1:
+                    part1 = " ".join(processed_words[:atnah_split_idx])
+                    part2 = " ".join(processed_words[atnah_split_idx:])
+                    heb = f"{part1}<br>{part2}"
+                    
+                # Scenario D: No major cadential markings found (Merged Prose/Poetic Lines)
                 else:
-                    # Safe fallback: If a verse has no Atnah mark, keep it intact on a single line
-                    heb = raw_heb_string
-                        
-                # Master set matching your exact database names
-                VALID_ORNAMENTS = {
-                    'pashta', 'geresh', 'azla', 'tarsin', 'pazer', 'zaqef-qatan',
-                    'zaqef-gadol', 'qadma', 'segol', 'z-qatan tsinnor', 'zarqa',
-                    'tsinnor', 'revia z-qatan', 'telisha-qetana', 'telisha-gedola',
-                    'qarne-farah', 'shalshelet', 'revia', 'ole', 'revia-mugrash',
-                    'illuy', 'z-gadol pashta', 'pashta pashta', 'pazer azla',
-                    'pazer z-qatan', 'z-qatan azla', 'azla pashta', 'azla t-qatana',
-                    'revia pazer', 'azla z-qatan', 'tarsin revia', 'geresh t-gedola'
-                }
+                    heb = " ".join(processed_words)
 
-                # 2. Extract true ornament names directly from your database row list
-                #ornamented_tokens_set = set()
-                #for r_idx, row in valid_rows.iterrows():
-                #    o_name = str(row.get('ORNAMENT_NAME', '')).lower().strip()
-                #    lyric_syll = str(row.get('LYRIC_SYLL', '')).strip().lower().replace('-', '')
+                # 4. Musicological Layout Construction
+                # Scenario A: Both exist (Tricolon -> 3 Lines)
+                if ole_split_idx != -1 and atnah_split_idx != -1:
+                    part1 = " ".join(processed_words[:ole_split_idx])
+                    part2 = " ".join(processed_words[ole_split_idx:atnah_split_idx])
+                    part3 = " ".join(processed_words[atnah_split_idx:])
+                    # This joins them into a single string with breaks and assigns it to 'heb'
+                    heb = f"{part1}<br>{part2}<br>{part3}"
                     
-                #    if o_name in VALID_ORNAMENTS and lyric_syll:
-                #       ornamented_tokens_set.add(lyric_syll)
-
-                # 3. Assemble text spans by safely inspecting ornament matches
-
-                # 4. BALANCED SPLIT MECHANISM: Bypasses LTR/RTL token drift safely
-                # heb = " ".join(span_words)
-
+                # Scenario B: ONLY Ole-Veyored is present (2 Lines)
+                elif ole_split_idx != -1:
+                    part1 = " ".join(processed_words[:ole_split_idx])
+                    part2 = " ".join(processed_words[ole_split_idx:])
+                    heb = f"{part1}<br>{part2}"
+                    
+                # Scenario C: ONLY Atnah is present (2 Lines)
+                elif atnah_split_idx != -1:
+                    part1 = " ".join(processed_words[:atnah_split_idx])
+                    part2 = " ".join(processed_words[atnah_split_idx:])
+                    heb = f"{part1}<br>{part2}"
+                    
+                # Scenario D: No major cadential markings found (Single Line)
+                else:
+                    heb = " ".join(processed_words)
 
 
         tuba_str = f'<span class="tuba-badge">📯 TUBA ({tuba_pitch})</span>' if tuba_pitch else ''
