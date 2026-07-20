@@ -21,7 +21,7 @@
         .matrix-table { width: 100%; border-collapse: collapse; margin-top: 20px;}
         .verse-row { border-bottom: 1px solid #ddd; display: table-row; }
         .verse-label { font-weight: bold; font-size: 14px; padding: 12px 5px; background: #eaeaea; text-align: center; border-right: 2px solid #bbb; display: table-cell; vertical-align: middle; }
-        .text-label { font-size: 13px; font-weight: bold; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; white-space: normal; direction: rtl; display: table-cell; vertical-align: middle; }
+        .text-label { font-size: 14px; font-weight: bold; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; white-space: normal; direction: rtl; display: table-cell; vertical-align: middle; }
         /* 📱 RESPONSIVE TABLET ENGINE: Triggers on iPad screen widths and below */
         @media (max-width: 1024px) {
             .text-label {
@@ -31,6 +31,23 @@
                 text-overflow: ellipsis;    /* Append clean three-dot ... marking */
             }
         }
+        /* Highlighting for Hebrew characters carrying te'amim above the text */
+        .text-label span.ornamented-word {
+            font-size: 13pt;
+            font-weight: bold;
+            background-color: rgba(245, 166, 35, 0.15); /* Soft transparent orange tint */
+            border-bottom: 2px dotted #F5A623;          /* Elegant dotted underline below text */
+            padding: 0 2px;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+        }
+        
+        /* Optional: Add a subtle text accent shift when the mouse hovers over it */
+        .text-label span.ornamented-word:hover {
+            background-color: rgba(245, 166, 35, 0.3);
+            cursor: help;
+        }
+
         .grid-cell { display: table-cell; vertical-align: middle; padding: 5px 0px; }
         /* Assign explicit, fixed widths to the two musical columns to hold the straight vertical axis */
         /* --- PROVEN 3-DIGIT HIGH-DENSITY COLUMN MATH --- */
@@ -91,7 +108,7 @@
     <div class="legend-item"><div class="color-box" style="background:#4A4A4A;"></div><span>C4</span></div><div class="legend-item"><div class="color-box" style="background:#FF851B;"></div><span>D4</span></div><div class="legend-item"><div class="color-box" style="background:#4A90E2;"></div><span>E4</span></div><div class="legend-item"><div class="color-box" style="background:#F5A623;"></div><span>F4</span></div><div class="legend-item"><div class="color-box" style="background:#D0021B;"></div><span>F#4</span></div><div class="legend-item"><div class="color-box" style="background:#7ED321;"></div><span>G4</span></div><div class="legend-item"><div class="color-box" style="background:#B8E986;"></div><span>G#4</span></div><div class="legend-item"><div class="color-box" style="background:#9B51E0;"></div><span>A4</span></div><div class="legend-item"><div class="color-box" style="background:#F8E71C;"></div><span>B4</span></div><div class="legend-item"><div class="color-box" style="background:#50E3C2;"></div><span>C5</span></div></div><table class="matrix-table">
         <tr class="verse-row">
             <td class="verse-label">1</td>
-            <td class="text-label" title="אָ֚ז יִקְרָ֣א יְהוֹשֻׁ֔עַ לָראוּבֵנִ֖י וְלַגָּדִ֑י<br>וְלַחֲצִ֖י מַטֵּ֥ה מְנַשֶּֽׁה">אָ֚ז יִקְרָ֣א יְהוֹשֻׁ֔עַ לָראוּבֵנִ֖י וְלַגָּדִ֑י<br>וְלַחֲצִ֖י מַטֵּ֥ה מְנַשֶּֽׁה</td>
+            <td class="text-label" title="">אָ֚ז יִקְרָ֣א יְהוֹשֻׁ֔עַ לָראוּבֵנִ֖י וְלַגָּדִ֑י<br>וְלַחֲצִ֖י מַטֵּ֥ה מְנַשֶּֽׁה</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="C5-B4-G#4-A4">
                     <div class="left-wing">
@@ -105,7 +122,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x3</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">2</td>
-            <td class="text-label" title="וַיֹּ֣אמֶר אֲלֵיהֶ֔ם אַתֶּ֣ם שְׁמַרְתֶּ֔ם אֵ֚ת כָּל־אֲשֶׁ֣ר צִוָּ֣ה אֶתְכֶ֔ם מֹשֶׁ֖ה עֶ֣בֶד יְהוָ֑ה וַתִּשְׁמְע֣וּ<br>בְקוֹלִ֔י לְכֹ֥ל אֲשֶׁר־צִוִּ֖יתִי אֶתְכֶֽם">וַיֹּ֣אמֶר אֲלֵיהֶ֔ם אַתֶּ֣ם שְׁמַרְתֶּ֔ם אֵ֚ת כָּל־אֲשֶׁ֣ר צִוָּ֣ה אֶתְכֶ֔ם מֹשֶׁ֖ה עֶ֣בֶד יְהוָ֑ה וַתִּשְׁמְע֣וּ<br>בְקוֹלִ֔י לְכֹ֥ל אֲשֶׁר־צִוִּ֖יתִי אֶתְכֶֽם</td>
+            <td class="text-label" title="">וַיֹּ֣אמֶר אֲלֵיהֶ֔ם אַתֶּ֣ם שְׁמַרְתֶּ֔ם אֵ֚ת כָּל־אֲשֶׁ֣ר צִוָּ֣ה אֶתְכֶ֔ם מֹשֶׁ֖ה עֶ֣בֶד יְהוָ֑ה<br>וַתִּשְׁמְע֣וּ בְקוֹלִ֔י לְכֹ֥ל אֲשֶׁר־צִוִּ֖יתִי אֶתְכֶֽם</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-C5-B4-G#4-B4-A4">
                     <div class="left-wing">
@@ -119,7 +136,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;"><sup>:</sup>B4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x2</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">3</td>
-            <td class="text-label" title="לֹֽא־עֲזַבְתֶּ֣ם אֶת־אֲחֵיכֶ֗ם זֶ֚ה יָמִ֣ים רַבִּ֔ים עַ֖ד הַיּ֣וֹם הַזֶּ֑ה וּשְׁמַרְתֶּ֕ם אֶת־מִשְׁמֶ֕רֶת<br>מִצְוַ֖ת יְהוָ֥ה אֱלֹהֵיכֶֽם">לֹֽא־עֲזַבְתֶּ֣ם אֶת־אֲחֵיכֶ֗ם זֶ֚ה יָמִ֣ים רַבִּ֔ים עַ֖ד הַיּ֣וֹם הַזֶּ֑ה וּשְׁמַרְתֶּ֕ם אֶת־מִשְׁמֶ֕רֶת<br>מִצְוַ֖ת יְהוָ֥ה אֱלֹהֵיכֶֽם</td>
+            <td class="text-label" title="">לֹֽא־עֲזַבְתֶּ֣ם אֶת־אֲחֵיכֶ֗ם זֶ֚ה יָמִ֣ים רַבִּ֔ים עַ֖ד הַיּ֣וֹם הַזֶּ֑ה<br>וּשְׁמַרְתֶּ֕ם אֶת־מִשְׁמֶ֕רֶת מִצְוַ֖ת יְהוָ֥ה אֱלֹהֵיכֶֽם</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-C5-B4-G#4-B4-A4">
                     <div class="left-wing">
@@ -133,7 +150,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>:</sup>A4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x3</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">4</td>
-            <td class="text-label" title="וְעַתָּ֗ה הֵנִ֨יחַ יְהוָ֤ה אֱלֹֽהֵיכֶם֙ לַאֲחֵיכֶ֔ם כַּאֲשֶׁ֖ר דִּבֶּ֣ר לָהֶ֑ם<br>וְעַתָּ֡ה פְּנוּ֩ וּלְכ֨וּ לָכֶ֜ם לְאָהֳלֵיכֶ֗ם אֶל־אֶ֙רֶץ֙ אֲחֻזַּתְכֶ֔ם אֲשֶׁ֣ר ׀ נָתַ֣ן לָכֶ֗ם מֹשֶׁה֙ עֶ֣בֶד יְהוָ֔ה בְּעֵ֖בֶר הַיַּרְדֵּֽן">וְעַתָּ֗ה הֵנִ֨יחַ יְהוָ֤ה אֱלֹֽהֵיכֶם֙ לַאֲחֵיכֶ֔ם כַּאֲשֶׁ֖ר דִּבֶּ֣ר לָהֶ֑ם<br>וְעַתָּ֡ה פְּנוּ֩ וּלְכ֨וּ לָכֶ֜ם לְאָהֳלֵיכֶ֗ם אֶל־אֶ֙רֶץ֙ אֲחֻזַּתְכֶ֔ם אֲשֶׁ֣ר ׀ נָתַ֣ן לָכֶ֗ם מֹשֶׁה֙ עֶ֣בֶד יְהוָ֔ה בְּעֵ֖בֶר הַיַּרְדֵּֽן</td>
+            <td class="text-label" title="">וְעַתָּ֗ה הֵנִ֨יחַ יְהוָ֤ה אֱלֹֽהֵיכֶם֙ לַאֲחֵיכֶ֔ם כַּאֲשֶׁ֖ר דִּבֶּ֣ר לָהֶ֑ם<br>וְעַתָּ֡ה פְּנוּ֩ וּלְכ֨וּ לָכֶ֜ם לְאָהֳלֵיכֶ֗ם אֶל־אֶ֙רֶץ֙ אֲחֻזַּתְכֶ֔ם אֲשֶׁ֣ר ׀ נָתַ֣ן לָכֶ֗ם מֹשֶׁה֙ עֶ֣בֶד יְהוָ֔ה בְּעֵ֖בֶר הַיַּרְדֵּֽן</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-C5-E4-G#4-B4-A4">
                     <div class="left-wing">
@@ -147,7 +164,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup><sup>&#x26B2;</sup><sup>~</sup><sup>:</sup>A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;"><sup>:</sup>B4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">5</td>
-            <td class="text-label" title="רַ֣ק ׀ שִׁמְר֣וּ מְאֹ֗ד לַעֲשׂ֨וֹת אֶת־הַמִּצְוָ֣ה וְאֶת־הַתּוֹרָה֮ אֲשֶׁ֣ר צִוָּ֣ה אֶתְכֶם֮ מֹשֶׁ֣ה<br>עֶֽבֶד־יְהוָה֒ לְ֠אַהֲבָה אֶת־יְהוָ֨ה אֱלֹהֵיכֶ֜ם וְלָלֶ֧כֶת בְּכָל־דְּרָכָ֛יו וְלִשְׁמֹ֥ר מִצְוֺתָ֖יו וּלְדָבְקָה־ב֑וֹ וּלְעָבְד֕וֹ בְּכָל־לְבַבְכֶ֖ם וּבְכָל־נַפְשְׁכֶֽם">רַ֣ק ׀ שִׁמְר֣וּ מְאֹ֗ד לַעֲשׂ֨וֹת אֶת־הַמִּצְוָ֣ה וְאֶת־הַתּוֹרָה֮ אֲשֶׁ֣ר צִוָּ֣ה אֶתְכֶם֮ מֹשֶׁ֣ה<br>עֶֽבֶד־יְהוָה֒ לְ֠אַהֲבָה אֶת־יְהוָ֨ה אֱלֹהֵיכֶ֜ם וְלָלֶ֧כֶת בְּכָל־דְּרָכָ֛יו וְלִשְׁמֹ֥ר מִצְוֺתָ֖יו וּלְדָבְקָה־ב֑וֹ וּלְעָבְד֕וֹ בְּכָל־לְבַבְכֶ֖ם וּבְכָל־נַפְשְׁכֶֽם</td>
+            <td class="text-label" title="">רַ֣ק ׀ שִׁמְר֣וּ מְאֹ֗ד לַעֲשׂ֨וֹת אֶת־הַמִּצְוָ֣ה וְאֶת־הַתּוֹרָה֮ אֲשֶׁ֣ר צִוָּ֣ה אֶתְכֶם֮ מֹשֶׁ֣ה עֶֽבֶד־יְהוָה֒ לְ֠אַהֲבָה אֶת־יְהוָ֨ה אֱלֹהֵיכֶ֜ם וְלָלֶ֧כֶת בְּכָל־דְּרָכָ֛יו וְלִשְׁמֹ֥ר מִצְוֺתָ֖יו וּלְדָבְקָה־ב֑וֹ<br>וּלְעָבְד֕וֹ בְּכָל־לְבַבְכֶ֖ם וּבְכָל־נַפְשְׁכֶֽם</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="B4-E4-C4-D4-F4-G#4-A4">
                     <div class="left-wing">
@@ -161,7 +178,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>:</sup>A4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x2</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">6</td>
-            <td class="text-label" title="וַֽיְבָרְכֵ֖ם יְהוֹשֻׁ֑עַ<br>וַֽיְשַׁלְּחֵ֔ם וַיֵּלְכ֖וּ אֶל־אָהֳלֵיהֶֽם פ">וַֽיְבָרְכֵ֖ם יְהוֹשֻׁ֑עַ<br>וַֽיְשַׁלְּחֵ֔ם וַיֵּלְכ֖וּ אֶל־אָהֳלֵיהֶֽם פ</td>
+            <td class="text-label" title="">וַֽיְבָרְכֵ֖ם יְהוֹשֻׁ֑עַ<br>וַֽיְשַׁלְּחֵ֔ם וַיֵּלְכ֖וּ אֶל־אָהֳלֵיהֶֽם פ</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-G#4-A4">
                     <div class="left-wing">
@@ -175,7 +192,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;"><sup>:</sup>E4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">7</td>
-            <td class="text-label" title="וְלַחֲצִ֣י ׀ שֵׁ֣בֶט הַֽמְנַשֶּׁ֗ה נָתַ֣ן מֹשֶׁה֮ בַּבָּשָׁן֒ וּלְחֶצְי֗וֹ נָתַ֤ן יְהוֹשֻׁ֙עַ֙ עִם־אֲחֵיהֶ֔ם בְּעֵ֥בֶר הַיַּרְדֵּ֖ן יָ֑מָּה<br>וְ֠גַם כִּ֣י שִׁלְּחָ֧ם יְהוֹשֻׁ֛עַ אֶל־אָהֳלֵיהֶ֖ם וַיְבָרֲכֵֽם">וְלַחֲצִ֣י ׀ שֵׁ֣בֶט הַֽמְנַשֶּׁ֗ה נָתַ֣ן מֹשֶׁה֮ בַּבָּשָׁן֒ וּלְחֶצְי֗וֹ נָתַ֤ן יְהוֹשֻׁ֙עַ֙ עִם־אֲחֵיהֶ֔ם בְּעֵ֥בֶר הַיַּרְדֵּ֖ן יָ֑מָּה<br>וְ֠גַם כִּ֣י שִׁלְּחָ֧ם יְהוֹשֻׁ֛עַ אֶל־אָהֳלֵיהֶ֖ם וַיְבָרֲכֵֽם</td>
+            <td class="text-label" title="">וְלַחֲצִ֣י ׀ שֵׁ֣בֶט הַֽמְנַשֶּׁ֗ה נָתַ֣ן מֹשֶׁה֮ בַּבָּשָׁן֒ וּלְחֶצְי֗וֹ נָתַ֤ן יְהוֹשֻׁ֙עַ֙ עִם־אֲחֵיהֶ֔ם בְּעֵ֥בֶר הַיַּרְדֵּ֖ן יָ֑מָּה<br>וְ֠גַם כִּ֣י שִׁלְּחָ֧ם יְהוֹשֻׁ֛עַ אֶל־אָהֳלֵיהֶ֖ם וַיְבָרֲכֵֽם</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-E4-B4-C5-F4-G#4-A4">
                     <div class="left-wing">
@@ -189,7 +206,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x26B2;</sup>A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A4A4A; color:#fff;">C4</div><div class="pitch-cell" style="background:#FF851B; color:#fff;">D4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">8</td>
-            <td class="text-label" title="וַיֹּ֨אמֶר אֲלֵיהֶ֜ם לֵאמֹ֗ר בִּנְכָסִ֨ים רַבִּ֜ים שׁ֤וּבוּ אֶל־אָֽהֳלֵיכֶם֙ וּבְמִקְנֶ֣ה רַב־מְאֹ֔ד בְּכֶ֨סֶף וּבְזָהָ֜ב וּבִנְחֹ֧שֶׁת וּבְבַרְזֶ֛ל וּבִשְׂלָמ֖וֹת הַרְבֵּ֣ה מְאֹ֑ד חִלְק֥וּ שְׁלַל־אֹיְבֵיכֶ֖ם<br>עִם־אֲחֵיכֶֽם פ">וַיֹּ֨אמֶר אֲלֵיהֶ֜ם לֵאמֹ֗ר בִּנְכָסִ֨ים רַבִּ֜ים שׁ֤וּבוּ אֶל־אָֽהֳלֵיכֶם֙ וּבְמִקְנֶ֣ה רַב־מְאֹ֔ד בְּכֶ֨סֶף וּבְזָהָ֜ב וּבִנְחֹ֧שֶׁת וּבְבַרְזֶ֛ל וּבִשְׂלָמ֖וֹת הַרְבֵּ֣ה מְאֹ֑ד חִלְק֥וּ שְׁלַל־אֹיְבֵיכֶ֖ם<br>עִם־אֲחֵיכֶֽם פ</td>
+            <td class="text-label" title="">וַיֹּ֨אמֶר אֲלֵיהֶ֜ם לֵאמֹ֗ר בִּנְכָסִ֨ים רַבִּ֜ים שׁ֤וּבוּ אֶל־אָֽהֳלֵיכֶם֙ וּבְמִקְנֶ֣ה רַב־מְאֹ֔ד בְּכֶ֨סֶף וּבְזָהָ֜ב וּבִנְחֹ֧שֶׁת וּבְבַרְזֶ֛ל וּבִשְׂלָמ֖וֹת הַרְבֵּ֣ה מְאֹ֑ד<br>חִלְק֥וּ שְׁלַל־אֹיְבֵיכֶ֖ם עִם־אֲחֵיכֶֽם פ</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-C5-E4-B4-C4-D4-G#4-B4-A4">
                     <div class="left-wing">
@@ -203,7 +220,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x3</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">9</td>
-            <td class="text-label" title="וַיָּשֻׁ֣בוּ וַיֵּלְכ֡וּ בְּנֵי־רְאוּבֵ֨ן וּבְנֵי־גָ֜ד וַחֲצִ֣י ׀ שֵׁ֣בֶט הַֽמְנַשֶּׁ֗ה מֵאֵת֙ בְּנֵ֣י יִשְׂרָאֵ֔ל מִשִּׁלֹ֖ה אֲשֶׁ֣ר בְּאֶֽרֶץ־כְּנָ֑עַן לָלֶ֜כֶת אֶל־אֶ֣רֶץ<br>הַגִּלְעָ֗ד אֶל־אֶ֤רֶץ אֲחֻזָּתָם֙ אֲשֶׁ֣ר נֹֽאחֲזוּ־בָ֔הּ עַל־פִּ֥י יְהוָ֖ה בְּיַד־מֹשֶֽׁה">וַיָּשֻׁ֣בוּ וַיֵּלְכ֡וּ בְּנֵי־רְאוּבֵ֨ן וּבְנֵי־גָ֜ד וַחֲצִ֣י ׀ שֵׁ֣בֶט הַֽמְנַשֶּׁ֗ה מֵאֵת֙ בְּנֵ֣י יִשְׂרָאֵ֔ל מִשִּׁלֹ֖ה אֲשֶׁ֣ר בְּאֶֽרֶץ־כְּנָ֑עַן לָלֶ֜כֶת אֶל־אֶ֣רֶץ<br>הַגִּלְעָ֗ד אֶל־אֶ֤רֶץ אֲחֻזָּתָם֙ אֲשֶׁ֣ר נֹֽאחֲזוּ־בָ֔הּ עַל־פִּ֥י יְהוָ֖ה בְּיַד־מֹשֶֽׁה</td>
+            <td class="text-label" title="">וַיָּשֻׁ֣בוּ וַיֵּלְכ֡וּ בְּנֵי־רְאוּבֵ֨ן וּבְנֵי־גָ֜ד וַחֲצִ֣י ׀ שֵׁ֣בֶט הַֽמְנַשֶּׁ֗ה מֵאֵת֙ בְּנֵ֣י יִשְׂרָאֵ֔ל מִשִּׁלֹ֖ה אֲשֶׁ֣ר בְּאֶֽרֶץ־כְּנָ֑עַן<br>לָלֶ֜כֶת אֶל־אֶ֣רֶץ הַגִּלְעָ֗ד אֶל־אֶ֤רֶץ אֲחֻזָּתָם֙ אֲשֶׁ֣ר נֹֽאחֲזוּ־בָ֔הּ עַל־פִּ֥י יְהוָ֖ה בְּיַד־מֹשֶֽׁה</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-E4-B4-G#4-B4-E4-A4">
                     <div class="left-wing">
@@ -217,7 +234,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;">C5</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;"><sup>:</sup>E4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">10</td>
-            <td class="text-label" title="וַיָּבֹ֙אוּ֙ אֶל־גְּלִיל֣וֹת הַיַּרְדֵּ֔ן אֲשֶׁ֖ר בְּאֶ֣רֶץ כְּנָ֑עַן וַיִּבְנ֣וּ<br>בְנֵי־רְאוּבֵ֣ן וּבְנֵי־גָ֡ד וַחֲצִ֣י שֵׁבֶט֩ הַֽמְנַשֶּׁ֨ה שָׁ֤ם מִזְבֵּ֙חַ֙ עַל־הַיַּרְדֵּ֔ן מִזְבֵּ֥חַ גָּד֖וֹל לְמַרְאֶֽה">וַיָּבֹ֙אוּ֙ אֶל־גְּלִיל֣וֹת הַיַּרְדֵּ֔ן אֲשֶׁ֖ר בְּאֶ֣רֶץ כְּנָ֑עַן וַיִּבְנ֣וּ<br>בְנֵי־רְאוּבֵ֣ן וּבְנֵי־גָ֡ד וַחֲצִ֣י שֵׁבֶט֩ הַֽמְנַשֶּׁ֨ה שָׁ֤ם מִזְבֵּ֙חַ֙ עַל־הַיַּרְדֵּ֔ן מִזְבֵּ֥חַ גָּד֖וֹל לְמַרְאֶֽה</td>
+            <td class="text-label" title="">וַיָּבֹ֙אוּ֙ אֶל־גְּלִיל֣וֹת הַיַּרְדֵּ֔ן אֲשֶׁ֖ר בְּאֶ֣רֶץ כְּנָ֑עַן<br>וַיִּבְנ֣וּ בְנֵי־רְאוּבֵ֣ן וּבְנֵי־גָ֡ד וַחֲצִ֣י שֵׁבֶט֩ הַֽמְנַשֶּׁ֨ה שָׁ֤ם מִזְבֵּ֙חַ֙ עַל־הַיַּרְדֵּ֔ן מִזְבֵּ֥חַ גָּד֖וֹל לְמַרְאֶֽה</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-G#4-B4-A4">
                     <div class="left-wing">
@@ -231,7 +248,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;"><sup>:</sup>C5</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">11</td>
-            <td class="text-label" title="וַיִּשְׁמְע֥וּ בְנֵי־יִשְׂרָאֵ֖ל לֵאמֹ֑ר הִנֵּ֣ה<br>בָנ֣וּ בְנֵי־רְאוּבֵ֣ן וּבְנֵי־גָ֡ד וַחֲצִי֩ שֵׁ֨בֶט הַֽמְנַשֶּׁ֜ה אֶת־הַמִּזְבֵּ֗חַ אֶל־מוּל֙ אֶ֣רֶץ כְּנַ֔עַן אֶל־גְּלִילוֹת֙ הַיַּרְדֵּ֔ן אֶל־עֵ֖בֶר בְּנֵ֥י יִשְׂרָאֵֽל">וַיִּשְׁמְע֥וּ בְנֵי־יִשְׂרָאֵ֖ל לֵאמֹ֑ר הִנֵּ֣ה<br>בָנ֣וּ בְנֵי־רְאוּבֵ֣ן וּבְנֵי־גָ֡ד וַחֲצִי֩ שֵׁ֨בֶט הַֽמְנַשֶּׁ֜ה אֶת־הַמִּזְבֵּ֗חַ אֶל־מוּל֙ אֶ֣רֶץ כְּנַ֔עַן אֶל־גְּלִילוֹת֙ הַיַּרְדֵּ֔ן אֶל־עֵ֖בֶר בְּנֵ֥י יִשְׂרָאֵֽל</td>
+            <td class="text-label" title="">וַיִּשְׁמְע֥וּ בְנֵי־יִשְׂרָאֵ֖ל לֵאמֹ֑ר<br>הִנֵּ֣ה בָנ֣וּ בְנֵי־רְאוּבֵ֣ן וּבְנֵי־גָ֡ד וַחֲצִי֩ שֵׁ֨בֶט הַֽמְנַשֶּׁ֜ה אֶת־הַמִּזְבֵּ֗חַ אֶל־מוּל֙ אֶ֣רֶץ כְּנַ֔עַן אֶל־גְּלִילוֹת֙ הַיַּרְדֵּ֔ן אֶל־עֵ֖בֶר בְּנֵ֥י יִשְׂרָאֵֽל</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-F4-G#4-A4">
                     <div class="left-wing">
@@ -245,7 +262,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;"><sup>:</sup>B4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">12</td>
-            <td class="text-label" title="וַֽיִּשְׁמְע֖וּ בְּנֵ֣י יִשְׂרָאֵ֑ל<br>וַיִּקָּ֨הֲל֜וּ כָּל־עֲדַ֤ת בְּנֵֽי־יִשְׂרָאֵל֙ שִׁלֹ֔ה לַעֲל֥וֹת עֲלֵיהֶ֖ם לַצָּבָֽא פ">וַֽיִּשְׁמְע֖וּ בְּנֵ֣י יִשְׂרָאֵ֑ל<br>וַיִּקָּ֨הֲל֜וּ כָּל־עֲדַ֤ת בְּנֵֽי־יִשְׂרָאֵל֙ שִׁלֹ֔ה לַעֲל֥וֹת עֲלֵיהֶ֖ם לַצָּבָֽא פ</td>
+            <td class="text-label" title="">וַֽיִּשְׁמְע֖וּ בְּנֵ֣י יִשְׂרָאֵ֑ל<br>וַיִּקָּ֨הֲל֜וּ כָּל־עֲדַ֤ת בְּנֵֽי־יִשְׂרָאֵל֙ שִׁלֹ֔ה לַעֲל֥וֹת עֲלֵיהֶ֖ם לַצָּבָֽא פ</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-G#4-B4-A4">
                     <div class="left-wing">
@@ -259,7 +276,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;">C5</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;"><sup>:</sup>E4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x2</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">13</td>
-            <td class="text-label" title="וַיִּשְׁלְח֨וּ בְנֵֽי־יִשְׂרָאֵ֜ל אֶל־בְּנֵי־רְאוּבֵ֧ן וְאֶל־בְּנֵי־גָ֛ד וְאֶל־חֲצִ֥י<br>שֵֽׁבֶט־מְנַשֶּׁ֖ה אֶל־אֶ֣רֶץ הַגִּלְעָ֑ד אֶת־פִּינְחָ֖ס בֶּן־אֶלְעָזָ֥ר הַכֹּהֵֽן">וַיִּשְׁלְח֨וּ בְנֵֽי־יִשְׂרָאֵ֜ל אֶל־בְּנֵי־רְאוּבֵ֧ן וְאֶל־בְּנֵי־גָ֛ד וְאֶל־חֲצִ֥י<br>שֵֽׁבֶט־מְנַשֶּׁ֖ה אֶל־אֶ֣רֶץ הַגִּלְעָ֑ד אֶת־פִּינְחָ֖ס בֶּן־אֶלְעָזָ֥ר הַכֹּהֵֽן</td>
+            <td class="text-label" title="">וַיִּשְׁלְח֨וּ בְנֵֽי־יִשְׂרָאֵ֜ל אֶל־בְּנֵי־רְאוּבֵ֧ן וְאֶל־בְּנֵי־גָ֛ד וְאֶל־חֲצִ֥י שֵֽׁבֶט־מְנַשֶּׁ֖ה אֶל־אֶ֣רֶץ הַגִּלְעָ֑ד<br>אֶת־פִּינְחָ֖ס בֶּן־אֶלְעָזָ֥ר הַכֹּהֵֽן</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-C4-D4-F4-E4-G#4-B4-A4">
                     <div class="left-wing">
@@ -273,7 +290,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x3</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">14</td>
-            <td class="text-label" title="וַעֲשָׂרָ֤ה נְשִׂאִים֙ עִמּ֔וֹ נָשִׂ֨יא אֶחָ֜ד נָשִׂ֤יא אֶחָד֙ לְבֵ֣ית אָ֔ב לְכֹ֖ל מַטּ֣וֹת יִשְׂרָאֵ֑ל<br>וְאִ֨ישׁ רֹ֧אשׁ בֵּית־אֲבוֹתָ֛ם הֵ֖מָּה לְאַלְפֵ֥י יִשְׂרָאֵֽל">וַעֲשָׂרָ֤ה נְשִׂאִים֙ עִמּ֔וֹ נָשִׂ֨יא אֶחָ֜ד נָשִׂ֤יא אֶחָד֙ לְבֵ֣ית אָ֔ב לְכֹ֖ל מַטּ֣וֹת יִשְׂרָאֵ֑ל<br>וְאִ֨ישׁ רֹ֧אשׁ בֵּית־אֲבוֹתָ֛ם הֵ֖מָּה לְאַלְפֵ֥י יִשְׂרָאֵֽל</td>
+            <td class="text-label" title="">וַעֲשָׂרָ֤ה נְשִׂאִים֙ עִמּ֔וֹ נָשִׂ֨יא אֶחָ֜ד נָשִׂ֤יא אֶחָד֙ לְבֵ֣ית אָ֔ב לְכֹ֖ל מַטּ֣וֹת יִשְׂרָאֵ֑ל<br>וְאִ֨ישׁ רֹ֧אשׁ בֵּית־אֲבוֹתָ֛ם הֵ֖מָּה לְאַלְפֵ֥י יִשְׂרָאֵֽל</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-C5-B4-G#4-B4-A4">
                     <div class="left-wing">
@@ -287,7 +304,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#4A4A4A; color:#fff;">C4</div><div class="pitch-cell" style="background:#FF851B; color:#fff;">D4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">15</td>
-            <td class="text-label" title="וַיָּבֹ֜אוּ אֶל־בְּנֵֽי־רְאוּבֵ֧ן וְאֶל־בְּנֵי־גָ֛ד וְאֶל־חֲצִ֥י שֵׁבֶט־מְנַשֶּׁ֖ה<br>אֶל־אֶ֣רֶץ הַגִּלְעָ֑ד וַיְדַבְּר֥וּ אִתָּ֖ם לֵאמֹֽר">וַיָּבֹ֜אוּ אֶל־בְּנֵֽי־רְאוּבֵ֧ן וְאֶל־בְּנֵי־גָ֛ד וְאֶל־חֲצִ֥י שֵׁבֶט־מְנַשֶּׁ֖ה<br>אֶל־אֶ֣רֶץ הַגִּלְעָ֑ד וַיְדַבְּר֥וּ אִתָּ֖ם לֵאמֹֽר</td>
+            <td class="text-label" title="">וַיָּבֹ֜אוּ אֶל־בְּנֵֽי־רְאוּבֵ֧ן וְאֶל־בְּנֵי־גָ֛ד וְאֶל־חֲצִ֥י שֵׁבֶט־מְנַשֶּׁ֖ה אֶל־אֶ֣רֶץ הַגִּלְעָ֑ד<br>וַיְדַבְּר֥וּ אִתָּ֖ם לֵאמֹֽר</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-C4-D4-F4-G#4-B4-A4">
                     <div class="left-wing">
@@ -301,7 +318,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x3</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">16</td>
-            <td class="text-label" title="כֹּ֣ה אָמְר֞וּ כֹּ֣ל ׀ עֲדַ֣ת יְהוָ֗ה מָֽה־הַמַּ֤עַל הַזֶּה֙ אֲשֶׁ֤ר מְעַלְתֶּם֙ בֵּאלֹהֵ֣י יִשְׂרָאֵ֔ל לָשׁ֣וּב הַיּ֔וֹם מֵאַחֲרֵ֖י יְהוָ֑ה<br>בִּבְנוֹתְכֶ֤ם לָכֶם֙ מִזְבֵּ֔חַ לִמְרָדְכֶ֥ם הַיּ֖וֹם בַּיהוָֽה">כֹּ֣ה אָמְר֞וּ כֹּ֣ל ׀ עֲדַ֣ת יְהוָ֗ה מָֽה־הַמַּ֤עַל הַזֶּה֙ אֲשֶׁ֤ר מְעַלְתֶּם֙ בֵּאלֹהֵ֣י יִשְׂרָאֵ֔ל לָשׁ֣וּב הַיּ֔וֹם מֵאַחֲרֵ֖י יְהוָ֑ה<br>בִּבְנוֹתְכֶ֤ם לָכֶם֙ מִזְבֵּ֔חַ לִמְרָדְכֶ֥ם הַיּ֖וֹם בַּיהוָֽה</td>
+            <td class="text-label" title="">כֹּ֣ה אָמְר֞וּ כֹּ֣ל ׀ עֲדַ֣ת יְהוָ֗ה מָֽה־הַמַּ֤עַל הַזֶּה֙ אֲשֶׁ֤ר מְעַלְתֶּם֙ בֵּאלֹהֵ֣י יִשְׂרָאֵ֔ל לָשׁ֣וּב הַיּ֔וֹם מֵאַחֲרֵ֖י יְהוָ֑ה<br>בִּבְנוֹתְכֶ֤ם לָכֶם֙ מִזְבֵּ֔חַ לִמְרָדְכֶ֥ם הַיּ֖וֹם בַּיהוָֽה</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="B4-E4-C5-B4-G#4-A4">
                     <div class="left-wing">
@@ -315,7 +332,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;"><sup>:</sup>C5</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x2</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">17</td>
-            <td class="text-label" title="הַמְעַט־לָ֙נוּ֙ אֶת־עֲוֺ֣ן פְּע֔וֹר אֲשֶׁ֤ר לֹא־הִטַּהַ֙רְנוּ֙ מִמֶּ֔נּוּ עַ֖ד הַיּ֣וֹם הַזֶּ֑ה וַיְהִ֥י הַנֶּ֖גֶף בַּעֲדַ֥ת<br>יְהוָֽה">הַמְעַט־לָ֙נוּ֙ אֶת־עֲוֺ֣ן פְּע֔וֹר אֲשֶׁ֤ר לֹא־הִטַּהַ֙רְנוּ֙ מִמֶּ֔נּוּ עַ֖ד הַיּ֣וֹם הַזֶּ֑ה וַיְהִ֥י הַנֶּ֖גֶף בַּעֲדַ֥ת<br>יְהוָֽה</td>
+            <td class="text-label" title="">הַמְעַט־לָ֙נוּ֙ אֶת־עֲוֺ֣ן פְּע֔וֹר אֲשֶׁ֤ר לֹא־הִטַּהַ֙רְנוּ֙ מִמֶּ֔נּוּ עַ֖ד הַיּ֣וֹם הַזֶּ֑ה<br>וַיְהִ֥י הַנֶּ֖גֶף בַּעֲדַ֥ת יְהוָֽה</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-C5-G#4-B4-A4">
                     <div class="left-wing">
@@ -329,7 +346,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">18</td>
-            <td class="text-label" title="וְאַתֶּם֙ תָּשֻׁ֣בוּ הַיּ֔וֹם מֵאַחֲרֵ֖י יְהוָ֑ה<br>וְהָיָ֗ה אַתֶּ֞ם תִּמְרְד֤וּ הַיּוֹם֙ בַּיהוָ֔ה וּמָחָ֕ר אֶֽל־כָּל־עֲדַ֥ת יִשְׂרָאֵ֖ל יִקְצֹֽף">וְאַתֶּם֙ תָּשֻׁ֣בוּ הַיּ֔וֹם מֵאַחֲרֵ֖י יְהוָ֑ה<br>וְהָיָ֗ה אַתֶּ֞ם תִּמְרְד֤וּ הַיּוֹם֙ בַּיהוָ֔ה וּמָחָ֕ר אֶֽל־כָּל־עֲדַ֥ת יִשְׂרָאֵ֖ל יִקְצֹֽף</td>
+            <td class="text-label" title="">וְאַתֶּם֙ תָּשֻׁ֣בוּ הַיּ֔וֹם מֵאַחֲרֵ֖י יְהוָ֑ה<br>וְהָיָ֗ה אַתֶּ֞ם תִּמְרְד֤וּ הַיּוֹם֙ בַּיהוָ֔ה וּמָחָ֕ר אֶֽל־כָּל־עֲדַ֥ת יִשְׂרָאֵ֖ל יִקְצֹֽף</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-G#4-A4">
                     <div class="left-wing">
@@ -343,7 +360,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;"><sup>:</sup>C5</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x2</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">19</td>
-            <td class="text-label" title="וְאַ֨ךְ אִם־טְמֵאָ֜ה אֶ֣רֶץ אֲחֻזַּתְכֶ֗ם עִבְר֨וּ לָכֶ֜ם אֶל־אֶ֨רֶץ אֲחֻזַּ֤ת יְהוָה֙ אֲשֶׁ֤ר שָֽׁכַן־שָׁם֙ מִשְׁכַּ֣ן יְהוָ֔ה וְהֵאָחֲז֖וּ בְּתוֹכֵ֑נוּ וּבַיהוָ֣ה אַל־תִּמְרֹ֗דוּ וְאֹתָ֙נוּ֙<br>אֶל־תִּמְרֹ֔דוּ בִּבְנֹתְכֶ֤ם לָכֶם֙ מִזְבֵּ֔חַ מִֽבַּלְעֲדֵ֔י מִזְבַּ֖ח יְהוָ֥ה אֱלֹהֵֽינוּ">וְאַ֨ךְ אִם־טְמֵאָ֜ה אֶ֣רֶץ אֲחֻזַּתְכֶ֗ם עִבְר֨וּ לָכֶ֜ם אֶל־אֶ֨רֶץ אֲחֻזַּ֤ת יְהוָה֙ אֲשֶׁ֤ר שָֽׁכַן־שָׁם֙ מִשְׁכַּ֣ן יְהוָ֔ה וְהֵאָחֲז֖וּ בְּתוֹכֵ֑נוּ וּבַיהוָ֣ה אַל־תִּמְרֹ֗דוּ וְאֹתָ֙נוּ֙<br>אֶל־תִּמְרֹ֔דוּ בִּבְנֹתְכֶ֤ם לָכֶם֙ מִזְבֵּ֔חַ מִֽבַּלְעֲדֵ֔י מִזְבַּ֖ח יְהוָ֥ה אֱלֹהֵֽינוּ</td>
+            <td class="text-label" title="">וְאַ֨ךְ אִם־טְמֵאָ֜ה אֶ֣רֶץ אֲחֻזַּתְכֶ֗ם עִבְר֨וּ לָכֶ֜ם אֶל־אֶ֨רֶץ אֲחֻזַּ֤ת יְהוָה֙ אֲשֶׁ֤ר שָֽׁכַן־שָׁם֙ מִשְׁכַּ֣ן יְהוָ֔ה וְהֵאָחֲז֖וּ בְּתוֹכֵ֑נוּ<br>וּבַיהוָ֣ה אַל־תִּמְרֹ֗דוּ וְאֹתָ֙נוּ֙ אֶל־תִּמְרֹ֔דוּ בִּבְנֹתְכֶ֤ם לָכֶם֙ מִזְבֵּ֔חַ מִֽבַּלְעֲדֵ֔י מִזְבַּ֖ח יְהוָ֥ה אֱלֹהֵֽינוּ</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-C5-E4-B4-G#4-A4">
                     <div class="left-wing">
@@ -357,7 +374,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;"><sup>:</sup>B4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;"><sup>:</sup>C5</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;"><sup>:</sup>E4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">20</td>
-            <td class="text-label" title="הֲל֣וֹא ׀ עָכָ֣ן בֶּן־זֶ֗רַח מָ֤עַל מַ֙עַל֙ בַּחֵ֔רֶם וְעַֽל־כָּל־עֲדַ֥ת יִשְׂרָאֵ֖ל הָ֣יָה קָ֑צֶף וְהוּא֙ אִ֣ישׁ<br>אֶחָ֔ד לֹ֥א גָוַ֖ע בַּעֲוֺנֽוֹ ס">הֲל֣וֹא ׀ עָכָ֣ן בֶּן־זֶ֗רַח מָ֤עַל מַ֙עַל֙ בַּחֵ֔רֶם וְעַֽל־כָּל־עֲדַ֥ת יִשְׂרָאֵ֖ל הָ֣יָה קָ֑צֶף וְהוּא֙ אִ֣ישׁ<br>אֶחָ֔ד לֹ֥א גָוַ֖ע בַּעֲוֺנֽוֹ ס</td>
+            <td class="text-label" title="">הֲל֣וֹא ׀ עָכָ֣ן בֶּן־זֶ֗רַח מָ֤עַל מַ֙עַל֙ בַּחֵ֔רֶם וְעַֽל־כָּל־עֲדַ֥ת יִשְׂרָאֵ֖ל הָ֣יָה קָ֑צֶף<br>וְהוּא֙ אִ֣ישׁ אֶחָ֔ד לֹ֥א גָוַ֖ע בַּעֲוֺנֽוֹ ס</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-C5-E4-F4-G#4-B4-A4">
                     <div class="left-wing">
@@ -371,7 +388,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;"><sup>:</sup>B4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x2</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">21</td>
-            <td class="text-label" title="וַֽיַּעֲנוּ֙ בְּנֵי־רְאוּבֵ֣ן וּבְנֵי־גָ֔ד וַחֲצִ֖י שֵׁ֣בֶט הַֽמְנַשֶּׁ֑ה וַֽיְדַבְּר֔וּ אֶת־רָאשֵׁ֖י<br>אַלְפֵ֥י יִשְׂרָאֵֽל">וַֽיַּעֲנוּ֙ בְּנֵי־רְאוּבֵ֣ן וּבְנֵי־גָ֔ד וַחֲצִ֖י שֵׁ֣בֶט הַֽמְנַשֶּׁ֑ה וַֽיְדַבְּר֔וּ אֶת־רָאשֵׁ֖י<br>אַלְפֵ֥י יִשְׂרָאֵֽל</td>
+            <td class="text-label" title="">וַֽיַּעֲנוּ֙ בְּנֵי־רְאוּבֵ֣ן וּבְנֵי־גָ֔ד וַחֲצִ֖י שֵׁ֣בֶט הַֽמְנַשֶּׁ֑ה<br>וַֽיְדַבְּר֔וּ אֶת־רָאשֵׁ֖י אַלְפֵ֥י יִשְׂרָאֵֽל</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-G#4-B4-E4-A4">
                     <div class="left-wing">
@@ -385,7 +402,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#4A90E2; color:#fff;"><sup>:</sup>E4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">22</td>
-            <td class="text-label" title="אֵל֩ ׀ אֱלֹהִ֨ים ׀ יְהוָ֜ה אֵ֣ל ׀ אֱלֹהִ֤ים ׀ יְהוָה֙ ה֣וּא<br>יֹדֵ֔עַ וְיִשְׂרָאֵ֖ל ה֣וּא יֵדָ֑ע אִם־בְּמֶ֤רֶד וְאִם־בְּמַ֙עַל֙ בַּיהוָ֔ה אַל־תּוֹשִׁיעֵ֖נוּ הַיּ֥וֹם הַזֶּֽה">אֵל֩ ׀ אֱלֹהִ֨ים ׀ יְהוָ֜ה אֵ֣ל ׀ אֱלֹהִ֤ים ׀ יְהוָה֙ ה֣וּא<br>יֹדֵ֔עַ וְיִשְׂרָאֵ֖ל ה֣וּא יֵדָ֑ע אִם־בְּמֶ֤רֶד וְאִם־בְּמַ֙עַל֙ בַּיהוָ֔ה אַל־תּוֹשִׁיעֵ֖נוּ הַיּ֥וֹם הַזֶּֽה</td>
+            <td class="text-label" title="">אֵל֩ ׀ אֱלֹהִ֨ים ׀ יְהוָ֜ה אֵ֣ל ׀ אֱלֹהִ֤ים ׀ יְהוָה֙ ה֣וּא יֹדֵ֔עַ וְיִשְׂרָאֵ֖ל ה֣וּא יֵדָ֑ע<br>אִם־בְּמֶ֤רֶד וְאִם־בְּמַ֙עַל֙ בַּיהוָ֔ה אַל־תּוֹשִׁיעֵ֖נוּ הַיּ֥וֹם הַזֶּֽה</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-C5-B4-G#4-B4-A4">
                     <div class="left-wing">
@@ -399,7 +416,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;"><sup>:</sup>C5</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x3</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">23</td>
-            <td class="text-label" title="לִבְנ֥וֹת לָ֙נוּ֙ מִזְבֵּ֔חַ לָשׁ֖וּב מֵאַחֲרֵ֣י יְהוָ֑ה<br>וְאִם־לְהַעֲל֨וֹת עָלָ֜יו עוֹלָ֣ה וּמִנְחָ֗ה וְאִם־לַעֲשׂ֤וֹת עָלָיו֙ זִבְחֵ֣י שְׁלָמִ֔ים יְהוָ֖ה ה֥וּא יְבַקֵּֽשׁ">לִבְנ֥וֹת לָ֙נוּ֙ מִזְבֵּ֔חַ לָשׁ֖וּב מֵאַחֲרֵ֣י יְהוָ֑ה<br>וְאִם־לְהַעֲל֨וֹת עָלָ֜יו עוֹלָ֣ה וּמִנְחָ֗ה וְאִם־לַעֲשׂ֤וֹת עָלָיו֙ זִבְחֵ֣י שְׁלָמִ֔ים יְהוָ֖ה ה֥וּא יְבַקֵּֽשׁ</td>
+            <td class="text-label" title="">לִבְנ֥וֹת לָ֙נוּ֙ מִזְבֵּ֔חַ לָשׁ֖וּב מֵאַחֲרֵ֣י יְהוָ֑ה<br>וְאִם־לְהַעֲל֨וֹת עָלָ֜יו עוֹלָ֣ה וּמִנְחָ֗ה וְאִם־לַעֲשׂ֤וֹת עָלָיו֙ זִבְחֵ֣י שְׁלָמִ֔ים יְהוָ֖ה ה֥וּא יְבַקֵּֽשׁ</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-F4-G#4-B4-A4">
                     <div class="left-wing">
@@ -413,7 +430,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;">C5</div><div class="pitch-cell" style="background:#F8E71C; color:#333;"><sup>:</sup>B4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">24</td>
-            <td class="text-label" title="וְאִם־לֹ֤א מִדְּאָגָה֙ מִדָּבָ֔ר עָשִׂ֥ינוּ אֶת־זֹ֖את לֵאמֹ֑ר מָחָ֗ר יֹאמְר֨וּ<br>בְנֵיכֶ֤ם לְבָנֵ֙ינוּ֙ לֵאמֹ֔ר מַה־לָּכֶ֕ם וְלַיהוָ֖ה אֱלֹהֵ֥י יִשְׂרָאֵֽל">וְאִם־לֹ֤א מִדְּאָגָה֙ מִדָּבָ֔ר עָשִׂ֥ינוּ אֶת־זֹ֖את לֵאמֹ֑ר מָחָ֗ר יֹאמְר֨וּ<br>בְנֵיכֶ֤ם לְבָנֵ֙ינוּ֙ לֵאמֹ֔ר מַה־לָּכֶ֕ם וְלַיהוָ֖ה אֱלֹהֵ֥י יִשְׂרָאֵֽל</td>
+            <td class="text-label" title="">וְאִם־לֹ֤א מִדְּאָגָה֙ מִדָּבָ֔ר עָשִׂ֥ינוּ אֶת־זֹ֖את לֵאמֹ֑ר<br>מָחָ֗ר יֹאמְר֨וּ בְנֵיכֶ֤ם לְבָנֵ֙ינוּ֙ לֵאמֹ֔ר מַה־לָּכֶ֕ם וְלַיהוָ֖ה אֱלֹהֵ֥י יִשְׂרָאֵֽל</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-C5-F4-G#4-A4">
                     <div class="left-wing">
@@ -427,7 +444,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;"><sup>:</sup>C5</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x3</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">25</td>
-            <td class="text-label" title="וּגְב֣וּל נָֽתַן־יְ֠הוָה בֵּינֵ֨נוּ וּבֵינֵיכֶ֜ם בְּנֵֽי־רְאוּבֵ֤ן וּבְנֵי־גָד֙ אֶת־הַיַּרְדֵּ֔ן אֵין־לָכֶ֥ם חֵ֖לֶק בַּיהוָ֑ה וְהִשְׁבִּ֤יתוּ בְנֵיכֶם֙ אֶת־בָּנֵ֔ינוּ לְבִלְתִּ֖י יְרֹ֥א<br>אֶת־יְהוָֽה">וּגְב֣וּל נָֽתַן־יְ֠הוָה בֵּינֵ֨נוּ וּבֵינֵיכֶ֜ם בְּנֵֽי־רְאוּבֵ֤ן וּבְנֵי־גָד֙ אֶת־הַיַּרְדֵּ֔ן אֵין־לָכֶ֥ם חֵ֖לֶק בַּיהוָ֑ה וְהִשְׁבִּ֤יתוּ בְנֵיכֶם֙ אֶת־בָּנֵ֔ינוּ לְבִלְתִּ֖י יְרֹ֥א<br>אֶת־יְהוָֽה</td>
+            <td class="text-label" title="">וּגְב֣וּל נָֽתַן־יְ֠הוָה בֵּינֵ֨נוּ וּבֵינֵיכֶ֜ם בְּנֵֽי־רְאוּבֵ֤ן וּבְנֵי־גָד֙ אֶת־הַיַּרְדֵּ֔ן אֵין־לָכֶ֥ם חֵ֖לֶק בַּיהוָ֑ה<br>וְהִשְׁבִּ֤יתוּ בְנֵיכֶם֙ אֶת־בָּנֵ֔ינוּ לְבִלְתִּ֖י יְרֹ֥א אֶת־יְהוָֽה</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-E4-C5-F4-G#4-A4">
                     <div class="left-wing">
@@ -441,7 +458,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;"><sup>:</sup>C5</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x3</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">26</td>
-            <td class="text-label" title="וַנֹּ֕אמֶר נַעֲשֶׂה־נָּ֣א לָ֔נוּ לִבְנ֖וֹת אֶת־הַמִּזְבֵּ֑חַ לֹ֥א לְעוֹלָ֖ה<br>וְלֹ֥א לְזָֽבַח">וַנֹּ֕אמֶר נַעֲשֶׂה־נָּ֣א לָ֔נוּ לִבְנ֖וֹת אֶת־הַמִּזְבֵּ֑חַ לֹ֥א לְעוֹלָ֖ה<br>וְלֹ֥א לְזָֽבַח</td>
+            <td class="text-label" title="">וַנֹּ֕אמֶר נַעֲשֶׂה־נָּ֣א לָ֔נוּ לִבְנ֖וֹת אֶת־הַמִּזְבֵּ֑חַ<br>לֹ֥א לְעוֹלָ֖ה וְלֹ֥א לְזָֽבַח</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-G#4-A4">
                     <div class="left-wing">
@@ -455,7 +472,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">27</td>
-            <td class="text-label" title="כִּי֩ עֵ֨ד ה֜וּא בֵּינֵ֣ינוּ וּבֵינֵיכֶ֗ם וּבֵ֣ין דֹּרוֹתֵינוּ֮ אַחֲרֵינוּ֒ לַעֲבֹ֞ד אֶת־עֲבֹדַ֤ת יְהוָה֙ לְפָנָ֔יו בְּעֹלוֹתֵ֥ינוּ וּבִזְבָחֵ֖ינוּ וּבִשְׁלָמֵ֑ינוּ וְלֹא־יֹאמְר֨וּ<br>בְנֵיכֶ֤ם מָחָר֙ לְבָנֵ֔ינוּ אֵין־לָכֶ֥ם חֵ֖לֶק בַּיהוָֽה">כִּי֩ עֵ֨ד ה֜וּא בֵּינֵ֣ינוּ וּבֵינֵיכֶ֗ם וּבֵ֣ין דֹּרוֹתֵינוּ֮ אַחֲרֵינוּ֒ לַעֲבֹ֞ד אֶת־עֲבֹדַ֤ת יְהוָה֙ לְפָנָ֔יו בְּעֹלוֹתֵ֥ינוּ וּבִזְבָחֵ֖ינוּ וּבִשְׁלָמֵ֑ינוּ וְלֹא־יֹאמְר֨וּ<br>בְנֵיכֶ֤ם מָחָר֙ לְבָנֵ֔ינוּ אֵין־לָכֶ֥ם חֵ֖לֶק בַּיהוָֽה</td>
+            <td class="text-label" title="">כִּי֩ עֵ֨ד ה֜וּא בֵּינֵ֣ינוּ וּבֵינֵיכֶ֗ם וּבֵ֣ין דֹּרוֹתֵינוּ֮ אַחֲרֵינוּ֒ לַעֲבֹ֞ד אֶת־עֲבֹדַ֤ת יְהוָה֙ לְפָנָ֔יו בְּעֹלוֹתֵ֥ינוּ וּבִזְבָחֵ֖ינוּ וּבִשְׁלָמֵ֑ינוּ<br>וְלֹא־יֹאמְר֨וּ בְנֵיכֶ֤ם מָחָר֙ לְבָנֵ֔ינוּ אֵין־לָכֶ֥ם חֵ֖לֶק בַּיהוָֽה</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-C5-F4-G#4-A4">
                     <div class="left-wing">
@@ -469,7 +486,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;"><sup>:</sup>C5</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x2</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">28</td>
-            <td class="text-label" title="וַנֹּ֕אמֶר וְהָיָ֗ה כִּֽי־יֹאמְר֥וּ אֵלֵ֛ינוּ וְאֶל־דֹּרֹתֵ֖ינוּ מָחָ֑ר וְאָמַ֡רְנוּ רְא֣וּ<br>אֶת־תַּבְנִית֩ מִזְבַּ֨ח יְהוָ֜ה אֲשֶׁר־עָשׂ֣וּ אֲבוֹתֵ֗ינוּ לֹ֤א לְעוֹלָה֙ וְלֹ֣א לְזֶ֔בַח כִּי־עֵ֣ד ה֔וּא בֵּינֵ֖ינוּ וּבֵינֵיכֶֽם">וַנֹּ֕אמֶר וְהָיָ֗ה כִּֽי־יֹאמְר֥וּ אֵלֵ֛ינוּ וְאֶל־דֹּרֹתֵ֖ינוּ מָחָ֑ר וְאָמַ֡רְנוּ רְא֣וּ<br>אֶת־תַּבְנִית֩ מִזְבַּ֨ח יְהוָ֜ה אֲשֶׁר־עָשׂ֣וּ אֲבוֹתֵ֗ינוּ לֹ֤א לְעוֹלָה֙ וְלֹ֣א לְזֶ֔בַח כִּי־עֵ֣ד ה֔וּא בֵּינֵ֖ינוּ וּבֵינֵיכֶֽם</td>
+            <td class="text-label" title="">וַנֹּ֕אמֶר וְהָיָ֗ה כִּֽי־יֹאמְר֥וּ אֵלֵ֛ינוּ וְאֶל־דֹּרֹתֵ֖ינוּ מָחָ֑ר<br>וְאָמַ֡רְנוּ רְא֣וּ אֶת־תַּבְנִית֩ מִזְבַּ֨ח יְהוָ֜ה אֲשֶׁר־עָשׂ֣וּ אֲבוֹתֵ֗ינוּ לֹ֤א לְעוֹלָה֙ וְלֹ֣א לְזֶ֔בַח כִּי־עֵ֣ד ה֔וּא בֵּינֵ֖ינוּ וּבֵינֵיכֶֽם</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-F4-D4-G#4-A4">
                     <div class="left-wing">
@@ -483,7 +500,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>~</sup>A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;">C5</div><div class="pitch-cell" style="background:#F8E71C; color:#333;"><sup>:</sup>B4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">29</td>
-            <td class="text-label" title="חָלִילָה֩ לָּ֨נוּ מִמֶּ֜נּוּ לִמְרֹ֣ד בַּֽיהוָ֗ה וְלָשׁ֤וּב הַיּוֹם֙ מֵאַחֲרֵ֣י יְהוָ֔ה לִבְנ֣וֹת מִזְבֵּ֔חַ לְעֹלָ֖ה לְמִנְחָ֣ה וּלְזָ֑בַח<br>מִלְּבַ֗ד מִזְבַּח֙ יְהוָ֣ה אֱלֹהֵ֔ינוּ אֲשֶׁ֖ר לִפְנֵ֥י מִשְׁכָּנֽוֹ פ">חָלִילָה֩ לָּ֨נוּ מִמֶּ֜נּוּ לִמְרֹ֣ד בַּֽיהוָ֗ה וְלָשׁ֤וּב הַיּוֹם֙ מֵאַחֲרֵ֣י יְהוָ֔ה לִבְנ֣וֹת מִזְבֵּ֔חַ לְעֹלָ֖ה לְמִנְחָ֣ה וּלְזָ֑בַח<br>מִלְּבַ֗ד מִזְבַּח֙ יְהוָ֣ה אֱלֹהֵ֔ינוּ אֲשֶׁ֖ר לִפְנֵ֥י מִשְׁכָּנֽוֹ פ</td>
+            <td class="text-label" title="">חָלִילָה֩ לָּ֨נוּ מִמֶּ֜נּוּ לִמְרֹ֣ד בַּֽיהוָ֗ה וְלָשׁ֤וּב הַיּוֹם֙ מֵאַחֲרֵ֣י יְהוָ֔ה לִבְנ֣וֹת מִזְבֵּ֔חַ לְעֹלָ֖ה לְמִנְחָ֣ה וּלְזָ֑בַח<br>מִלְּבַ֗ד מִזְבַּח֙ יְהוָ֣ה אֱלֹהֵ֔ינוּ אֲשֶׁ֖ר לִפְנֵ֥י מִשְׁכָּנֽוֹ פ</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-E4-C5-B4-G#4-B4-A4">
                     <div class="left-wing">
@@ -497,7 +514,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;"><sup>:</sup>B4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">30</td>
-            <td class="text-label" title="וַיִּשְׁמַ֞ע פִּֽינְחָ֣ס הַכֹּהֵ֗ן וּנְשִׂיאֵ֨י הָעֵדָ֜ה וְרָאשֵׁ֨י אַלְפֵ֤י יִשְׂרָאֵל֙ אֲשֶׁ֣ר<br>אִתּ֔וֹ אֶת־הַ֨דְּבָרִ֔ים אֲשֶׁ֧ר דִּבְּר֛וּ בְּנֵי־רְאוּבֵ֥ן וּבְנֵי־גָ֖ד וּבְנֵ֣י מְנַשֶּׁ֑ה וַיִּיטַ֖ב בְּעֵינֵיהֶֽם">וַיִּשְׁמַ֞ע פִּֽינְחָ֣ס הַכֹּהֵ֗ן וּנְשִׂיאֵ֨י הָעֵדָ֜ה וְרָאשֵׁ֨י אַלְפֵ֤י יִשְׂרָאֵל֙ אֲשֶׁ֣ר<br>אִתּ֔וֹ אֶת־הַ֨דְּבָרִ֔ים אֲשֶׁ֧ר דִּבְּר֛וּ בְּנֵי־רְאוּבֵ֥ן וּבְנֵי־גָ֖ד וּבְנֵ֣י מְנַשֶּׁ֑ה וַיִּיטַ֖ב בְּעֵינֵיהֶֽם</td>
+            <td class="text-label" title="">וַיִּשְׁמַ֞ע פִּֽינְחָ֣ס הַכֹּהֵ֗ן וּנְשִׂיאֵ֨י הָעֵדָ֜ה וְרָאשֵׁ֨י אַלְפֵ֤י יִשְׂרָאֵל֙ אֲשֶׁ֣ר אִתּ֔וֹ אֶת־הַ֨דְּבָרִ֔ים אֲשֶׁ֧ר דִּבְּר֛וּ בְּנֵי־רְאוּבֵ֥ן וּבְנֵי־גָ֖ד וּבְנֵ֣י מְנַשֶּׁ֑ה<br>וַיִּיטַ֖ב בְּעֵינֵיהֶֽם</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-C5-B4-C4-D4-F4-G#4-B4-A4">
                     <div class="left-wing">
@@ -511,7 +528,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x2</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">31</td>
-            <td class="text-label" title="וַיֹּ֣אמֶר פִּֽינְחָ֣ס בֶּן־אֶלְעָזָ֣ר הַכֹּהֵ֡ן אֶל־בְּנֵי־רְאוּבֵ֨ן וְאֶל־בְּנֵי־גָ֜ד וְאֶל־בְּנֵ֣י מְנַשֶּׁ֗ה הַיּ֤וֹם ׀ יָדַ֙עְנוּ֙ כִּֽי־בְתוֹכֵ֣נוּ<br>יְהוָ֔ה אֲשֶׁ֛ר לֹא־מְעַלְתֶּ֥ם בַּיהוָ֖ה הַמַּ֣עַל הַזֶּ֑ה אָ֗ז הִצַּלְתֶּ֛ם אֶת־בְּנֵ֥י יִשְׂרָאֵ֖ל מִיַּ֥ד יְהוָֽה">וַיֹּ֣אמֶר פִּֽינְחָ֣ס בֶּן־אֶלְעָזָ֣ר הַכֹּהֵ֡ן אֶל־בְּנֵי־רְאוּבֵ֨ן וְאֶל־בְּנֵי־גָ֜ד וְאֶל־בְּנֵ֣י מְנַשֶּׁ֗ה הַיּ֤וֹם ׀ יָדַ֙עְנוּ֙ כִּֽי־בְתוֹכֵ֣נוּ<br>יְהוָ֔ה אֲשֶׁ֛ר לֹא־מְעַלְתֶּ֥ם בַּיהוָ֖ה הַמַּ֣עַל הַזֶּ֑ה אָ֗ז הִצַּלְתֶּ֛ם אֶת־בְּנֵ֥י יִשְׂרָאֵ֖ל מִיַּ֥ד יְהוָֽה</td>
+            <td class="text-label" title="">וַיֹּ֣אמֶר פִּֽינְחָ֣ס בֶּן־אֶלְעָזָ֣ר הַכֹּהֵ֡ן אֶל־בְּנֵי־רְאוּבֵ֨ן וְאֶל־בְּנֵי־גָ֜ד וְאֶל־בְּנֵ֣י מְנַשֶּׁ֗ה הַיּ֤וֹם ׀ יָדַ֙עְנוּ֙ כִּֽי־בְתוֹכֵ֣נוּ יְהוָ֔ה אֲשֶׁ֛ר לֹא־מְעַלְתֶּ֥ם בַּיהוָ֖ה הַמַּ֣עַל הַזֶּ֑ה<br>אָ֗ז הִצַּלְתֶּ֛ם אֶת־בְּנֵ֥י יִשְׂרָאֵ֖ל מִיַּ֥ד יְהוָֽה</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-E4-B4-C5-E4-B4-D4-F4-G#4-B4-A4">
                     <div class="left-wing">
@@ -525,7 +542,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#FF851B; color:#fff;">D4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">32</td>
-            <td class="text-label" title="וַיָּ֣שָׁב פִּֽינְחָ֣ס בֶּן־אֶלְעָזָ֣ר הַכֹּהֵ֣ן ׀ וְהַנְּשִׂיאִ֡ים מֵאֵ֣ת בְּנֵֽי־רְאוּבֵן֩ וּמֵאֵ֨ת<br>בְּנֵי־גָ֜ד מֵאֶ֧רֶץ הַגִּלְעָ֛ד אֶל־אֶ֥רֶץ כְּנַ֖עַן אֶל־בְּנֵ֣י יִשְׂרָאֵ֑ל וַיָּשִׁ֥בוּ אוֹתָ֖ם דָּבָֽר">וַיָּ֣שָׁב פִּֽינְחָ֣ס בֶּן־אֶלְעָזָ֣ר הַכֹּהֵ֣ן ׀ וְהַנְּשִׂיאִ֡ים מֵאֵ֣ת בְּנֵֽי־רְאוּבֵן֩ וּמֵאֵ֨ת<br>בְּנֵי־גָ֜ד מֵאֶ֧רֶץ הַגִּלְעָ֛ד אֶל־אֶ֥רֶץ כְּנַ֖עַן אֶל־בְּנֵ֣י יִשְׂרָאֵ֑ל וַיָּשִׁ֥בוּ אוֹתָ֖ם דָּבָֽר</td>
+            <td class="text-label" title="">וַיָּ֣שָׁב פִּֽינְחָ֣ס בֶּן־אֶלְעָזָ֣ר הַכֹּהֵ֣ן ׀ וְהַנְּשִׂיאִ֡ים מֵאֵ֣ת בְּנֵֽי־רְאוּבֵן֩ וּמֵאֵ֨ת בְּנֵי־גָ֜ד מֵאֶ֧רֶץ הַגִּלְעָ֛ד אֶל־אֶ֥רֶץ כְּנַ֖עַן אֶל־בְּנֵ֣י יִשְׂרָאֵ֑ל<br>וַיָּשִׁ֥בוּ אוֹתָ֖ם דָּבָֽר</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-E4-B4-E4-C4-D4-F4-G#4-B4-A4">
                     <div class="left-wing">
@@ -539,7 +556,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x3</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">33</td>
-            <td class="text-label" title="וַיִּיטַ֣ב הַדָּבָ֗ר בְּעֵינֵי֙ בְּנֵ֣י יִשְׂרָאֵ֔ל וַיְבָרֲכ֥וּ אֱלֹהִ֖ים בְּנֵ֣י יִשְׂרָאֵ֑ל<br>וְלֹ֣א אָמְר֗וּ לַעֲל֤וֹת עֲלֵיהֶם֙ לַצָּבָ֔א לְשַׁחֵת֙ אֶת־הָאָ֔רֶץ אֲשֶׁ֛ר בְּנֵי־רְאוּבֵ֥ן וּבְנֵי־גָ֖ד יֹשְׁבִ֥ים בָּֽהּ">וַיִּיטַ֣ב הַדָּבָ֗ר בְּעֵינֵי֙ בְּנֵ֣י יִשְׂרָאֵ֔ל וַיְבָרֲכ֥וּ אֱלֹהִ֖ים בְּנֵ֣י יִשְׂרָאֵ֑ל<br>וְלֹ֣א אָמְר֗וּ לַעֲל֤וֹת עֲלֵיהֶם֙ לַצָּבָ֔א לְשַׁחֵת֙ אֶת־הָאָ֔רֶץ אֲשֶׁ֛ר בְּנֵי־רְאוּבֵ֥ן וּבְנֵי־גָ֖ד יֹשְׁבִ֥ים בָּֽהּ</td>
+            <td class="text-label" title="">וַיִּיטַ֣ב הַדָּבָ֗ר בְּעֵינֵי֙ בְּנֵ֣י יִשְׂרָאֵ֔ל וַיְבָרֲכ֥וּ אֱלֹהִ֖ים בְּנֵ֣י יִשְׂרָאֵ֑ל<br>וְלֹ֣א אָמְר֗וּ לַעֲל֤וֹת עֲלֵיהֶם֙ לַצָּבָ֔א לְשַׁחֵת֙ אֶת־הָאָ֔רֶץ אֲשֶׁ֛ר בְּנֵי־רְאוּבֵ֥ן וּבְנֵי־גָ֖ד יֹשְׁבִ֥ים בָּֽהּ</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-F4-G#4-B4-A4">
                     <div class="left-wing">
@@ -553,7 +570,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;">A4</div><div class="pitch-cell" style="background:#F8E71C; color:#333;">B4</div><div class="pitch-cell" style="background:#50E3C2; color:#fff;"><sup>:</sup>C5</div><div class="pitch-cell" style="background:#FF851B; color:#fff;">D4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#B8E986; color:#333;">G#4</div><div class="pitch-cell" style="background:#F5A623; color:#fff;">F4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">34</td>
-            <td class="text-label" title="וַֽיִּקְרְא֛וּ בְּנֵי־רְאוּבֵ֥ן וּבְנֵי־גָ֖ד לַמִּזְבֵּ֑חַ כִּ֣י עֵ֥ד<br>הוּא֙ בֵּֽינֹתֵ֔ינוּ כִּ֥י יְהוָ֖ה הָאֱלֹהִֽים פ">וַֽיִּקְרְא֛וּ בְּנֵי־רְאוּבֵ֥ן וּבְנֵי־גָ֖ד לַמִּזְבֵּ֑חַ כִּ֣י עֵ֥ד<br>הוּא֙ בֵּֽינֹתֵ֔ינוּ כִּ֥י יְהוָ֖ה הָאֱלֹהִֽים פ</td>
+            <td class="text-label" title="">וַֽיִּקְרְא֛וּ בְּנֵי־רְאוּבֵ֥ן וּבְנֵי־גָ֖ד לַמִּזְבֵּ֑חַ<br>כִּ֣י עֵ֥ד הוּא֙ בֵּֽינֹתֵ֔ינוּ כִּ֥י יְהוָ֖ה הָאֱלֹהִֽים פ</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-D4-F4-G#4-A4">
                     <div class="left-wing">

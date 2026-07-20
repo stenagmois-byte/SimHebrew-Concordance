@@ -21,7 +21,7 @@
         .matrix-table { width: 100%; border-collapse: collapse; margin-top: 20px;}
         .verse-row { border-bottom: 1px solid #ddd; display: table-row; }
         .verse-label { font-weight: bold; font-size: 14px; padding: 12px 5px; background: #eaeaea; text-align: center; border-right: 2px solid #bbb; display: table-cell; vertical-align: middle; }
-        .text-label { font-size: 13px; font-weight: bold; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; white-space: normal; direction: rtl; display: table-cell; vertical-align: middle; }
+        .text-label { font-size: 14px; font-weight: bold; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; white-space: normal; direction: rtl; display: table-cell; vertical-align: middle; }
         /* 📱 RESPONSIVE TABLET ENGINE: Triggers on iPad screen widths and below */
         @media (max-width: 1024px) {
             .text-label {
@@ -31,6 +31,23 @@
                 text-overflow: ellipsis;    /* Append clean three-dot ... marking */
             }
         }
+        /* Highlighting for Hebrew characters carrying te'amim above the text */
+        .text-label span.ornamented-word {
+            font-size: 13pt;
+            font-weight: bold;
+            background-color: rgba(245, 166, 35, 0.15); /* Soft transparent orange tint */
+            border-bottom: 2px dotted #F5A623;          /* Elegant dotted underline below text */
+            padding: 0 2px;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+        }
+        
+        /* Optional: Add a subtle text accent shift when the mouse hovers over it */
+        .text-label span.ornamented-word:hover {
+            background-color: rgba(245, 166, 35, 0.3);
+            cursor: help;
+        }
+
         .grid-cell { display: table-cell; vertical-align: middle; padding: 5px 0px; }
         /* Assign explicit, fixed widths to the two musical columns to hold the straight vertical axis */
         /* --- PROVEN 3-DIGIT HIGH-DENSITY COLUMN MATH --- */
@@ -91,7 +108,7 @@
     <div class="legend-item"><div class="color-box" style="background:#4A4A4A;"></div><span>C4</span></div><div class="legend-item"><div class="color-box" style="background:#FF851B;"></div><span>D4</span></div><div class="legend-item"><div class="color-box" style="background:#4A90E2;"></div><span>E4</span></div><div class="legend-item"><div class="color-box" style="background:#F5A623;"></div><span>F4</span></div><div class="legend-item"><div class="color-box" style="background:#D0021B;"></div><span>F#4</span></div><div class="legend-item"><div class="color-box" style="background:#7ED321;"></div><span>G4</span></div><div class="legend-item"><div class="color-box" style="background:#B8E986;"></div><span>G#4</span></div><div class="legend-item"><div class="color-box" style="background:#9B51E0;"></div><span>A4</span></div><div class="legend-item"><div class="color-box" style="background:#F8E71C;"></div><span>B4</span></div><div class="legend-item"><div class="color-box" style="background:#50E3C2;"></div><span>C5</span></div></div><table class="matrix-table">
         <tr class="verse-row">
             <td class="verse-label">1</td>
-            <td class="text-label" title="שִׁ֗יר הַֽמַּ֫עֲל֥וֹת אֵ֭לֶיךָ נָשָׂ֣אתִי אֶת־עֵינַ֑י הַ֝יֹּשְׁבִ֗י<br>בַּשָּׁמָֽיִם">שִׁ֗יר הַֽמַּ֫עֲל֥וֹת אֵ֭לֶיךָ נָשָׂ֣אתִי אֶת־עֵינַ֑י הַ֝יֹּשְׁבִ֗י<br>בַּשָּׁמָֽיִם</td>
+            <td class="text-label" title="">שִׁ֗יר הַֽמַּ֫עֲל֥וֹת אֵ֭לֶיךָ נָשָׂ֣אתִי אֶת־עֵינַ֑י<br>הַ֝יֹּשְׁבִ֗י בַּשָּׁמָֽיִם</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-F#4-G4-B4-A4">
                     <div class="left-wing">
@@ -105,7 +122,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="tuba-badge">📯 TUBA (A4)</span><span class="motif-count-badge">x2</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">2</td>
-            <td class="text-label" title="הִנֵּ֨ה כְעֵינֵ֪י עֲבָדִ֡ים אֶל־יַ֤ד אֲ‍ֽדוֹנֵיהֶ֗ם כְּעֵינֵ֣י שִׁפְחָה֮<br>אֶל־יַ֪ד גְּבִ֫רְתָּ֥הּ כֵּ֣ן עֵ֭ינֵינוּ אֶל־יְהוָ֣ה אֱלֹהֵ֑ינוּ עַ֝֗ד שֶׁיְּחָנֵּֽנוּ">הִנֵּ֨ה כְעֵינֵ֪י עֲבָדִ֡ים אֶל־יַ֤ד אֲ‍ֽדוֹנֵיהֶ֗ם כְּעֵינֵ֣י שִׁפְחָה֮<br>אֶל־יַ֪ד גְּבִ֫רְתָּ֥הּ כֵּ֣ן עֵ֭ינֵינוּ אֶל־יְהוָ֣ה אֱלֹהֵ֑ינוּ עַ֝֗ד שֶׁיְּחָנֵּֽנוּ</td>
+            <td class="text-label" title="">הִנֵּ֨ה כְעֵינֵ֪י עֲבָדִ֡ים אֶל־יַ֤ד אֲ‍ֽדוֹנֵיהֶ֗ם כְּעֵינֵ֣י שִׁפְחָה֮ אֶל־יַ֪ד גְּבִ֫רְתָּ֥הּ כֵּ֣ן עֵ֭ינֵינוּ אֶל־יְהוָ֣ה אֱלֹהֵ֑ינוּ<br>עַ֝֗ד שֶׁיְּחָנֵּֽנוּ</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-D4-C5-E4-B4-D4-F#4-B4-G4-B4-A4">
                     <div class="left-wing">
@@ -119,7 +136,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x2</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">3</td>
-            <td class="text-label" title="חָנֵּ֣נוּ יְהוָ֣ה חָנֵּ֑נוּ<br>כִּי־רַ֝֗ב שָׂבַ֥עְנוּ בֽוּז">חָנֵּ֣נוּ יְהוָ֣ה חָנֵּ֑נוּ<br>כִּי־רַ֝֗ב שָׂבַ֥עְנוּ בֽוּז</td>
+            <td class="text-label" title="">חָנֵּ֣נוּ יְהוָ֣ה חָנֵּ֑נוּ<br>כִּי־רַ֝֗ב שָׂבַ֥עְנוּ בֽוּז</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-B4-A4">
                     <div class="left-wing">
@@ -133,7 +150,7 @@
                     <div class="right-wing"><div class="pitch-cell" style="background:#9B51E0; color:#fff;"><sup>&#x25C6;</sup>A4</div><div class="pitch-cell" style="background:#D0021B; color:#fff;">F#4</div><div class="pitch-cell" style="background:#4A90E2; color:#fff;">E4</div><span class="motif-count-badge">x2</span></div></div></td></tr>
         <tr class="verse-row">
             <td class="verse-label">4</td>
-            <td class="text-label" title="רַבַּת֮ שָֽׂבְעָה־לָּ֪הּ נַ֫פְשֵׁ֥נוּ הַלַּ֥עַג הַשַּׁאֲנַנִּ֑ים הַ֝בּ֗וּז<br>לִגְאֵ֥יוֹנִֽים">רַבַּת֮ שָֽׂבְעָה־לָּ֪הּ נַ֫פְשֵׁ֥נוּ הַלַּ֥עַג הַשַּׁאֲנַנִּ֑ים הַ֝בּ֗וּז<br>לִגְאֵ֥יוֹנִֽים</td>
+            <td class="text-label" title="">רַבַּת֮ שָֽׂבְעָה־לָּ֪הּ נַ֫פְשֵׁ֥נוּ הַלַּ֥עַג הַשַּׁאֲנַנִּ֑ים<br>הַ֝בּ֗וּז לִגְאֵ֥יוֹנִֽים</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="E4-D4-F#4-A4">
                     <div class="left-wing">

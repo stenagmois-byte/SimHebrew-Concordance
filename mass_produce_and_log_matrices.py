@@ -90,7 +90,7 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         .matrix-table {{ width: 100%; border-collapse: collapse; margin-top: 20px;}}
         .verse-row {{ border-bottom: 1px solid #ddd; display: table-row; }}
         .verse-label {{ font-weight: bold; font-size: 14px; padding: 12px 5px; background: #eaeaea; text-align: center; border-right: 2px solid #bbb; display: table-cell; vertical-align: middle; }}
-        .text-label {{ font-size: 13px; font-weight: bold; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; white-space: normal; direction: rtl; display: table-cell; vertical-align: middle; }}
+        .text-label {{ font-size: 14px; font-weight: bold; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; white-space: normal; direction: rtl; display: table-cell; vertical-align: middle; }}
         /* 📱 RESPONSIVE TABLET ENGINE: Triggers on iPad screen widths and below */
         @media (max-width: 1024px) {{
             .text-label {{
@@ -100,6 +100,23 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
                 text-overflow: ellipsis;    /* Append clean three-dot ... marking */
             }}
         }}
+        /* Highlighting for Hebrew characters carrying te'amim above the text */
+        .text-label span.ornamented-word {{
+            font-size: 13pt;
+            font-weight: bold;
+            background-color: rgba(245, 166, 35, 0.15); /* Soft transparent orange tint */
+            border-bottom: 2px dotted #F5A623;          /* Elegant dotted underline below text */
+            padding: 0 2px;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+        }}
+        
+        /* Optional: Add a subtle text accent shift when the mouse hovers over it */
+        .text-label span.ornamented-word:hover {{
+            background-color: rgba(245, 166, 35, 0.3);
+            cursor: help;
+        }}
+
         .grid-cell {{ display: table-cell; vertical-align: middle; padding: 5px 0px; }}
         /* Assign explicit, fixed widths to the two musical columns to hold the straight vertical axis */
         /* --- PROVEN 3-DIGIT HIGH-DENSITY COLUMN MATH --- */
@@ -363,35 +380,65 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
             book_id = base_name
             chapter_id = "001"
         
+        heb_clean_text = ""
         heb = ""
         if 'HEB_TEXT' in group.columns:
             valid_heb = group['HEB_TEXT'].dropna()
             if not valid_heb.empty:
-                # 1. Clean the raw string from the JSON column
+                # 1. Pull the 100% clean, original text value directly out of the row cell
                 raw_heb_string = html.unescape(str(valid_heb.iloc[0])).replace('\n', ' ').strip()
                 
-                # 2. If a structural cadence divide exists, execute a precision split
-                if pause_raw_idx != -1:
+                # 2. Define the absolute Unicode character for the Atnah (Etnachta) accent mark
+                ATNAH_CHAR = "\u0591"
+                
+                # 3. Dynamic Semantic Split: Look for the accent marker natively inside the Hebrew words
+                if ATNAH_CHAR in raw_heb_string:
                     heb_words = raw_heb_string.split()
+                    split_index = -1
                     
-                    # Count how many individual word-boundaries exist in the left wing.
-                    # We map this by looking at how many syllable segments fall up to the pause index
-                    # that do not contain a trailing hyphen separator.
-                    left_word_count = len([s for s in syllables[:pause_raw_idx + 1] if not str(s).endswith('-')])
+                    # Search through the words to locate exactly where the wishbone mark rests
+                    for idx, word in enumerate(heb_words):
+                        if ATNAH_CHAR in word:
+                            split_index = idx + 1 # Set the cut boundary exactly after this word ends
+                            break
                     
-                    # Safe boundary guard: Ensure the calculated split index makes logical sense
-                    if 0 < left_word_count < len(heb_words):
-                        # Combine left and right parts cleanly separated by a line break
-                        left_text_part = " ".join(heb_words[:left_word_count])
-                        right_text_part = " ".join(heb_words[left_word_count:])
-                        heb = f"{left_text_part}<br>{right_text_part}"
+                    if split_index != -1 and split_index < len(heb_words):
+                        left_part = " ".join(heb_words[:split_index])
+                        right_part = " ".join(heb_words[split_index:])
+                        heb = f"{left_part}<br>{right_part}"
                     else:
-                        # Fallback to absolute center split if string mapping is anomalous
-                        mid_pt = len(heb_words) // 2
-                        heb = f"{' '.join(heb_words[:mid_pt])}<br>{' '.join(heb_words[mid_pt:])}"
+                        heb = raw_heb_string
                 else:
-                    # Fallback if there is no structural divide (e.g. verse has no Atnah/Oleh)
+                    # Safe fallback: If a verse has no Atnah mark, keep it intact on a single line
                     heb = raw_heb_string
+                        
+                # Master set matching your exact database names
+                VALID_ORNAMENTS = {
+                    'pashta', 'geresh', 'azla', 'tarsin', 'pazer', 'zaqef-qatan',
+                    'zaqef-gadol', 'qadma', 'segol', 'z-qatan tsinnor', 'zarqa',
+                    'tsinnor', 'revia z-qatan', 'telisha-qetana', 'telisha-gedola',
+                    'qarne-farah', 'shalshelet', 'revia', 'ole', 'revia-mugrash',
+                    'illuy', 'z-gadol pashta', 'pashta pashta', 'pazer azla',
+                    'pazer z-qatan', 'z-qatan azla', 'azla pashta', 'azla t-qatana',
+                    'revia pazer', 'azla z-qatan', 'tarsin revia', 'geresh t-gedola'
+                }
+
+                # 2. Extract true ornament names directly from your database row list
+                #ornamented_tokens_set = set()
+                #for r_idx, row in valid_rows.iterrows():
+                #    o_name = str(row.get('ORNAMENT_NAME', '')).lower().strip()
+                #    lyric_syll = str(row.get('LYRIC_SYLL', '')).strip().lower().replace('-', '')
+                    
+                #    if o_name in VALID_ORNAMENTS and lyric_syll:
+                #       ornamented_tokens_set.add(lyric_syll)
+
+                # 3. Assemble text spans by safely inspecting ornament matches
+
+                # 4. BALANCED SPLIT MECHANISM: Bypasses LTR/RTL token drift safely
+                # heb = " ".join(span_words)
+
+
+
         tuba_str = f'<span class="tuba-badge">📯 TUBA ({tuba_pitch})</span>' if tuba_pitch else ''
         
         left_key = " ".join(left_notes)
@@ -413,7 +460,7 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         html_content += f"""
         <tr class="verse-row">
             <td class="verse-label">{clean_verse_display}</td>
-            <td class="text-label" title="{heb}">{heb}</td>
+            <td class="text-label" title="{heb_clean_text}">{heb}</td>
             <td class="grid-cell">
                 <div class="half-verse-container" data-half-verse-id="{left_id_signature}">
                     <div class="left-wing">
