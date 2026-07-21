@@ -127,8 +127,13 @@ def build_reconciliation_matrix(master_sequence_log):
         if prose_cnt == 0 and poetry_cnt == 0:
             continue
 
-        prose_pct = (prose_cnt / prose_totals) * 100 if prose_totals > 0 else 0
-        poetry_pct = (poetry_cnt / poetry_totals) * 100 if poetry_totals > 0 else 0
+        # PINPOINT CLARITY FIX: Compute percentages relative to the explicit functional tier total
+        # Prose denominator = prose_totals (All Prose elements) or len(prose_subset[prose_subset["functional_context"] == context_label])
+        prose_tier_total = len(prose_subset[prose_subset["functional_context"] == context_label])
+        poetry_tier_total = len(poetry_subset[poetry_subset["functional_context"] == context_label])
+
+        prose_pct = (prose_cnt / prose_tier_total) * 100 if prose_tier_total > 0 else 0
+        poetry_pct = (poetry_cnt / poetry_tier_total) * 100 if poetry_tier_total > 0 else 0
 
         # Gather sample references
         samples_list = []
@@ -161,11 +166,12 @@ def build_reconciliation_matrix(master_sequence_log):
         # REFERENCE CODES
         html += f"        <td><span class=\"sample-text\">{samples_display_str}</span></td>\n"
         
-        # FREQUENCY METRIC DATA COLUMNS
+        # FREQUENCY METRIC DATA COLUMNS WITH EXPLICIT TITLES IN HOVER/TEXT
+        # Displays percentage along with a clear title marker mapping to the specific subset tier
         html += f"        <td class=\"num-col\">{prose_cnt if prose_cnt > 0 else '-'}</td>\n"
-        html += f"        <td class=\"num-col\">{f'{prose_pct:.2f}%' if prose_cnt > 0 else '-'}</td>\n"
+        html += f"        <td class=\"num-col\" title=\"of {prose_tier_total} {context_label} elements\">{f'{prose_pct:.2f}%' if prose_cnt > 0 else '-'}</td>\n"
         html += f"        <td class=\"num-col\">{poetry_cnt if poetry_cnt > 0 else '-'}</td>\n"
-        html += f"        <td class=\"num-col\">{f'{poetry_pct:.2f}%' if poetry_cnt > 0 else '-'}</td>\n"
+        html += f"        <td class=\"num-col\" title=\"of {poetry_tier_total} {context_label} elements\">{f'{poetry_pct:.2f}%' if poetry_cnt > 0 else '-'}</td>\n"
         html += "      </tr>\n"
 
     html += f"""    </tbody>
