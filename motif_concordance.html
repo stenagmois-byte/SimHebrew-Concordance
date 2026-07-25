@@ -233,8 +233,12 @@
         // =====================================================================
         // Pulls the target folder name from the map if it's grouped.
         // Defaults directly to its standard uppercase name token if it's an isolated book.
-        let targetFolder = bookToFolderMap[rawBookCode] || bookCode;
+        // Pull the mapped folder, or construct a dynamic Initcap fallback (e.g., "LEVITICUS" -> "Leviticus")
+        let targetFolder = bookToFolderMap[rawBookCode] || (bookCode.charAt(0).toUpperCase() + bookCode.slice(1).toLowerCase());
+        
+        // Your target URL line remains completely unchanged
         let targetChapterUrl = `./musicscores/${targetFolder}/${chapterFileName}`;
+
         // =====================================================================
 
         tableBody.innerHTML += `
