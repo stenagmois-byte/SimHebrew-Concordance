@@ -160,15 +160,27 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         .nav-btn.home-btn:hover {{ background: #333333; }}    </style>
 </head>
 <body>
-    <!-- Sticky Header Navigation -->
-    <div class="nav-bar">
-        <div class="nav-title">📖 {book_id.replace('_', ' ')} — Chapter {current_ch}</div>
-        <div class="nav-cluster">
-            {prev_button}
-            {home_button}
-            {next_button}
-        </div>
+<!-- Sticky Header Navigation Matching Your Oxford CSS Block Layout -->
+<div class="nav" style="display: flex; justify-content: space-between; align-items: center;">
+    
+    <!-- Left Hand Narrative Title Alignment -->
+    <div class="nav-title" style="margin: 0; font-size: 1.1rem; color: #333;">
+        📖 {book_id.replace('_', ' ').title()} — Chapter {current_ch}
     </div>
+    
+    <!-- Right Hand Action Controls Alignment Cluster -->
+    <div class="nav-cluster" style="display: flex; gap: 8px; align-items: center;">
+        {prev_button}
+        {home_button}
+        
+        <!-- Search Subsystem Portal Link Hook -->
+        <a id="globalSearchBtn" href="../../motif_concordance.html?book={book_id.upper()}" class="nav-btn" style="background-color: #800000; color: white; border: 1px solid #800000; text-decoration: none; padding: 6px 12px; border-radius: 4px; font-variant: all-small-caps; font-weight: bold; font-family: sans-serif; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            🔍 Search Motifs
+        </a>
+        
+        {next_button}
+    </div>
+</div>
 
     <h1>🎼 SHV Aligned Melodic Matrix: {book_id} {current_ch}</h1>
     <p><i>Rows are aligned directly after the main structural cadence.</i></p>
@@ -607,6 +619,34 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
                     // TRIPLE UP the braces so Python leaves the JavaScript variable intact
                     const structuralMatches = document.querySelectorAll(`[data-half-verse-id="${identifier}"]`);
                     structuralMatches.forEach(el => el.classList.add('highlighted-verse'));
+
+                    // =========================================================
+                    // 🧠 GLOBAL MOTIF MEMORY PORTAL (Python Safe Escaped)
+                    // =========================================================
+                    // 1. Locate your new header navigation search button
+                    const searchBtn = document.getElementById('globalSearchBtn');
+                    if (searchBtn && identifier) {
+                        // 2. Standardize hyphens/underscores to spaces just in case
+                        const cleanPattern = identifier.replace(/_/g, ' ').replace(/-/g, ' ').trim().toUpperCase();
+                        
+                        // 3. Web-encode the phrase safely for the URL parameters
+                        const encodedPattern = encodeURIComponent(cleanPattern);
+                        
+                        // 4. Update the target link destination to track their last selected motif
+                        searchBtn.href = `../../motif_concordance.html?motif=${encodedPattern}`;
+                        
+                        // 5. Visually update the button text to show it read their mind
+                        searchBtn.innerHTML = `🔍 Search: ${cleanPattern}`;
+                    }
+                    // =========================================================
+                } else {
+                    // If they unclick/deselect the highlight, reset the header button back to generic mode
+                    const searchBtn = document.getElementById('globalSearchBtn');
+                    if (searchBtn && identifier) {
+                        const cleanPattern = identifier.replace(/_/g, ' ').replace(/-/g, ' ').trim().toUpperCase();
+                        const encodedPattern = encodeURIComponent(cleanPattern);                                                                searchBtn.href = `../../motif_concordance.html?motif=${{encodedPattern}}&book={book_id.upper()}`;
+                        searchBtn.innerHTML = `🔍 Search: ${cleanPattern}`;
+                    }
                 }
             });
         });
@@ -616,6 +656,64 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
 </html>"""
     return html_content
     
+# =====================================================================
+# ADD THIS DEFINITION TO THE BOTTOM OF mass_produce_and_log_matrices.py
+# =====================================================================
+def extract_motif_concordance(accumulated_verse_phrases, translation_lookup):
+    """
+    Takes your verified, compacted musical phrases directly from your main loop,
+    maps them to translation.json, and counts rolling sub-motifs over the Tanakh.
+    """
+    import json
+    from collections import defaultdict
+    
+    motif_counts = defaultdict(int)
+    motif_distribution = defaultdict(lambda: defaultdict(int))
+    motif_occurrences = defaultdict(list)
+    
+    print("\n[Motif Subsystem] Building global musical concordance index...")
+    
+    # 1. Loop through your verified, compacted verse phrases from the main run
+    for verse_key, compacted_notes in accumulated_verse_phrases.items():
+        # Expecting verse_key format like "GENESIS_001_001"
+        book_name = verse_key.split('_')[0]
+        
+        # Cross-reference with your translation data engine
+        text_meta = translation_lookup.get(verse_key, {})
+        eng_text = text_meta.get("eng_text", "[Translation missing]")
+        is_poetry = text_meta.get("poetry", "0")
+        
+        # 2. Extract rolling window sub-motifs of length 3 to 5 from your verified shapes
+        for size in range(3, 6):
+            for i in range(len(compacted_notes) - size + 1):
+                motif_slice = compacted_notes[i:i+size]
+                motif_str = " ".join(motif_slice)
+                
+                motif_counts[motif_str] += 1
+                motif_distribution[motif_str][book_name] += 1
+                
+                motif_occurrences[motif_str].append({
+                    "reference": verse_key,
+                    "poetry_flag": is_poetry,
+                    "english_text": eng_text,
+                    "note_sequence": motif_slice,
+                    "start_index": i
+                })
+                
+    # 3. Format and save the global sidecar file completely in isolation
+    compiled_matrix = {}
+    for motif, total in motif_counts.items():
+        compiled_matrix[motif] = {
+            "motif": motif,
+            "total_occurrences": total,
+            "book_breakdown": dict(motif_distribution[motif]),
+            "occurrences": motif_occurrences[motif]
+        }
+        
+    with open("motif_relationship_matrix.json", "w", encoding="utf-8") as f:
+        json.dump(compiled_matrix, f, ensure_ascii=False)
+        
+    print(f"[Motif Subsystem] Done! Extracted {len(compiled_matrix)} searchable motifs.")
 
 
 if __name__ == "__main__":
@@ -807,9 +905,106 @@ if __name__ == "__main__":
                 rep_f.write("\n")
                 
         print(f"📊 Success! Detailed structural report saved to: {sequence_report_path}")
-        # --- THIS IS THE CALL TO YOUR NEW DASHBOARD MATRIX ---
-        # Import your standalone visualization engine file
-        import generate_reconciliation_matrix as grm
+
+    # =========================================================================
+    # 🎼 INTEGRATED SUBSYSTEM: SEARCHABLE MUSICAL CONCORDANCE GENERATOR
+    # =========================================================================
+    try:
+        import json
+        from collections import defaultdict
         
-        # Execute the HTML builder by passing it your master log array
-        grm.build_reconciliation_matrix(master_sequence_log)
+        print("\n[Motif Subsystem] Loading native Oracle text data from translation.json...")
+        with open("translation.json", "r", encoding="utf-8") as f:
+            translation_data = json.load(f)
+            
+        # Dig into the nested "results" array to pull out rows safely
+        items_list = translation_data["results"][0]["items"]
+
+        # Map objects for fast index lookups (Key format: "GENESIS_001_001")
+        text_lookup = {}
+        for item in items_list:
+            if "book_cd" in item and "chapter_cd" in item and "verse_cd" in item:
+                k = f"{item['book_cd'].upper()}_{item['chapter_cd']}_{item['verse_cd']}"
+                raw_text = item.get("eng_text", "[Text Missing]")
+                clean_text = raw_text.replace("<br>", " ‖ ").replace("<br/>", " ‖ ")
+                
+                text_lookup[k] = clean_text
+                
+        motif_counts = defaultdict(int)
+        motif_distribution = defaultdict(lambda: defaultdict(int))
+        motif_occurrences = defaultdict(list)
+        
+        print("[Motif Subsystem] Extracting rolling note windows across the Tanakh...")
+        
+        # =========================================================================
+        # 🛡️ THE BULLETPROOF STRING PADDING SAFEGUARD
+        # =========================================================================
+        # Read from your active master log variable while running in memory
+        for entry in master_sequence_log:
+            book = str(entry.get("book") or entry.get("book_cd") or "").upper().strip()
+            
+            # Extract chapter and verse numbers safely
+            raw_ch = str(entry.get("chapter") or entry.get("chapter_cd") or "").strip()
+            raw_vs = str(entry.get("verse") or entry.get("verse_cd") or "").strip()
+            
+            # CRITICAL ZERO-PADDING STANDARD MATCH: 
+            # If the numbers are single digits (like "1"), force them to "001" 
+            # to match your native Oracle translation.json format exactly!
+            ch = raw_ch.zfill(3)
+            vs = raw_vs.zfill(3)
+            
+            pattern_str = entry.get("sequence_pattern", "")
+            if not pattern_str or pattern_str == "0" or not book:
+                continue
+                
+            notes_array = pattern_str.split()
+            
+            # Restitch the key using your exact unified database format
+            verse_key = f"{book}_{ch}_{vs}"
+            
+            # NOW THE LOOKUP WILL MATCH PERFECTLY:
+            # "1_CHRONICLES_001_001" locks cleanly into "1_CHRONICLES_001_001"
+            eng_text = text_lookup.get(verse_key, "[Text missing in translation.json]")
+            is_poetry = str(entry.get("is_poetry", "0"))
+            
+            for size in range(3, 6):
+                for i in range(len(notes_array) - size + 1):
+                    motif_slice = notes_array[i : i + size]
+                    motif_str = " ".join(motif_slice)
+                    
+                    motif_counts[motif_str] += 1
+                    motif_distribution[motif_str][book] += 1
+                    
+                    motif_occurrences[motif_str].append({
+                        "reference": verse_key,
+                        "poetry_flag": is_poetry,
+                        "type": entry.get("type", "General"),
+                        "start_index": i,
+                        "english_text": eng_text  # Added this field back into the index file
+                    })
+                    
+        # Format the final output matrix
+        compiled_matrix = {}
+        for motif, total in motif_counts.items():
+            compiled_matrix[motif] = {
+                "motif": motif,
+                "total_occurrences": total,
+                "book_breakdown": dict(motif_distribution[motif]),
+                "occurrences": motif_occurrences[motif]
+            }
+            
+        with open("motif_relationship_matrix.json", "w", encoding="utf-8") as out_f:
+            json.dump(compiled_matrix, fp=out_f, ensure_ascii=False)
+            
+        print(f"🎉 [Motif Subsystem] Success! Extracted {len(compiled_matrix)} searchable motifs.")
+        print("🔗 Global index sidecar saved completely to: motif_relationship_matrix.json")
+        
+    except Exception as ex:
+        print(f"⚠️ [Motif Subsystem] Notice: Analysis skipped due to configuration error: {str(ex)}")
+    # =========================================================================
+
+    # --- THIS IS THE CALL TO YOUR NEW DASHBOARD MATRIX ---
+    # Import your standalone visualization engine file
+    import generate_reconciliation_matrix as grm
+    # Execute the HTML builder by passing it your master log array
+    grm.build_reconciliation_matrix(master_sequence_log)        

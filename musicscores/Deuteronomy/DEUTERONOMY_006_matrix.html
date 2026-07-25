@@ -91,15 +91,27 @@
         .nav-btn.home-btn:hover { background: #333333; }    </style>
 </head>
 <body>
-    <!-- Sticky Header Navigation -->
-    <div class="nav-bar">
-        <div class="nav-title">📖 DEUTERONOMY — Chapter 6</div>
-        <div class="nav-cluster">
-            <a href="DEUTERONOMY_005_matrix.html" class="nav-btn">◀ Prev</a>
-            <a href="../index.html" class="nav-btn home-btn">📁 Index</a>
-            <a href="DEUTERONOMY_007_matrix.html" class="nav-btn">Next ▶</a>
-        </div>
+<!-- Sticky Header Navigation Matching Your Oxford CSS Block Layout -->
+<div class="nav" style="display: flex; justify-content: space-between; align-items: center;">
+    
+    <!-- Left Hand Narrative Title Alignment -->
+    <div class="nav-title" style="margin: 0; font-size: 1.1rem; color: #333;">
+        📖 Deuteronomy — Chapter 6
     </div>
+    
+    <!-- Right Hand Action Controls Alignment Cluster -->
+    <div class="nav-cluster" style="display: flex; gap: 8px; align-items: center;">
+        <a href="DEUTERONOMY_005_matrix.html" class="nav-btn">◀ Prev</a>
+        <a href="../index.html" class="nav-btn home-btn">📁 Index</a>
+        
+        <!-- Search Subsystem Portal Link Hook -->
+        <a id="globalSearchBtn" href="../../motif_concordance.html?book=DEUTERONOMY" class="nav-btn" style="background-color: #800000; color: white; border: 1px solid #800000; text-decoration: none; padding: 6px 12px; border-radius: 4px; font-variant: all-small-caps; font-weight: bold; font-family: sans-serif; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            🔍 Search Motifs
+        </a>
+        
+        <a href="DEUTERONOMY_007_matrix.html" class="nav-btn">Next ▶</a>
+    </div>
+</div>
 
     <h1>🎼 SHV Aligned Melodic Matrix: DEUTERONOMY 6</h1>
     <p><i>Rows are aligned directly after the main structural cadence.</i></p>
@@ -473,6 +485,34 @@
                     // TRIPLE UP the braces so Python leaves the JavaScript variable intact
                     const structuralMatches = document.querySelectorAll(`[data-half-verse-id="${identifier}"]`);
                     structuralMatches.forEach(el => el.classList.add('highlighted-verse'));
+
+                    // =========================================================
+                    // 🧠 GLOBAL MOTIF MEMORY PORTAL (Python Safe Escaped)
+                    // =========================================================
+                    // 1. Locate your new header navigation search button
+                    const searchBtn = document.getElementById('globalSearchBtn');
+                    if (searchBtn && identifier) {
+                        // 2. Standardize hyphens/underscores to spaces just in case
+                        const cleanPattern = identifier.replace(/_/g, ' ').replace(/-/g, ' ').trim().toUpperCase();
+                        
+                        // 3. Web-encode the phrase safely for the URL parameters
+                        const encodedPattern = encodeURIComponent(cleanPattern);
+                        
+                        // 4. Update the target link destination to track their last selected motif
+                        searchBtn.href = `../../motif_concordance.html?motif=${encodedPattern}`;
+                        
+                        // 5. Visually update the button text to show it read their mind
+                        searchBtn.innerHTML = `🔍 Search: ${cleanPattern}`;
+                    }
+                    // =========================================================
+                } else {
+                    // If they unclick/deselect the highlight, reset the header button back to generic mode
+                    const searchBtn = document.getElementById('globalSearchBtn');
+                    if (searchBtn && identifier) {
+                        const cleanPattern = identifier.replace(/_/g, ' ').replace(/-/g, ' ').trim().toUpperCase();
+                        const encodedPattern = encodeURIComponent(cleanPattern);                                                                searchBtn.href = `../../motif_concordance.html?motif=${{encodedPattern}}&book={book_id.upper()}`;
+                        searchBtn.innerHTML = `🔍 Search: ${cleanPattern}`;
+                    }
                 }
             });
         });

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="qstyles.css">
+  <title>Tanach Musical Motif Concordance</title>
+  <style>
+    /* 🎨 Clean, Top-Down Single Column Layout Styles */
+    .search-panel { background-color: #fffcf4; border: 2px solid #800000; padding: 15px; margin: 15px 0; border-radius: 6px; }
+    .search-input { padding: 8px; font-size: 1.1rem; border: 1px solid #ccc; width: 60%; border-radius: 4px; }
+    .search-btn { padding: 8px 16px; font-size: 1.1rem; background-color: #800000; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    
+    /* Consolidated Book Distribution row sitting directly below the search panel */
+    .book-panel-horizontal { display: flex; flex-wrap: wrap; gap: 8px; background: #fafafa; border: 1px solid #ddd; padding: 12px; border-radius: 4px; margin-bottom: 20px; align-items: center; }
+    .book-panel-title { font-family: sans-serif; font-size: 0.85rem; font-weight: bold; color: #666; text-transform: uppercase; margin-right: 5px; }
+    
+    .book-link-item { display: inline-flex; align-items: center; background: white; border: 1px solid #ccc; padding: 4px 10px; font-family: serif; font-size: 1rem; cursor: pointer; border-radius: 15px; }
+    .book-link-item:hover, .book-link-item.active { background: #e6dfcf; color: #800000; font-weight: bold; border-color: #800000; }
+    .badge { background: #800000; color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.75rem; font-family: sans-serif; margin-left: 6px; }
+    
+    /* 📊 3-Column Structural Text Matrix Table Styles */
+    .concordance-matrix-table { width: 100%; border-collapse: collapse; font-family: 'Georgia', serif; margin-top: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .concordance-matrix-table td { padding: 10px 12px; border: 1px solid #ddd; vertical-align: top; font-size: 1.05rem; }
+    .matrix-hdr { background-color: #f3f0e8; color: #800000; font-weight: bold; font-family: sans-serif; font-size: 0.85rem; text-transform: uppercase; }
+    
+    .text-cell { line-height: 1.5; color: #222; }
+  </style>
+</head>
+<body>
+
+  <div class="nav">
+    <a href="./musicscores/index.html">← Back to Volume Directory</a>
+  </div>
+
+  <h1>Musical Motif Concordance</h1>
+
+  <!-- Top Search Bar Panel -->
+  <div class="search-panel">
+    <input type="text" id="motifSearch" class="search-input" value="G4 F#4 E4" placeholder="Enter notes...">
+    <button class="search-btn" onclick="runMotifSearch()">Search Motif</button>
+  </div>
+
+  <div id="loadingStatus" style="font-weight: bold; color: #666;">Initializing concordance asset databases...</div>
+
+  <!-- Primary Main View Content Area -->
+  <div id="workspace" style="display: none;">
+    
+    <!-- 1. Horizontal Book Counts Metrics Row (Sitting directly underneath the search bar) -->
+    <div class="book-panel-horizontal">
+      <span class="book-panel-title">Count by Book:</span>
+      <button class="book-link-item active" id="allBooksBtn" onclick="filterByBook('ALL')">✨ All Books</button>
+      <div id="bookDistributionList" style="display: inline-flex; flex-wrap: wrap; gap: 6px;"></div>
+    </div>
+
+    <!-- 2. Active Occurrences Header Totals Banner (Pushed cleanly to the top of the data list) -->
+    <h3 style="margin-top: 25px; border-bottom: 2px solid #800000; padding-bottom: 5px;">
+      Occurrences (<span id="totalOccurrencesCounter">0</span>)
+    </h3>
+    
+    <!-- 3. Consolidated 3-Column Structural Text Data Table Matrix (No redundant pitch blocks) -->
+    <table class="concordance-matrix-table">
+      <thead>
+        <tr>
+          <td class="matrix-hdr" style="width: 20%;">Book</td>
+          <td class="matrix-hdr" style="width: 15%;">Location</td>
+          <td class="matrix-hdr" style="width: 65%;">English Text</td>
+        </tr>
+      </thead>
+      <tbody id="matrixTableBody"></tbody>
+    </table>
+  </div>
+  <script>
+    let motifMatrix = null;
+    let currentSelectedBook = 'ALL';
+    let canonicalOrder = {};
+
+    // =====================================================================
+    // 🗺️ UNIVERSAL COMPOSITE DIRECTORY ROUTER MAP
+    // =====================================================================
+    // Maps database book codes directly to your custom physical folder names.
+    // Ensure the spelling matches your actual computer folder cases exactly.
+    const bookToFolderMap = {
+        // Joshua & Judges Group
+        "JOSHUA": "Joshua-Judges", 
+        "JUDGES": "Joshua-Judges",
+        
+        // Samuel Group
+        "1_SAMUEL": "Samuel", 
+        "2_SAMUEL": "Samuel",
+        
+        // Kings Group
+        "1_KINGS": "Kings", 
+        "2_KINGS": "Kings",
+        
+        // The Twelve Minor Prophets
+        "HOSEA": "The Twelve", "JOEL": "The Twelve", "AMOS": "The Twelve",
+        "OBADIAH": "The Twelve", "JONAH": "The Twelve", "MICAH": "The Twelve",
+        "NAHUM": "The Twelve", "HABAKKUK": "The Twelve", "ZEPHANIAH": "The Twelve",
+        "HAGGAI": "The Twelve", "ZECHARIAH": "The Twelve", "MALACHI": "The Twelve",
+        
+        // The Psalms Group
+        "PSALMS": "The Psalms",
+        
+        // Daniel, Ezra, Nehemiah Group
+        "DANIEL": "Daniel-Ezra-Nehemiah", 
+        "EZRA": "Daniel-Ezra-Nehemiah", 
+        "NEHEMIAH": "Daniel-Ezra-Nehemiah",
+        
+        // Chronicles Group
+        "1_CHRONICLES": "Chronicles", 
+        "2_CHRONICLES": "Chronicles"
+    };
+
+    // Strict Canonical Index matching your bookseq.json row sequences precisely
+    const canonicalOrderMap = {
+        "GENESIS": 1, "EXODUS": 2, "LEVITICUS": 3, "NUMBERS": 4, "DEUTERONOMY": 5,
+        "JOSHUA": 6, "JUDGES": 7, "1_SAMUEL": 8, "2_SAMUEL": 9, "1_KINGS": 10,
+        "2_KINGS": 11, "ISAIAH": 12, "JEREMIAH": 13, "EZEKIEL": 14, "HOSEA": 15,
+        "JOEL": 16, "AMOS": 17, "OBADIAH": 18, "JONAH": 19, "MICAH": 20,
+        "NAHUM": 21, "HABAKKUK": 22, "ZEPHANIAH": 23, "HAGGAI": 24, "ZECHARIAH": 25,
+        "MALACHI": 26, "PSALMS": 27, "PROVERBS": 28, "JOB": 29, "SONG": 30,
+        "RUTH": 31, "LAMENTATIONS": 32, "QOHELET": 33, "ESTHER": 34, "DANIEL": 35,
+        "EZRA": 36, "NEHEMIAH": 37, "1_CHRONICLES": 38, "2_CHRONICLES": 39
+    };
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const motifRes = await fetch('motif_relationship_matrix.json');
+        motifMatrix = await motifRes.json();
+        
+        // Initialize dynamic bookseq layout mapping asset
+        const seqRes = await fetch('bookseq.json');
+        const seqData = await seqRes.json();
+        
+        let seqItems = seqData.results?.items || seqData.items || [];
+        seqItems.forEach(item => {
+            if (item.book_cd) {
+                // Normalize spaces to underscores to guarantee an absolute structural match
+                let key = item.book_cd.toUpperCase().replace(/\s+/g, '_').trim();
+                canonicalOrder[key] = parseInt(item.book_seq_no);
+            }
+        });
+
+        document.getElementById('loadingStatus').style.display = 'none';
+        document.getElementById('workspace').style.display = 'block';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const passedMotif = urlParams.get('motif');
+        if (passedMotif) {
+            document.getElementById('motifSearch').value = passedMotif.trim().toUpperCase();
+        }
+        
+        runMotifSearch();
+      } catch (err) {
+        document.getElementById('loadingStatus').innerHTML = `❌ Error initializing: ${err.message}`;
+      }
+    });
+
+    function runMotifSearch() {
+      currentSelectedBook = 'ALL';
+      renderConcordanceView();
+    }
+
+    function renderConcordanceView() {
+      const searchStr = document.getElementById('motifSearch').value.trim().toUpperCase();
+      const dataMatch = motifMatrix[searchStr];
+      
+      const distList = document.getElementById('bookDistributionList');
+      const tableBody = document.getElementById('matrixTableBody');
+      
+      distList.innerHTML = '';
+      tableBody.innerHTML = '';
+      document.getElementById('totalOccurrencesCounter').innerText = '0';
+      
+      if (!dataMatch) {
+        tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#aaa; font-style:italic; padding: 20px;">No matching structural occurrences discovered for this profile.</td></tr>';
+        return;
+      }
+
+      // 1. Draw the Horizontal Book Badge Pills sorted in strict canonical 1-39 sequence
+      Object.entries(dataMatch.book_breakdown)
+        .sort((a, b) => {
+            let keyA = a[0].toUpperCase().replace(/\s+/g, '_').trim();
+            let keyB = b[0].toUpperCase().replace(/\s+/g, '_').trim();
+            
+            let rankA = canonicalOrder[keyA] || canonicalOrderMap[keyA] || 999;
+            let rankB = canonicalOrder[keyB] || canonicalOrderMap[keyB] || 999;
+            return rankA - rankB;
+        })
+        .forEach(([book, count]) => {
+          let bClean = book.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+          let activeClass = currentSelectedBook === book.toUpperCase() ? 'active' : '';
+          
+          distList.innerHTML += `
+            <button class="book-link-item ${activeClass}" onclick="filterByBook('${book.toUpperCase()}')">
+              <strong>${bClean}</strong><span class="badge">${count}</span>
+            </button>`;
+        });
+        
+      const allBtn = document.getElementById('allBooksBtn');
+      if (allBtn) {
+        if (currentSelectedBook === 'ALL') allBtn.classList.add('active');
+        else allBtn.classList.remove('active');
+      }
+
+      // 2. Loop Through All Occurrences Un-Capped
+      let displayCount = 0;
+      for (let i = 0; i < dataMatch.occurrences.length; i++) {
+        let occ = dataMatch.occurrences[i];
+        let parts = occ.reference.split('_');
+        let vsNum = parseInt(parts.pop()); 
+        let chNum = parseInt(parts.pop()); 
+        let rawBookCode = parts.join('_').toUpperCase().trim(); 
+        let bookCode = rawBookCode.replace(/\d+$/, ''); 
+
+        if (currentSelectedBook !== 'ALL' && currentSelectedBook !== rawBookCode) continue;
+
+        displayCount++;
+        
+        let textLine = occ.english_text || "[Translation text entry missing]";
+        let bookDisplay = bookCode.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        let refDisplay = `${bookDisplay} ${chNum}:${vsNum}`;
+
+        let paddedCh = String(chNum).padStart(3, '0');
+        
+        // Keeps the precise structural database name syntax intact for the final filename target
+        // Outputs matching files like: 1_CHRONICLES_029_matrix.html or PSALMS_001_matrix.html
+        let chapterFileName = `${rawBookCode}_${paddedCh}_matrix.html`;
+        
+        // =====================================================================
+        // 🗺️ INTELLIGENT DIRECTORY PATH ROUTER
+        // =====================================================================
+        // Pulls the target folder name from the map if it's grouped.
+        // Defaults directly to its standard uppercase name token if it's an isolated book.
+        let targetFolder = bookToFolderMap[rawBookCode] || bookCode;
+        let targetChapterUrl = `./musicscores/${targetFolder}/${chapterFileName}`;
+        // =====================================================================
+
+        tableBody.innerHTML += `
+          <tr>
+            <td style="font-weight:bold; font-family:sans-serif; color:#444; width: 20%;">
+              ${bookDisplay}
+              <div style="font-size:0.75rem; color:#888; font-weight:normal; margin-top:4px; line-height: 1.3;">
+                ${occ.poetry_flag === '1' ? 'Poetic System' : 'Prose System'}<br>Tier: ${occ.type}
+              </div>
+            </td>
+            <td style="width: 15%;">
+              <a href="${targetChapterUrl}" style="color:#800000; text-decoration:underline; font-weight:bold; font-family: sans-serif;" title="Open complete chapter color matrix">
+                ${chNum}:${vsNum} ↗
+              </a>
+            </td>
+            <td class="text-cell" style="width: 65%;">
+              <div style="font-size: 1.1rem;">${textLine}</div>
+            </td>
+          </tr>
+        `;
+      }
+      
+      document.getElementById('totalOccurrencesCounter').innerText = displayCount;
+      
+      if (displayCount === 0) {
+        tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#aaa; font-style:italic; padding: 20px;">No matching entries found inside this specific book filter block.</td></tr>';
+      }
+    }
+
+    function filterByBook(bookKey) {
+      currentSelectedBook = bookKey.toUpperCase().trim();
+      renderConcordanceView();
+    }
+  </script>
+
+</body>
+</html>

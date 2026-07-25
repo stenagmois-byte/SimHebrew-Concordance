@@ -8,13 +8,19 @@ This directory contains data matrices, full-chapter **MusicXML scores**, and aut
 
 ## 🔍 The Project Pillars & Datasets
 
-This project provides two distinct, canonical data pipelines spanning all 39 books of the Tanach:
+This project provides several tools spanning all 39 books of the Tanach:
 
-1. **`MUSICSTATS.xlsx` (The Fixed-Interval Baseline)**: This data matrix captures every verse with its raw text-accent abbreviations and clean note equivalents. The entire dataset is mapped in the default fixed modes popularized by Suzanne Haïk-Vantoura (SHV): the `f -> g#` interval system for the 21 prose books, and the `f# -> g` system for the 3 poetic books (Psalms, Proverbs, Job).
-2. **MusicXML Archive (The Dynamic Modal Traces)**: A comprehensive library of raw MusicXML files extracted directly from our database. Unlike the static baseline, this archive incorporates variable modal shifts chosen specifically to match the structural, strophic, and emotional demands of the text—particularly across the Psalms.
+1. **`MUSICSTATS.xlsx` (The Fixed-Interval Baseline)**: This data matrix captures every verse with its raw text-accent abbreviations and clean note equivalents. The entire dataset is mapped in the default fixed modes popularized by Suzanne Haïk-Vantoura (SHV): the `f -> g#` interval system for the 21 prose books, and the `f# -> g` system for the 3 poetic books (Psalms, Proverbs, Job). This xlsx is static but usable.
+2. **MusicXML Archive (readable with any music program)**: A comprehensive library of raw MusicXML files extracted directly from our database. Unlike the static baseline, this archive incorporates variable modal shifts chosen specifically to match the structural, strophic, and emotional demands of the text—particularly across the Psalms.
+
+3. **MSCZ Archive (as read by Musescore)**.
+
+4. **JSON files -- several representing extracts from the Oracle database that supported the translation and musical project**.
+
+5. **An interactive display that allows the user to see the musical structure and investigate motifs across the entire canon**.
 
 ### 🧩 The Ultimate Deep Puzzle: Decrypting the Ancient Modes
-By providing both a fixed baseline and a fluid modal trace, this lab invites researchers to tackle a generational question: **Is there an acoustic fingerprint embedded in the sequence lines or strophes that hints at the exact musical mode the ancients were using?** Using Python, we can search for the unique interval patterns that mathematically signal a shift in the ancient musical key.
+By providing both a fixed baseline and a fluid modal trace, this lab invites researchers to tackle a generational question: **Look for example, for an acoustic fingerprint embedded in the sequence lines or strophes that hints at the style, or the musical mode the ancient reciters/composerss were using.**
 
 ---
 
@@ -28,25 +34,12 @@ Make sure you have Python installed, then install the required data analysis lib
 pip install pandas openpyxl
 ```
 
-### Executing the Genesis 1 Sequence Test
-1. Clone this repository to your computer.
-2. Navigate into the script directory using your Command Prompt or Terminal:
-   ```bash
-   cd musicscores/analysis_scripts
-   ```
-3. Run the automated explorer script:
-   ```bash
-   python explore_genesis.py
-   ```
-
-The script will look up into the parent folder, process `MUSICSTATS.xlsx`, and output a mathematical breakdown of the top repeating musical phrases (n-grams), cleanly isolating the inner structural architecture of the chapter (such as the 3-note building blocks of the famous Creation Refrain).
-
 ---
 
 ## 🤝 Open Invitation for Collaboration
 This framework is a stimulus designed to spark cross-disciplinary research:
 * **Biblical Scholars**: Search for cross-verse structural echoes—identifying where entirely different books share an identical musical-emotional fingerprint.
-* **Musicians & Vocalists**: Track the *tessitura* (pitch curves) of ancient poetry to understand how the music drop into quiet interludes or peaks into high-intensity caps (like the high `C` via the *mahpakh* accent).
+* **Musicians & Vocalists**: Track the *tessitura* of ancient poetry to understand how the music drops into quiet interludes or peaks into high-intensity warning (like the high `C` via the *mahpakh* accent -- see Psalms 115).
 * **Composers**: Leverage the raw MusicXML data as a foundational framework for modern arrangements and choral soundscapes derived directly from the canonical text.
 
 ---
