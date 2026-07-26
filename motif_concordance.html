@@ -192,53 +192,95 @@
       }
 
       // 2. Loop Through All Occurrences Un-Capped
-      let displayCount = 0;
-      for (let i = 0; i < dataMatch.occurrences.length; i++) {
-        let occ = dataMatch.occurrences[i];
-        let parts = occ.reference.split('_');
-        let vsNum = parseInt(parts.pop()); 
-        let chNum = parseInt(parts.pop()); 
-        let rawBookCode = parts.join('_').toUpperCase().trim(); 
+  // =====================================================================
+  // 2. Sort and Loop Through All Occurrences in Strict Canonical Sequence
+  // =====================================================================
+  let displayCount = 0;
 
-        if (currentSelectedBook !== 'ALL' && currentSelectedBook !== rawBookCode) continue;
+  // Create a copy of the occurrences array and sort it safely
+  const sortedOccurrences = [...dataMatch.occurrences].sort((a, b) => {
+    // Unpack reference A
+    let partsA = a.reference.split('_');
+    let vsA = parseInt(partsA.pop()) || 0;
+    let chA = parseInt(partsA.pop()) || 0;
+    let bookKeyA = partsA.join('_').toUpperCase().trim();
 
-        displayCount++;
-        
-        let textLine = occ.english_text || "[Translation text entry missing]";
-        let bookDisplay = rawBookCode.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-        let refDisplay = `${bookDisplay} ${chNum}:${vsNum}`;
+    // Unpack reference B
+    let partsB = b.reference.split('_');
+    let vsB = parseInt(partsB.pop()) || 0;
+    let chB = parseInt(partsB.pop()) || 0;
+    let bookKeyA_clean = bookKeyA.replace(/\s+/g, '_');
+    
+    let partsB_clean = b.reference.split('_');
+    let vsB_clean = parseInt(partsB_clean.pop()) || 0;
+    let chB_clean = parseInt(partsB_clean.pop()) || 0;
+    let bookKeyB = partsB_clean.join('_').toUpperCase().trim();
+    let bookKeyB_clean = bookKeyB.replace(/\s+/g, '_');
 
-        let paddedCh = String(chNum).padStart(3, '0');
-        let chapterFileName = `${rawBookCode}_${paddedCh}_matrix.html`;
-        
-        // Robust directory folder fallback pathing strategy
-        let targetFolder = bookToFolderMap[rawBookCode];
-        if (!targetFolder) {
-            let cleanFallback = rawBookCode.replace(/^[\d_]+/, '');
-            targetFolder = cleanFallback.charAt(0).toUpperCase() + cleanFallback.slice(1).toLowerCase();
-        }
-        
-        let targetChapterUrl = `./musicscores/${targetFolder}/${chapterFileName}`;
+    // 1. Compare by Canonical Book Index
+    let rankA = canonicalOrder[bookKeyA_clean] || canonicalOrderMap[bookKeyA_clean] || 999;
+    let rankB = canonicalOrder[bookKeyB_clean] || canonicalOrderMap[bookKeyB_clean] || 999;
+    
+    if (rankA !== rankB) {
+        return rankA - rankB;
+    }
+    
+    // 2. If same book, compare by Chapter Number
+    if (chA !== chB_clean) {
+        return chA - chB_clean;
+    }
+    
+    // 3. If same chapter, compare by Verse Number
+    return vsA - vsB_clean;
+  });
 
-        tableBody.innerHTML += `
-          <tr>
-            <td style="font-weight:bold; font-family:sans-serif; color:#444; width: 20%;">
-              ${bookDisplay}
-              <div style="font-size:0.75rem; color:#888; font-weight:normal; margin-top:4px; line-height: 1.3;">
-                ${occ.poetry_flag === '1' ? 'Poetic System' : 'Prose System'}<br>Tier: ${occ.type}
-              </div>
-            </td>
-            <td style="width: 15%;">
-              <a href="${targetChapterUrl}" style="color:#800000; text-decoration:underline; font-weight:bold; font-family: sans-serif;" title="Open complete chapter color matrix">
-                ${chNum}:${vsNum} ↗
-              </a>
-            </td>
-            <td class="text-cell" style="width: 65%;">
-              <div style="font-size: 1.1rem;">${textLine}</div>
-            </td>
-          </tr>
-        `;
-      }
+  // Now loop through the beautifully sorted array
+  for (let i = 0; i < sortedOccurrences.length; i++) {
+    let occ = sortedOccurrences[i];
+    let parts = occ.reference.split('_');
+    let vsNum = parseInt(parts.pop()); 
+    let chNum = parseInt(parts.pop()); 
+    let rawBookCode = parts.join('_').toUpperCase().trim(); 
+
+    if (currentSelectedBook !== 'ALL' && currentSelectedBook !== rawBookCode) continue;
+
+    displayCount++;
+    
+    let textLine = occ.english_text || "[Translation text entry missing]";
+    let bookDisplay = rawBookCode.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    let refDisplay = `${bookDisplay} ${chNum}:${vsNum}`;
+
+    let paddedCh = String(chNum).padStart(3, '0');
+    let chapterFileName = `${rawBookCode}_${paddedCh}_matrix.html`;
+    
+    let targetFolder = bookToFolderMap[rawBookCode];
+    if (!targetFolder) {
+        let cleanFallback = rawBookCode.replace(/^[\d_]+/, '');
+        targetFolder = cleanFallback.charAt(0).toUpperCase() + cleanFallback.slice(1).toLowerCase();
+    }
+    
+    let targetChapterUrl = `./musicscores/${targetFolder}/${chapterFileName}`;
+
+    tableBody.innerHTML += `
+      <tr>
+        <td style="font-weight:bold; font-family:sans-serif; color:#444; width: 20%;">
+          ${bookDisplay}
+          <div style="font-size:0.75rem; color:#888; font-weight:normal; margin-top:4px; line-height: 1.3;">
+            ${occ.poetry_flag === '1' ? 'Poetic System' : 'Prose System'}<br>Tier: ${occ.type}
+          </div>
+        </td>
+        <td style="width: 15%;">
+          <a href="${targetChapterUrl}" style="color:#800000; text-decoration:underline; font-weight:bold; font-family: sans-serif;" title="Open complete chapter color matrix">
+            ${chNum}:${vsNum} ↗
+          </a>
+        </td>
+        <td class="text-cell" style="width: 65%;">
+          <div style="font-size: 1.1rem;">${textLine}</div>
+        </td>
+      </tr>
+    `;
+  }
+
       
       document.getElementById('totalOccurrencesCounter').innerText = displayCount;
       
