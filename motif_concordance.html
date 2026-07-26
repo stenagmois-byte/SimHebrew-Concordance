@@ -149,7 +149,12 @@
             document.getElementById('searchInput').value = decoded;
         }
         
-        runMotifSearch();
+        // ---------------------------------------------------------------------
+        // 🧲 CORE CONTEXT MENU ENGINE HOOK
+        // ---------------------------------------------------------------------
+        setupContextMenuEngine();
+        
+        renderConcordanceView();
       } catch (err) {
         document.getElementById('loadingStatus').innerHTML = `❌ Error initializing: ${err.message}`;
       }
@@ -306,7 +311,7 @@
         targetFolder = cleanFallback.charAt(0).toUpperCase() + cleanFallback.slice(1).toLowerCase();
     }
     
-    let targetChapterUrl = `./musicscores/${targetFolder}/${chapterFileName}`;
+    let targetChapterUrl = `./musicscores/${targetFolder}/${chapterFileName}#${occ.reference}`;
 
     tableBody.innerHTML += `
       <tr>
@@ -340,7 +345,105 @@
       currentSelectedBook = bookKey.toUpperCase().trim();
       renderConcordanceView();
     }
-  </script>
+    // =====================================================================
+    // 🎛️ RIGHT-CLICK CONTEXT MENU CONTROLLER LOGIC
+    // =====================================================================
+    function setupContextMenuEngine() {
+      const searchInput = document.getElementById('searchInput');
+      const contextMenu = document.getElementById('customContextMenu');
+      const extensionsList = document.getElementById('relatedExtensionsList');
 
+      if (!searchInput || !contextMenu || !extensionsList) return;
+
+      searchInput.addEventListener('contextmenu', function(e) {
+        const rawValue = searchInput.value || '';
+        const currentText = rawValue.trim().replace(/\s+/g, ' ').toUpperCase();
+        
+        if (!currentText || !motifMatrix) return;
+
+        e.preventDefault();
+
+        // Scan master matrix keys to find embedded patterns
+        const allKeys = Object.keys(motifMatrix);
+        const related = allKeys.filter(key => {
+            const cleanKey = key.trim().replace(/\s+/g, ' ').toUpperCase();
+            return cleanKey !== currentText && cleanKey.includes(currentText);
+        });
+
+        extensionsList.innerHTML = '';
+        
+        if (related.length === 0) {
+          extensionsList.innerHTML = '<div style="padding: 10px 12px; color: #aaa; font-style: italic; font-family: sans-serif; font-size: 0.85rem;">No larger structural motifs embed this profile.</div>';
+        } else {
+          related.sort((a, b) => a.length - b.length);
+          
+          related.forEach(motifKey => {
+            // Calculate both the global total and the localized book total
+            const totalCount = motifMatrix[motifKey].occurrences ? motifMatrix[motifKey].occurrences.length : 0;
+            
+            // Check if it exists in the currently active book filter
+            const bookBreakdown = motifMatrix[motifKey].book_breakdown || {};
+            const localCount = bookBreakdown[currentSelectedBook] || 0;
+            
+            const rowItem = document.createElement('div');
+            rowItem.style.padding = '8px 12px';
+            rowItem.style.cursor = 'pointer';
+            rowItem.style.borderBottom = '1px solid #f0f0f0';
+            rowItem.style.fontFamily = 'monospace';
+            rowItem.style.fontSize = '0.95rem';
+            rowItem.style.color = '#333';
+            
+            // Visual Indicator: If it doesn't exist in the active book, dim the text slightly
+            if (currentSelectedBook !== 'ALL' && localCount === 0) {
+                rowItem.style.opacity = '0.45';
+                rowItem.style.color = '#777';
+            }
+            
+            // Render counts neatly (e.g., "E4 F#4 A4 B4 (Global: 142 | Psalms: 12)")
+            let countDisplay = `(Global: ${totalCount})`;
+            if (currentSelectedBook !== 'ALL') {
+                let cleanBookName = currentSelectedBook.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+                countDisplay = `(Global: ${totalCount} | ${cleanBookName}: ${localCount})`;
+            }
+            
+            rowItem.innerHTML = `<strong>${motifKey}</strong> <span style="color:#800000; font-family:sans-serif; font-size:0.8rem; font-weight:bold; margin-left:4px;">${countDisplay}</span>`;
+            
+            rowItem.addEventListener('click', () => {
+              searchInput.value = motifKey;
+              contextMenu.style.display = 'none';
+              
+              // FIX: Maintain the current book constraint completely!
+              // The active filter (e.g. 'LEVITICUS') stays locked in place.
+              renderConcordanceView();
+            });            
+            rowItem.addEventListener('mouseenter', () => { rowItem.style.background = '#e6dfcf'; rowItem.style.color = '#800000'; });
+            rowItem.addEventListener('mouseleave', () => { rowItem.style.background = '#ffffff'; rowItem.style.color = '#333'; });
+            
+            extensionsList.appendChild(rowItem);
+          });
+        }
+
+        contextMenu.style.left = `${e.pageX}px`;
+        contextMenu.style.top = `${e.pageY}px`;
+        contextMenu.style.display = 'block';
+      });
+
+      document.addEventListener('click', function(event) {
+          if (!contextMenu.contains(event.target) && event.target !== searchInput) {
+              contextMenu.style.display = 'none';
+          }
+      });
+    }
+
+  </script>
+  <!-- ===================================================================== -->
+  <!-- 🎛️ DYNAMIC RIGHT-CLICK EXTENSIONS CONTROLLER LAYER                     -->
+  <!-- ===================================================================== -->
+  <div id="customContextMenu" style="display: none; position: absolute; background: #ffffff; border: 2px solid #800000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 4px; z-index: 10000; font-family: sans-serif; font-size: 0.95rem; max-height: 300px; overflow-y: auto; width: 260px;">
+    <div style="background: #f3f0e8; color: #800000; font-weight: bold; padding: 8px 12px; border-bottom: 1px solid #ddd; font-size: 0.75rem; text-transform: uppercase; font-family: sans-serif; tracking-letter: 0.5px;">
+      🔗 Embedded Motif Extensions
+    </div>
+    <div id="relatedExtensionsList"></div>
+  </div>
 </body>
 </html>
