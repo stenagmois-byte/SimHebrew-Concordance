@@ -78,41 +78,19 @@
     // =====================================================================
     // 🗺️ UNIVERSAL COMPOSITE DIRECTORY ROUTER MAP
     // =====================================================================
-    // Maps database book codes directly to your custom physical folder names.
-    // Ensure the spelling matches your actual computer folder cases exactly.
     const bookToFolderMap = {
-        // Joshua & Judges Group
-        "JOSHUA": "Joshua-Judges", 
-        "JUDGES": "Joshua-Judges",
-        
-        // Samuel Group
-        "1_SAMUEL": "Samuel", 
-        "2_SAMUEL": "Samuel",
-        
-        // Kings Group
-        "1_KINGS": "Kings", 
-        "2_KINGS": "Kings",
-        
-        // The Twelve Minor Prophets
+        "JOSHUA": "Joshua-Judges", "JUDGES": "Joshua-Judges",
+        "1_SAMUEL": "Samuel", "2_SAMUEL": "Samuel",
+        "1_KINGS": "Kings", "2_KINGS": "Kings",
         "HOSEA": "The Twelve", "JOEL": "The Twelve", "AMOS": "The Twelve",
         "OBADIAH": "The Twelve", "JONAH": "The Twelve", "MICAH": "The Twelve",
         "NAHUM": "The Twelve", "HABAKKUK": "The Twelve", "ZEPHANIAH": "The Twelve",
         "HAGGAI": "The Twelve", "ZECHARIAH": "The Twelve", "MALACHI": "The Twelve",
-        
-        // The Psalms Group
         "PSALMS": "The Psalms",
-        
-        // Daniel, Ezra, Nehemiah Group
-        "DANIEL": "Daniel-Ezra-Nehemiah", 
-        "EZRA": "Daniel-Ezra-Nehemiah", 
-        "NEHEMIAH": "Daniel-Ezra-Nehemiah",
-        
-        // Chronicles Group
-        "1_CHRONICLES": "Chronicles", 
-        "2_CHRONICLES": "Chronicles"
+        "DANIEL": "Daniel-Ezra-Nehemiah", "EZRA": "Daniel-Ezra-Nehemiah", "NEHEMIAH": "Daniel-Ezra-Nehemiah",
+        "1_CHRONICLES": "Chronicles", "2_CHRONICLES": "Chronicles"
     };
 
-    // Strict Canonical Index matching your bookseq.json row sequences precisely
     const canonicalOrderMap = {
         "GENESIS": 1, "EXODUS": 2, "LEVITICUS": 3, "NUMBERS": 4, "DEUTERONOMY": 5,
         "JOSHUA": 6, "JUDGES": 7, "1_SAMUEL": 8, "2_SAMUEL": 9, "1_KINGS": 10,
@@ -129,14 +107,12 @@
         const motifRes = await fetch('motif_relationship_matrix.json');
         motifMatrix = await motifRes.json();
         
-        // Initialize dynamic bookseq layout mapping asset
         const seqRes = await fetch('bookseq.json');
         const seqData = await seqRes.json();
         
         let seqItems = seqData.results?.items || seqData.items || [];
         seqItems.forEach(item => {
             if (item.book_cd) {
-                // Normalize spaces to underscores to guarantee an absolute structural match
                 let key = item.book_cd.toUpperCase().replace(/\s+/g, '_').trim();
                 canonicalOrder[key] = parseInt(item.book_seq_no);
             }
@@ -145,10 +121,13 @@
         document.getElementById('loadingStatus').style.display = 'none';
         document.getElementById('workspace').style.display = 'block';
 
+        // Robust Localhost URL query parsing line
         const urlParams = new URLSearchParams(window.location.search);
         const passedMotif = urlParams.get('motif');
         if (passedMotif) {
-            document.getElementById('motifSearch').value = passedMotif.trim().toUpperCase();
+            // FIX: Safely decode parameters and target 'searchInput' element
+            let decoded = decodeURIComponent(passedMotif).trim().replace(/\s+/g, ' ');
+            document.getElementById('searchInput').value = decoded;
         }
         
         runMotifSearch();
@@ -163,8 +142,9 @@
     }
 
     function renderConcordanceView() {
-      const searchStr = document.getElementById('motifSearch').value.trim().toUpperCase();
-      const dataMatch = motifMatrix[searchStr];
+      // FIX: Reference 'searchInput' layout element cleanly to prevent null pointer crashes
+      const rawInput = document.getElementById('searchInput').value || '';
+      const searchStr = rawInput.trim().replace(/\s+/g, ' ').toUpperCase();
       
       const distList = document.getElementById('bookDistributionList');
       const tableBody = document.getElementById('matrixTableBody');
@@ -172,6 +152,13 @@
       distList.innerHTML = '';
       tableBody.innerHTML = '';
       document.getElementById('totalOccurrencesCounter').innerText = '0';
+      
+      if (!motifMatrix) return;
+      
+      // Dynamic case-insensitive key lookups matching your json file structure perfectly
+      const matrixKeys = Object.keys(motifMatrix);
+      const matchedKey = matrixKeys.find(key => key.trim().replace(/\s+/g, ' ').toUpperCase() === searchStr);
+      const dataMatch = matchedKey ? motifMatrix[matchedKey] : null;
       
       if (!dataMatch) {
         tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#aaa; font-style:italic; padding: 20px;">No matching structural occurrences discovered for this profile.</td></tr>';
@@ -212,34 +199,26 @@
         let vsNum = parseInt(parts.pop()); 
         let chNum = parseInt(parts.pop()); 
         let rawBookCode = parts.join('_').toUpperCase().trim(); 
-        let bookCode = rawBookCode.replace(/\d+$/, ''); 
 
         if (currentSelectedBook !== 'ALL' && currentSelectedBook !== rawBookCode) continue;
 
         displayCount++;
         
         let textLine = occ.english_text || "[Translation text entry missing]";
-        let bookDisplay = bookCode.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        let bookDisplay = rawBookCode.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
         let refDisplay = `${bookDisplay} ${chNum}:${vsNum}`;
 
         let paddedCh = String(chNum).padStart(3, '0');
-        
-        // Keeps the precise structural database name syntax intact for the final filename target
-        // Outputs matching files like: 1_CHRONICLES_029_matrix.html or PSALMS_001_matrix.html
         let chapterFileName = `${rawBookCode}_${paddedCh}_matrix.html`;
         
-        // =====================================================================
-        // 🗺️ INTELLIGENT DIRECTORY PATH ROUTER
-        // =====================================================================
-        // Pulls the target folder name from the map if it's grouped.
-        // Defaults directly to its standard uppercase name token if it's an isolated book.
-        // Pull the mapped folder, or construct a dynamic Initcap fallback (e.g., "LEVITICUS" -> "Leviticus")
-        let targetFolder = bookToFolderMap[rawBookCode] || (bookCode.charAt(0).toUpperCase() + bookCode.slice(1).toLowerCase());
+        // Robust directory folder fallback pathing strategy
+        let targetFolder = bookToFolderMap[rawBookCode];
+        if (!targetFolder) {
+            let cleanFallback = rawBookCode.replace(/^[\d_]+/, '');
+            targetFolder = cleanFallback.charAt(0).toUpperCase() + cleanFallback.slice(1).toLowerCase();
+        }
         
-        // Your target URL line remains completely unchanged
         let targetChapterUrl = `./musicscores/${targetFolder}/${chapterFileName}`;
-
-        // =====================================================================
 
         tableBody.innerHTML += `
           <tr>
