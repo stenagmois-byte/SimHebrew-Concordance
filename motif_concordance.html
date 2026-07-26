@@ -313,24 +313,39 @@
     
     let targetChapterUrl = `./musicscores/${targetFolder}/${chapterFileName}#${occ.reference}`;
 
-    tableBody.innerHTML += `
-      <tr>
-        <td style="font-weight:bold; font-family:sans-serif; color:#444; width: 20%;">
-          ${bookDisplay}
-          <div style="font-size:0.75rem; color:#888; font-weight:normal; margin-top:4px; line-height: 1.3;">
-            ${occ.poetry_flag === '1' ? 'Poetic System' : 'Prose System'}<br>Tier: ${occ.type}
-          </div>
-        </td>
-        <td style="width: 15%;">
-          <a href="${targetChapterUrl}" style="color:#800000; text-decoration:underline; font-weight:bold; font-family: sans-serif;" title="Open complete chapter color matrix">
-            ${chNum}:${vsNum} ↗
-          </a>
-        </td>
-        <td class="text-cell" style="width: 65%;">
-          <div style="font-size: 1.1rem;">${textLine}</div>
-        </td>
-      </tr>
-    `;
+        // =====================================================================
+        // 🗣️ LITURGICAL ACCENT & CANTILLATION TERMINOLOGY TRANSLATOR
+        // =====================================================================
+        let liturgicalTier = occ.type || "Unknown Tier";
+        
+        if (liturgicalTier === "Left Approach") {
+            liturgicalTier = "Approach to the Subdominant (Atnah)";
+        } else if (liturgicalTier === "Right Resolution") {
+            liturgicalTier = "Return to the Tonic (Silluq)";
+        } else if (liturgicalTier === "No Atnah") {
+            liturgicalTier = "Verse Without Subdominant (Atnah) Cadence";
+        }
+        // =====================================================================
+
+        tableBody.innerHTML += `
+          <tr>
+            <td style="font-weight:bold; font-family:sans-serif; color:#444; width: 20%;">
+              ${bookDisplay}
+              <div style="font-size:0.75rem; color:#888; font-weight:normal; margin-top:4px; line-height: 1.3;">
+                ${occ.poetry_flag === '1' ? 'Poetry:' : 'Prose:'}
+                ${liturgicalTier}
+              </div>
+            </td>
+            <td style="width: 15%;">
+              <a href="${targetChapterUrl}" style="color:#800000; text-decoration:underline; font-weight:bold; font-family: sans-serif;" title="Open complete chapter color matrix">
+                ${chNum}:${vsNum} ↗
+              </a>
+            </td>
+            <td class="text-cell" style="width: 65%;">
+              <div style="font-size: 1.1rem;">${textLine}</div>
+            </td>
+          </tr>
+        `;
   }
 
       
