@@ -83,33 +83,138 @@ def run_distribution_analysis():
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Ornament Usage by Recitation Pitch</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="qstyles.css">
+    <title>Ornament Usage by Recitation Pitch — Tanach Musical Concordance</title>
     <style>
-        body {{ font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; color: #333; line-height: 1.6; background-color: #fdfdfb; }}
-        h1 {{ color: #8A6D3B; border-bottom: 2px solid #8A6D3B; padding-bottom: 10px; }}
-        p {{ max-width: 850px; text-align: justify; }}
-        table {{ border-collapse: collapse; margin-top: 30px; width: 100%; max-width: 950px; border: 2px solid #8A6D3B; background-color: white; }}
-        th {{ background-color: #8A6D3B; color: white; font-weight: 600; padding: 12px 14px; border: 1px solid #70582F; text-align: center; }}
-        th.left-align, td.left-align {{ text-align: left; font-weight: bold; background-color: #fdfaf2; border-right: 2px solid #8A6D3B; }}
-        td {{ padding: 10px 14px; border: 1px solid #ddd; text-align: center; }}
-        tr:nth-child(even) {{ background-color: #fcfbfa; }}
-        tr:hover {{ background-color: #f5efe3; }}
-        .total-cell {{ background-color: #fdfaf2; font-weight: bold; border-right: 1px solid #8A6D3B; }}
-        .footnote {{ margin-top: 40px; font-size: 0.98em; max-width: 850px; border-left: 5px solid #8A6D3B; padding-left: 20px; font-style: italic; text-align: justify; }}
+        /* 🏛️ OXFORD ACADEMIC TYPOGRAPHY & LAYOUT RESET */
+        body {{ 
+            font-family: 'Georgia', serif; 
+            margin: 40px auto; 
+            max-width: 1050px; 
+            color: #222222; 
+            line-height: 1.65; 
+            background-color: #fffcf4; 
+            padding: 0 20px;
+        }}
+        
+        .nav {{ 
+            margin-bottom: 25px; 
+            font-family: sans-serif; 
+            font-size: 0.9rem; 
+        }}
+        .nav a {{ 
+            color: #800000; 
+            text-decoration: none; 
+            font-weight: bold; 
+        }}
+        .nav a:hover {{ 
+            text-decoration: underline; 
+        }}
+
+        h1 {{ 
+            font-family: sans-serif; 
+            color: #800000; 
+            font-size: 2.2rem; 
+            margin-bottom: 10px; 
+            font-weight: normal;
+        }}
+        
+        p {{ 
+            text-align: justify; 
+            font-size: 1.1rem; 
+            color: #333; 
+            margin-bottom: 25px; 
+        }}
+
+        /* 📊 OXFORD SCHOLASTIC CRITICAL APPARATUS TABLE STYLES */
+        table {{ 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-family: sans-serif; 
+            font-size: 0.95rem; 
+            margin: 35px 0; 
+            background-color: #ffffff; 
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05); 
+            border-top: 2px solid #800000; 
+            border-bottom: 2px solid #800000; 
+        }}
+        
+        th {{ 
+            background-color: #f3f0e8; 
+            color: #800000; 
+            font-weight: bold; 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            padding: 12px 10px; 
+            border-bottom: 1px solid #800000; 
+            text-align: center; 
+        }}
+        
+        th.left-align, td.left-align {{ 
+            text-align: left; 
+            font-weight: bold; 
+            color: #222; 
+            font-family: serif; 
+            font-size: 1.1rem; 
+            padding-left: 15px; 
+        }}
+        
+        td {{ 
+            padding: 10px; 
+            border-bottom: 1px solid #eaeaea; 
+            text-align: center; 
+            color: #444; 
+        }}
+        
+        tr:hover {{ 
+            background-color: #fcfaf2; 
+        }}
+        
+        .total-cell {{ 
+            font-weight: bold; 
+            color: #800000; 
+            background-color: #fdfcf7; 
+        }}
+        
+        /* Zero count styling to make active values pop out cleanly */
+        .zero-count {{ 
+            color: #ccc; 
+            font-weight: 300; 
+        }}
+
+        /* 📜 CRITICAL COMMENTARY BAR POINTER */
+        .footnote {{ 
+            margin-top: 40px; 
+            font-family: 'Georgia', serif; 
+            font-size: 1.05rem; 
+            border-top: 1px solid #800000; 
+            padding-top: 20px; 
+            color: #444; 
+        }}
+        .footnote p {{ 
+            text-align: justify; 
+            line-height: 1.6; 
+        }}
     </style>
 </head>
 <body>
 
+    <div class="nav">
+        <a href="./musicscores/index.html">← Back to Volume Directory</a>
+    </div>
+
     <h1>Ornament Usage by Recitation Pitch</h1>
-    <p>The first characteristic of the deciphering key to the musical sense of the accents is the separation of the accents below the text from those above. Those below the text define the recitation pitch. Those above are ornamentation relative to that defined pitch. The usage of ornaments by pitch gives some insight into the  music of a particular section of the text. The table below shows the usage of ornaments by recitation pitch. 
+    <p>The first characteristic of the deciphering key to the musical sense of the accents is the separation of the accents below the text from those above. Those below the text define the recitation pitch. Those above are ornamentation relative to that defined pitch. The usage of ornaments by pitch gives some insight into the music of a particular section of the text. The table below shows the usage of ornaments by recitation pitch. 
     We can see immediately which ornaments are rarely or frequently used and on which pitches.</p>
 
     <table>
         <thead>
             <tr>
-                <th class="left-align">Ornament / Pitch</th>
-                <th>Total</th>
-                {"".join(f"<th>{lbl}</th>" for lbl in PITCH_LABELS)}
+                <th class="left-align" style="width: 25%;">Ornament / Pitch</th>
+                <th style="width: 11%;">Total Footprint</th>
+                {"".join(f'<th style="width: 8%;">{lbl}</th>' for lbl in PITCH_LABELS)}
             </tr>
         </thead>
         <tbody>
@@ -117,13 +222,14 @@ def run_distribution_analysis():
 
     if not sorted_rows:
         html_output += """        <tr>
-            <td colspan="10" style="padding: 30px; color: red; font-weight: bold;">
+            <td colspan="10" style="padding: 40px; color: #800000; font-style: italic;">
                 ❌ Verification Warning: Evaluated 0 valid ornament entries inside JSON data structures.
             </td>
         </tr>"""
     else:
         for total, orn, counts in sorted_rows:
-            counts_str = "".join(f"<td>{c if c > 0 else '0'}</td>" for c in counts)
+            # Transform '0' values to use dimmed styling so real density points pop out visually
+            counts_str = "".join(f"<td>{c}</td>" if c > 0 else '<td class="zero-count">0</td>' for c in counts)
             html_output += f"""        <tr>
                 <td class="left-align">{html.escape(orn)}</td>
                 <td class="total-cell">{total}</td>
