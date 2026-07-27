@@ -101,10 +101,7 @@ def run_distribution_analysis():
 <body>
 
     <h1>Ornament Usage by Recitation Pitch</h1>
-    <p>The first characteristic of the deciphering key to the musical sense of the accents is the separation of the 
-    accents below the text from those above. Those below the text define the recitation pitch. Those above are 
-    ornamentation relative to that defined pitch. The usage of ornaments by pitch gives some insight into the 
-    music of a particular section of the text. The table below shows the usage of ornaments by recitation pitch. 
+    <p>The first characteristic of the deciphering key to the musical sense of the accents is the separation of the accents below the text from those above. Those below the text define the recitation pitch. Those above are ornamentation relative to that defined pitch. The usage of ornaments by pitch gives some insight into the  music of a particular section of the text. The table below shows the usage of ornaments by recitation pitch. 
     We can see immediately which ornaments are rarely or frequently used and on which pitches.</p>
 
     <table>
@@ -137,10 +134,9 @@ def run_distribution_analysis():
     </table>
 
     <div class="footnote">
-        <p>The first two on the list are two ornaments on a single syllable. The first is unique in the Bible. It occurs in 
-        Genesis 35:22 on the word בִּבְכֹ֥ות (bar 221 in the image below). The second occurs 4 times in the Bible. 
-        Double pashta is frequent on two consecutive syllables, but it is rare to have two on the same syllable. This 
-        happens also in Exodus 20, Deuteronomy 5 and Isaiah 23:8.</p>
+    <p>We can see immediately which ornaments are rarely or frequently used and on which pitches. The first 13 rows are double accents on a single syllable. They are noted in the publications. They are all rare. Several are in the decalogues. Notice the sole tarsin on the low c in the table above. It is from 2 Chronicles 24:27 in the Leningrad Codex. It is not in the Aleppo codex online at mgketer.org. So in the terms of the deciphering key, no ornament ever occurs on a low c. In terms of traditional Hebrew names, no accent above the text ever occurs following a darga and before another accent under the text is encountered. The largest contributor to the musical corpus of the accents above the text is the zaqef-qatan. This is a significant division of the text into phrases, sometimes in surprising contexts where one would not expect to breathe. Each has to be looked at individually.
+    </p>
+
     </div>
 
 </body>
