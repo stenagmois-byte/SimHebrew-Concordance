@@ -183,7 +183,7 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
 </div>
 
     <h1>🎼 SHV Aligned Melodic Matrix: {book_id} {current_ch}</h1>
-    <p><i>Rows are aligned directly after the main structural cadence.</i></p>
+    <p><i>Rows are centered around the main structural cadence. Star highlights a verse beginning on a note other than the tonic. </i></p>
     <h3>🎨 Color Mapping Legend (Tonic E4)</h3>
     <div class="legend">
     """
@@ -546,7 +546,7 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         right_id_signature = "-".join(right_notes) if right_notes else "empty-right"
                         
         html_content += f"""
-        <tr class="verse-row">
+        <tr class="verse-row" id="{book_id}_{ch}_{vs}">
             <td class="verse-label">{clean_verse_display}</td>
             <td class="text-label" title="{heb_clean_text}">{heb}</td>
             <td class="grid-cell">
