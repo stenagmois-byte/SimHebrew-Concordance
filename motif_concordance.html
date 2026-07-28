@@ -116,10 +116,21 @@
 
     window.addEventListener('DOMContentLoaded', async () => {
       try {
-        const motifRes = await fetch('motif_relationship_matrix.json');
+        // Add a dynamic timestamp token to bypass aggressive GitHub server caching
+        const cacheBuster = `?t=${new Date().getTime()}`;
+        
+        console.log("⏳ Initializing asset streaming from GitHub repository repositories...");
+        
+        const motifRes = await fetch(`motif_relationship_matrix.json${cacheBuster}`);
+        if (!motifRes.ok) {
+            throw new Error(`HTTP network error! Matrix file status: ${motifRes.status} ${motifRes.statusText}`);
+        }
         motifMatrix = await motifRes.json();
         
-        const seqRes = await fetch('bookseq.json');
+        const seqRes = await fetch(`bookseq.json${cacheBuster}`);
+        if (!seqRes.ok) {
+            throw new Error(`HTTP network error! Book sequence file status: ${seqRes.status} ${seqRes.statusText}`);
+        }
         const seqData = await seqRes.json();
         
         let seqItems = seqData.results?.items || seqData.items || [];
