@@ -7,7 +7,14 @@
   <title>Tanach Musical Motif Concordance</title>
   <style>
     /* 🎨 Clean, Top-Down Single Column Layout Styles */
-    .search-panel { background-color: #fffcf4; border: 2px solid #800000; padding: 15px; margin: 15px 0; border-radius: 6px; }
+    .search-panel { background-color: #fffcf4; border: 2px solid #800000; padding: 15px; margin: 15px 0; border-radius: 6px; 
+    position: -webkit-sticky; /* Support Safari */
+    position: sticky;
+    top: 10px;               /* Sits beautifully 10px below the top edge */
+    z-index: 2000;           /* Guarantees it stays layered above the table text */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08); /* Adds a subtle drop shadow when floating */
+
+}
     .search-input { padding: 8px; font-size: 1.1rem; border: 1px solid #ccc; width: 60%; border-radius: 4px; }
     .search-btn { padding: 8px 16px; font-size: 1.1rem; background-color: #800000; color: white; border: none; border-radius: 4px; cursor: pointer; }
     
@@ -32,6 +39,9 @@
   <div class="nav">
     <a href="./musicscores/index.html">← Back to Volume Directory</a>
   </div>
+<div id="truncationWarningText" style="display: none; color: #b36b00; font-family: sans-serif; font-size: 0.9rem; font-weight: bold; margin-top: 10px;">
+  ⚠️ Notice: Input is limited to 5 reciting notes.
+</div>
 
   <h1>Musical Motif Concordance</h1>
 
@@ -184,7 +194,24 @@
     function renderConcordanceView() {
       // FIX: Reference 'searchInput' layout element cleanly to prevent null pointer crashes
       const rawInput = document.getElementById('searchInput').value || '';
-      const searchStr = rawInput.trim().replace(/\s+/g, ' ').toUpperCase();
+      // 1. Clean and split the input string into individual notes
+      let noteArray = rawInput.trim().replace(/\s+/g, ' ').split(' ');
+  
+  // ✂️ AUTOMATIC 5-NOTE MAXIMUM SAFE GUARDRAIL
+  const visualWarning = document.getElementById('truncationWarningText');
+  
+  if (noteArray.length > 5) {
+      noteArray = noteArray.slice(0, 5);
+      document.getElementById('searchInput').value = noteArray.join(' ');
+      
+      // Reveal the visual warning banner straight to the user on the screen!
+      if (visualWarning) visualWarning.style.display = 'block';
+  } else {
+      // Hide it if they search for a standard 3, 4, or 5-note motif
+      if (visualWarning) visualWarning.style.display = 'none';
+  }  
+      const searchStr = noteArray.join(' ').toUpperCase();
+      //const searchStr = rawInput.trim().replace(/\s+/g, ' ').toUpperCase();
       
       const distList = document.getElementById('bookDistributionList');
       const tableBody = document.getElementById('matrixTableBody');

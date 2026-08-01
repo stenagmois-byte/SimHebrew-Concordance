@@ -161,8 +161,8 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
 </head>
 <body>
 <!-- Sticky Header Navigation Matching Your Oxford CSS Block Layout -->
-<div class="nav" style="display: flex; justify-content: space-between; align-items: center;">
-    
+<div class="nav" style="display: flex; justify-content: space-between; align-items: center; position: -webkit-sticky; position: sticky; top: 0; z-index: 9999; background-color: #fffcf4; border-bottom: 2px solid #800000; padding: 10px 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.08);">
+
     <!-- Left Hand Narrative Title Alignment -->
     <div class="nav-title" style="margin: 0; font-size: 1.1rem; color: #333;">
         📖 {book_id.replace('_', ' ').title()} — Chapter {current_ch}
