@@ -29,27 +29,28 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
     w_col2 = "40%"  # Maximum space for full Hebrew lines
     w_col3 = "32%"  # Snug Left-Wing grid path
     w_col4 = "25%"  # Snug Right-Wing grid path
-    is_poetry_flag = "0"
+    is_poetry_flg = "0"
     clean_book = str(book_id).upper().strip()
     if clean_book in ["PSALMS", "PROVERBS"]:
-        is_poetry_flag = "1"
+        is_poetry_flg = "1"
             
     elif clean_book == "JOB":
         try:
             ch_num = int(chapter_id)
             # Job chapters 3 through 41 are the poetic core
             if 3 <= ch_num <= 41:
-                is_poetry_flag = "1"
+                is_poetry_flg = "1"
         except ValueError:
             pass
 
     # --- DYNAMIC FLUID GRID PERCENTAGE MAPPER ---
-    if is_poetry_flag == "1":
+    if is_poetry_flg == "1":
         # Poetic Canvas: Give the expanded Hebrew text plenty of room, balancing the wings
         w_col1 = "3%"   # Verse number
         w_col2 = "32%"  # Expanded Hebrew text (Breathing room for full lines)
         w_col3 = "35%"  # Left-Wing Musical Grid
         w_col4 = "30%"  # Right-Wing Musical Grid
+
     try:
         current_ch = int(chapter_id)
     except ValueError:
@@ -207,6 +208,7 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         
         # Locate your critical baseline Atnah marker
         p_idx = r_notes.index("A4") if "A4" in r_notes else -1
+        is_poetry_flag = check_verse_poetry_status(str(book_id).upper().strip(), ch, vs)
         
         if p_idx != -1:
             # --- CATEGORIES 1 & 2: VERSE CONTAINS AN ATNAH ---
@@ -220,21 +222,21 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
             # Keep your original individual chapter printing lines exactly as they are
             if l_str: left_chapter_pool.append(l_str)
             if r_str: right_chapter_pool.append(r_str)
-            
             # PINPOINT MASTER LOG ENTRY: Track left and right segments separately with your poetry flag
             if l_str:
                 master_sequence_log.append({
                     "book": book_id, "chapter": int(chapter_id), "verse": int(vs),
                     "sequence_pattern": l_str,
                     "type": "Left Approach",
-                    "is_poetry": is_poetry_flag
+                    "is_poetry": "1" if is_poetry_flag else "0"
+
                 })
             if r_str:
                 master_sequence_log.append({
                     "book": book_id, "chapter": int(chapter_id), "verse": int(vs),
                     "sequence_pattern": r_str,
                     "type": "Right Resolution",
-                    "is_poetry": is_poetry_flag
+                    "is_poetry": "1" if is_poetry_flag else "0"
                 })
         else:
             # --- CATEGORY 3: VERSE HAS NO ATNAH ---
@@ -247,7 +249,7 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
                     "book": book_id, "chapter": int(chapter_id), "verse": int(vs),
                     "sequence_pattern": no_atnah_str,
                     "type": "No Atnah",
-                    "is_poetry": is_poetry_flag
+                    "is_poetry": "1" if is_poetry_flag else "0"
                 })
             
     left_global_counts = Counter(left_chapter_pool)
@@ -413,12 +415,15 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
             if not valid_heb.empty:
                 # 1. SET THE POETRY FLAG: Dynamically inspect the JSON column inside this verse group
 
-                is_poetry_flag = False
-                if 'POETRY' in group.columns:
-                    is_poetry_flag = bool(group['POETRY'].iloc[0] == 1 or str(group['POETRY'].iloc[0]).strip().lower() in ['1', 'true', 'p'])
-                else:
-                    # Robust fallback to your script's native music loop conditions
-                    is_poetry_flag = has_global_ole
+              
+                # PINPOINT SCOPE FIX: Secure ch and vs straight from the active pandas group row
+                if not group.empty:
+                    # Grabs the value from the first row (.iloc[0]) of the active column
+                    raw_ch = group['CHAPTER_CD'].iloc[0] if 'CHAPTER_CD' in group.columns else group['CHAPTER'].iloc[0]
+                    raw_vs = group['VERSE_CD'].iloc[0] if 'VERSE_CD' in group.columns else group['VERSE'].iloc[0]
+                    raw_book = group['BOOK_CD'].iloc[0] if 'BOOK_CD' in group.columns else clean_book
+                    
+                    is_poetry_flag = check_verse_poetry_status(raw_book, raw_ch, raw_vs)
 
                 # 1. Pull the clean, original Hebrew string out of the cell
                 raw_heb_string = html.unescape(str(valid_heb.iloc[0])).replace('\n', ' ').strip()
@@ -663,7 +668,36 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
 </body>
 </html>"""
     return html_content
+
+def check_verse_poetry_status(book_name, chapter_val, verse_val):
+    """
+    Returns True if the specific verse belongs to the Poetic Accent System,
+    otherwise returns False (Prose System default).
+    """
+    is_poetic = False
+    book_upper = str(book_name).upper().strip()
     
+    try:
+        ch_num = int(chapter_val)
+        vs_num = int(verse_val)
+        
+        # 1. Evaluate strict Poetic Books
+        if book_upper in ["PSALMS", "PROVERBS"]:
+            is_poetic = True
+            
+        # 2. Evaluate precise verse-level Job boundaries
+        elif book_upper in ["JOB"]:
+            if 3 <= ch_num <= 42:
+                # Job 3:1 is narrative prose prologue; Job 42:7+ is narrative prose epilogue
+                if (ch_num == 3 and vs_num <= 2) or (ch_num == 42 and vs_num >= 7):
+                    is_poetic = False
+                else:
+                    is_poetic = True  # Strict poetic core dialogue system
+                    
+    except (ValueError, TypeError):
+        pass
+        
+    return is_poetic    
 # =====================================================================
 # ADD THIS DEFINITION TO THE BOTTOM OF mass_produce_and_log_matrices.py
 # =====================================================================
