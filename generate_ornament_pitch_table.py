@@ -5,6 +5,17 @@ from collections import defaultdict
 def run_distribution_analysis():
     PITCH_KEYS = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
     PITCH_LABELS = ['c', 'd', 'e', 'f', 'g', 'A', 'B', 'C']
+    # 🏛️ TRADITIONAL HEBREW PITCH NAMES MAPPING
+    PITCH_TO_HEBREW_NAME = {
+        "c": "Darga",
+        "d": "Tevir/Galgal",
+        "e": "Silluq",
+        "f": "Mercha",
+        "g": "Tifha/D'khi",
+        "A": "Atnah",
+        "B": "Munach",
+        "C": "Mahpach/Yetiv"
+    }
     
     matrix = defaultdict(lambda: defaultdict(int))
     target_dirs = ["./musicscores"]
@@ -146,6 +157,10 @@ def run_distribution_analysis():
                     </div>
                   </td>\n"""
         table_rows_html += f"</tr>\n"
+    header_cells = ""
+    for lbl in PITCH_LABELS:
+        heb_name = PITCH_TO_HEBREW_NAME.get(lbl, lbl)
+        header_cells += f"<th>{lbl}<br><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>{heb_name}</span></th>"
 
     # 🏛️ INJECT THE STRUCTURE INTO YOUR SITE HTML BODY
     # 1. INITIALIZE THE TOP SECTION OF THE HTML FILE
@@ -188,7 +203,7 @@ def run_distribution_analysis():
             <tr>
                 <th class='left-align'>Ornament Name</th>
                 <th class='total-cell'>Total</th>
-                {"".join([f"<th>{lbl}</th>" for lbl in PITCH_LABELS])}
+                {header_cells}
             </tr>
         </thead>
         <tbody>

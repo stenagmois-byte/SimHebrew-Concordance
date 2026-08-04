@@ -97,8 +97,22 @@
             const targetOrnament = (urlParams.get('ornament') || '').trim().toLowerCase();
             const targetPitch = (urlParams.get('pitch') || '').trim();
 
+            // 🏛️ TRADITIONAL HEBREW PITCH NAMES MAPPING
+            const pitchToHebrewName = {
+                "c": "Darga", 
+                "d": "Tevir / Galgal", 
+                "e": "Silluq", 
+                "f": "Mercha",
+                "g": "Tifha / D'khi", 
+                "A": "Atnah", 
+                "B": "Munach", 
+                "C": "Mahpach / Yetiv"
+            };
+            const traditionalName = pitchToHebrewName[targetPitch] || "Unknown Accent";
+
+            // 🧼 SWAP HEADERS TO RECITATION PITCH + TRADITIONAL ACCENT NAME
             document.getElementById('page-title').innerText = `Occurrences of ${targetOrnament.toUpperCase()}`;
-            document.getElementById('page-subtitle').innerText = `Pitch Center: ${targetPitch}`;
+            document.getElementById('page-subtitle').innerText = `Recitation Pitch: ${targetPitch} (${traditionalName})`;
 
             const recordsTable = document.getElementById('records-table-body');
             const statusContainer = document.getElementById('explorer-status');
