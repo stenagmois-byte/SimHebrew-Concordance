@@ -63,7 +63,25 @@
             border-radius: 3px;
             display: inline-block;
         }
-    </style>
+.diacritic-control-panel {
+    margin: 15px 0 25px 0;
+    font-family: sans-serif;
+    font-size: 0.95rem;
+}
+.toggle-switch {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+.toggle-switch input {
+    margin-right: 8px;
+    accent-color: #800000; /* Sophisticated burgundy checkbox */
+}
+.toggle-label {
+    color: #444;
+    font-weight: bold;
+}    </style>
 </head>
 <body>
 
@@ -75,6 +93,12 @@
     <div class="explorer-subtitle" id="page-subtitle">Processing distribution lookup records...</div>
 
     <div id="explorer-status"></div>
+<div class="diacritic-control-panel">
+    <label class="toggle-switch">
+        <input type="checkbox" id="vowel-toggle" checked>
+        <span class="toggle-label">Show Niqqud (Vowels)</span>
+    </label>
+</div>
 
     <table class="explorer-table">
         <thead>
@@ -97,47 +121,28 @@
             const targetOrnament = (urlParams.get('ornament') || '').trim().toLowerCase();
             const targetPitch = (urlParams.get('pitch') || '').trim();
 
-            // 🏛️ TRADITIONAL HEBREW PITCH NAMES MAPPING
             const pitchToHebrewName = {
-                "c": "Darga", 
-                "d": "Tevir / Galgal", 
-                "e": "Silluq", 
-                "f": "Mercha",
-                "g": "Tifha / D'khi", 
-                "A": "Atnah", 
-                "B": "Munach", 
-                "C": "Mahpach / Yetiv"
+                "c": "Darga", "d": "Tevir / Galgal", "e": "Silluq", "f": "Mercha",
+                "g": "Tifha / D'khi", "A": "Atnah", "B": "Munach", "C": "Mahpach / Yetiv"
             };
+
             const traditionalName = pitchToHebrewName[targetPitch] || "Unknown Accent";
 
-            // 🧼 SWAP HEADERS TO RECITATION PITCH + TRADITIONAL ACCENT NAME
             document.getElementById('page-title').innerText = `Occurrences of ${targetOrnament.toUpperCase()}`;
             document.getElementById('page-subtitle').innerText = `Recitation Pitch: ${targetPitch} (${traditionalName})`;
 
             const recordsTable = document.getElementById('records-table-body');
             const statusContainer = document.getElementById('explorer-status');
+            const vowelToggle = document.getElementById('vowel-toggle');
 
             // 🎯 STRICT NON-DUPLICATING WLC SINGLE-CHARACTER GLYPH MAP
             const ornamentGlyphMap = {
-                "segol": "\u0592",            // [U-1426] ֒
-                "shalshelet": "\u0593",       // [U-1427] ֓
-                "zaqef-qatan": "\u0594",      // [U-1428] ֔
-                "zaqef-gadol": "\u0595",      // [U-1429] ֕
-                "revia": "\u0596",            // [U-1431] ֗
-                "zarqa": "\u0598",            // [U-1432] ֮
-                "pashta": "\u0599",           // [U-1433] ֙
-                "telisha-gedola": "\u05A0",   // [U-1440] ֠
-                "pazer": "\u05A1",            // [U-1441] ֡
-                "azla": "\u059C",             // [U-1436] ֜
-                "geresh-muqdam": "\u059D",    // [U-1437] ֝
-                "tarsin": "\u059E",           // [U-1438] ֞
-                "qarne-farah": "\u059F",      // [U-1439] ֟
-                "revia-mugrash": "\u059D",    // [U-1437] ֘
-                "qadma": "\u05A8",            // [U-1448] ֨
-                "telisha-qetana": "\u05A9",   // [U-1449] ֩
-                "ole": "\u05AB",               // [U-1451] ֫
-                "illuy": "\u05AC",            // [U-1452] ֬
-                "tsinnor": "\u05AE"           // [U-1454] ֮
+                "segol": "\u0592", "shalshelet": "\u0593", "zaqef-qatan": "\u0594",
+                "zaqef-gadol": "\u0595", "revia": "\u0596", "zarqa": "\u0598",
+                "pashta": "\u0599", "telisha-gedola": "\u05A0", "pazer": "\u05A1",
+                "azla": "\u059C", "geresh-muqdam": "\u059D", "tarsin": "\u059E",
+                "qarne-farah": "\u059F", "revia-mugrash": "\u059D", "qadma": "\u05A8",
+                "telisha-qetana": "\u05A9", "ole": "\u05AB", "illuy": "\u05AC", "tsinnor": "\u05AE"
             };
 
             const targetGlyph = ornamentGlyphMap[targetOrnament];
@@ -147,7 +152,7 @@
                 .then(response => response.json())
                 .then(indexData => {
                     
-                    // 🔎 Case-Insensitive Key Match to safely align your database properties
+                    // Case-Insensitive Key Match to safely align your database properties
                     const actualOrnamentKey = Object.keys(indexData).find(
                         key => key.trim().toLowerCase() === targetOrnament
                     );
@@ -169,42 +174,76 @@
                         return parseInt(a.v) - parseInt(b.v);
                     });
 
-                    const displayLimit = 150;
+                    const displayLimit = 10;
                     statusContainer.innerHTML = `<div class="explorer-badge">Showing ${Math.min(allMatches.length, displayLimit)} of ${allMatches.length} matching rows.</div>`;
 
-                    const htmlBuffer = [];
+                    // 🧠 CACHE ARRAYS INITIALIZED CORRECTLY WITHIN THE SCOPE:
+                    const recordsCache = [];
                     
-                    // 🔄 The loop code block now sits completely nested inside the file evaluation thread
                     allMatches.slice(0, displayLimit).forEach(item => {
                         let rawText = item.t && item.t.trim() ? item.t : "";
-                        let highlightedText = rawText;
+                        let textWithVowels = rawText;
+                        let textWithoutVowels = rawText;
 
                         if (rawText && targetGlyph) {
-                            // Force Canonical Composition (NFC) to match your precise WLC byte arrays
-                            const fusedVerse = rawText.normalize("NFC");
-                            const words = fusedVerse.split(' ');
-                            
-                            const processedWords = words.map(word => {
+                            // 1. PROCESS FULL TEXT VIEW (Zero Normalization! Direct WLC Byte strings)
+                            const wordsWith = rawText.split(' ');
+                            const processedWith = wordsWith.map(word => {
                                 if (word.includes(targetGlyph)) {
                                     return `<span class="highlight-word">${word}</span>`;
                                 }
                                 return word;
                             });
-                            highlightedText = processedWords.join(' ');
+                            textWithVowels = processedWith.join(' ');
+
+                            // 2. THE ORACLE-STYLE TRANSLATE LOOP (Strip core Niqqud without reordering accents)
+                            const stripVowelsRegex = /[\u05B0-\u05B9\u05BB\u05C1\u05C2]/g;
+                            const plainAccentVerse = rawText.replace(stripVowelsRegex, '');
+                            
+                            const wordsWithout = plainAccentVerse.split(' ');
+                            const processedWithout = wordsWithout.map(word => {
+                                if (word.includes(targetGlyph)) {
+                                    return `<span class="highlight-word">${word}</span>`;
+                                }
+                                return word;
+                            });
+                            textWithoutVowels = processedWithout.join(' ');
+
                         } else if (!rawText) {
-                            highlightedText = `<span style="color:#aaa; font-style:italic; font-size:1rem;">Text element missing inside data file node</span>`;
+                            const errMsg = `<span style="color:#aaa; font-style:italic; font-size:1rem;">Text element missing inside data file node</span>`;
+                            textWithVowels = errMsg;
+                            textWithoutVowels = errMsg;
                         }
-                        
-                        htmlBuffer.push(`
-                            <tr>
-                                <td class="location-cell">${item.b} ${item.c}:${item.v}</td>
-                                <td class="hebrew-cell">${highlightedText}</td>
-                            </tr>
-                        `);
+
+                        recordsCache.push({
+                            location: `${item.b} ${item.c}:${item.v}`,
+                            withVowels: textWithVowels,
+                            withoutVowels: textWithoutVowels
+                        });
                     });
 
-                    // Flush text row templates to active DOM tree in a single assignment operation
-                    recordsTable.innerHTML = htmlBuffer.join('');
+                    // ⚙️ FAST UI VIEWPORT RENDERING SWITCH ENGINE
+                    function drawTableRows() {
+                        const showVowels = vowelToggle.checked;
+                        const htmlBuffer = [];
+                        
+                        recordsCache.forEach(item => {
+                            const activeText = showVowels ? item.withVowels : item.withoutVowels;
+                            htmlBuffer.push(`
+                                <tr>
+                                    <td class="location-cell">${item.location}</td>
+                                    <td class="hebrew-cell">${activeText}</td>
+                                </tr>
+                            `);
+                        });
+                        recordsTable.innerHTML = htmlBuffer.join('');
+                    }
+
+                    // Bind the toggle checkbox interaction logic directly
+                    vowelToggle.addEventListener('change', drawTableRows);
+                    
+                    // Execute initial draw operation cycle on page DOM load
+                    drawTableRows();
                 })
                 .catch(err => {
                     console.error("Fetch Data Loop Crash:", err);
