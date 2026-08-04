@@ -93,13 +93,20 @@
     <div class="explorer-subtitle" id="page-subtitle">Processing distribution lookup records...</div>
 
     <div id="explorer-status"></div>
-<div class="diacritic-control-panel">
+<div class="diacritic-control-panel" style="display: flex; gap: 30px; align-items: center;">
     <label class="toggle-switch">
         <input type="checkbox" id="vowel-toggle" checked>
         <span class="toggle-label">Show Niqqud (Vowels)</span>
     </label>
+    
+    <!-- 📖 NEW BOOK FILTER DROPDOWN -->
+    <label style="font-family: sans-serif; font-size: 0.95rem; color: #444; font-weight: bold;">
+        Filter by Book:
+        <select id="book-filter" style="margin-left: 8px; padding: 4px 8px; font-family: sans-serif; border: 1px solid #800000; border-radius: 4px; background-color: #fff;">
+            <option value="all">-- All Books --</option>
+        </select>
+    </label>
 </div>
-
     <table class="explorer-table">
         <thead>
             <tr>
@@ -134,6 +141,7 @@
             const recordsTable = document.getElementById('records-table-body');
             const statusContainer = document.getElementById('explorer-status');
             const vowelToggle = document.getElementById('vowel-toggle');
+            const bookFilter = document.getElementById('book-filter');
 
             // 🎯 STRICT NON-DUPLICATING WLC SINGLE-CHARACTER GLYPH MAP
             const ornamentGlyphMap = {
@@ -147,12 +155,11 @@
 
             const targetGlyph = ornamentGlyphMap[targetOrnament];
 
-            // 🌐 LOCALHOST FETCH ENGINE: Reads the raw JSON data file safely inside a single scope
+            // 🌐 LOCALHOST FETCH ENGINE: Reads raw JSON data
             fetch('ornament_index.json')
                 .then(response => response.json())
                 .then(indexData => {
                     
-                    // Case-Insensitive Key Match to safely align your database properties
                     const actualOrnamentKey = Object.keys(indexData).find(
                         key => key.trim().toLowerCase() === targetOrnament
                     );
@@ -174,41 +181,49 @@
                         return parseInt(a.v) - parseInt(b.v);
                     });
 
-                    const displayLimit = 150;
-                    statusContainer.innerHTML = `<div class="explorer-badge">Showing ${Math.min(allMatches.length, displayLimit)} of ${allMatches.length} matching rows.</div>`;
+                    // 🗺️ DYNAMICALLY POPULATE BOOK FILTER DROPDOWN
+                    // Extracts a unique, ordered list of books present in this specific result set
+                    const uniqueBooks = [];
+                    allMatches.forEach(item => {
+                        if (!uniqueBooks.includes(item.b)) {
+                            uniqueBooks.push(item.b);
+                        }
+                    });
+                    
+                    uniqueBooks.forEach(book => {
+                        const opt = document.createElement('option');
+                        opt.value = book;
+                        opt.innerText = book;
+                        bookFilter.appendChild(opt);
+                    });
 
-                    // 🧠 CACHE ARRAYS INITIALIZED CORRECTLY WITHIN THE SCOPE:
+                    // 🧠 CACHE COMPILATION LOOP FOR ALL RECORDS
                     const recordsCache = [];
                     
-                    allMatches.slice(0, displayLimit).forEach(item => {
+                    allMatches.forEach(item => {
                         let rawText = item.t && item.t.trim() ? item.t : "";
                         let textWithVowels = rawText;
                         let textWithoutVowels = rawText;
 
                         if (rawText && targetGlyph) {
-                            // 1. PROCESS FULL TEXT VIEW (Zero Normalization! Direct WLC Byte strings)
+                            // 1. Process full text standard
                             const wordsWith = rawText.split(' ');
                             const processedWith = wordsWith.map(word => {
-                                if (word.includes(targetGlyph)) {
-                                    return `<span class="highlight-word">${word}</span>`;
-                                }
+                                if (word.includes(targetGlyph)) return `<span class="highlight-word">${word}</span>`;
                                 return word;
                             });
                             textWithVowels = processedWith.join(' ');
 
-                            // 2. THE ORACLE-STYLE TRANSLATE LOOP (Strip core Niqqud without reordering accents)
+                            // 2. Oracle-style native vowel strip
                             const stripVowelsRegex = /[\u05B0-\u05B9\u05BB\u05C1\u05C2]/g;
                             const plainAccentVerse = rawText.replace(stripVowelsRegex, '');
                             
                             const wordsWithout = plainAccentVerse.split(' ');
                             const processedWithout = wordsWithout.map(word => {
-                                if (word.includes(targetGlyph)) {
-                                    return `<span class="highlight-word">${word}</span>`;
-                                }
+                                if (word.includes(targetGlyph)) return `<span class="highlight-word">${word}</span>`;
                                 return word;
                             });
                             textWithoutVowels = processedWithout.join(' ');
-
                         } else if (!rawText) {
                             const errMsg = `<span style="color:#aaa; font-style:italic; font-size:1rem;">Text element missing inside data file node</span>`;
                             textWithVowels = errMsg;
@@ -216,18 +231,29 @@
                         }
 
                         recordsCache.push({
+                            book: item.b, // Used for live drop-down filtering evaluation
                             location: `${item.b} ${item.c}:${item.v}`,
                             withVowels: textWithVowels,
                             withoutVowels: textWithoutVowels
                         });
                     });
 
-                    // ⚙️ FAST UI VIEWPORT RENDERING SWITCH ENGINE
+                    // ⚙️ LIVE RENDERING & FILTERING ENGINE
                     function drawTableRows() {
+                        const selectedBook = bookFilter.value;
                         const showVowels = vowelToggle.checked;
-                        const htmlBuffer = [];
                         
-                        recordsCache.forEach(item => {
+                        // Apply the book filter step
+                        const filteredRecords = recordsCache.filter(item => {
+                            return selectedBook === 'all' || item.book === selectedBook;
+                        });
+
+                        // Enforce your maximum 10-record safety cap limit on the filtered subset
+                        const displayLimit = 150;
+                        statusContainer.innerHTML = `<div class="explorer-badge">Showing ${Math.min(filteredRecords.length, displayLimit)} of ${filteredRecords.length} filtered rows.</div>`;
+
+                        const htmlBuffer = [];
+                        filteredRecords.slice(0, displayLimit).forEach(item => {
                             const activeText = showVowels ? item.withVowels : item.withoutVowels;
                             htmlBuffer.push(`
                                 <tr>
@@ -239,10 +265,11 @@
                         recordsTable.innerHTML = htmlBuffer.join('');
                     }
 
-                    // Bind the toggle checkbox interaction logic directly
+                    // Bind active listeners to both user controls
                     vowelToggle.addEventListener('change', drawTableRows);
+                    bookFilter.addEventListener('change', drawTableRows);
                     
-                    // Execute initial draw operation cycle on page DOM load
+                    // Initial rendering execution
                     drawTableRows();
                 })
                 .catch(err => {
