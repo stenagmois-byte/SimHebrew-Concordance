@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="qstyles.css">
+    <title>Ornament Occurrence Explorer</title>
+    <style>
+        body { 
+            font-family: 'Georgia', serif; 
+            margin: 40px auto; 
+            max-width: 1050px; 
+            color: #222222; 
+            background-color: #fffcf4; 
+            padding: 0 20px;
+        }
+        .explorer-nav { font-family: sans-serif; margin-bottom: 25px; font-size: 0.9rem; }
+        .explorer-nav a { color: #800000; text-decoration: none; font-weight: bold; }
+        .explorer-nav a:hover { text-decoration: underline; }
+        
+        h1 { font-family: sans-serif; color: #800000; font-weight: normal; margin-bottom: 5px; }
+        .explorer-subtitle { font-family: sans-serif; font-size: 1.1rem; color: #555; margin-bottom: 30px; }
+        
+        .explorer-badge {
+            display: inline-block;
+            padding: 8px 12px;
+            background-color: #f3f0e8;
+            border-left: 4px solid #800000;
+            font-family: sans-serif;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        table.explorer-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-family: sans-serif; 
+            background: #fff;
+            border-top: 2px solid #800000; 
+            border-bottom: 2px solid #800000; 
+            margin-top: 20px;
+        }
+        table.explorer-table th { background-color: #f3f0e8; color: #800000; font-weight: bold; padding: 12px; font-size: 0.9rem; text-transform: uppercase; }
+        table.explorer-table td { padding: 15px; border-bottom: 1px solid #eaeaea; }
+        
+        .location-cell { font-weight: bold; color: #800000; width: 25%; text-align: left; vertical-align: top; }
+        
+        .hebrew-cell { 
+            direction: rtl; 
+            text-align: right; 
+            font-family: 'SBL Hebrew', 'Ezra SIL', 'Times New Roman', serif; 
+            font-size: 1.6rem; 
+            line-height: 2.2;
+            width: 75%;
+            padding-right: 20px;
+        }
+        
+        /* 🏷️ THE GOLD ACCENT HIGHLIGHT RULE */
+        .highlight-word {
+            background-color: #fff2cc; 
+            border-bottom: 2px dashed #d99600; 
+            padding: 0 4px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="explorer-nav">
+        <a href="ornament_usage_by_pitch.html">← Back to Distribution Matrix</a>
+    </div>
+
+    <h1 id="page-title">Ornament Explorer</h1>
+    <div class="explorer-subtitle" id="page-subtitle">Processing distribution lookup records...</div>
+
+    <div id="explorer-status"></div>
+
+    <table class="explorer-table">
+        <thead>
+            <tr>
+                <th style="text-align: left; padding-left: 15px;">Location</th>
+                <th style="text-align: right; padding-right: 15px;">Hebrew Text Segment</th>
+            </tr>
+        </thead>
+        <tbody id="records-table-body">
+            <!-- Records load here -->
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.hasLoadedRecords) return;
+            window.hasLoadedRecords = true;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetOrnament = (urlParams.get('ornament') || '').trim().toLowerCase();
+            const targetPitch = (urlParams.get('pitch') || '').trim();
+
+            document.getElementById('page-title').innerText = `Occurrences of ${targetOrnament.toUpperCase()}`;
+            document.getElementById('page-subtitle').innerText = `Pitch Center: ${targetPitch}`;
+
+            const recordsTable = document.getElementById('records-table-body');
+            const statusContainer = document.getElementById('explorer-status');
+
+            // 🎯 STRICT NON-DUPLICATING WLC SINGLE-CHARACTER GLYPH MAP
+            const ornamentGlyphMap = {
+                "segol": "\u0592",            // [U-1426] ֒
+                "shalshelet": "\u0593",       // [U-1427] ֓
+                "zaqef-qatan": "\u0594",      // [U-1428] ֔
+                "zaqef-gadol": "\u0595",      // [U-1429] ֕
+                "revia": "\u0596",            // [U-1431] ֗
+                "zarqa": "\u0598",            // [U-1432] ֮
+                "pashta": "\u0599",           // [U-1433] ֙
+                "telisha-gedola": "\u05A0",   // [U-1440] ֠
+                "pazer": "\u05A1",            // [U-1441] ֡
+                "azla": "\u059C",             // [U-1436] ֜
+                "geresh-muqdam": "\u059D",    // [U-1437] ֝
+                "tarsin": "\u059E",           // [U-1438] ֞
+                "qarne-farah": "\u059F",      // [U-1439] ֟
+                "revia-mugrash": "\u059D",    // [U-1437] ֘
+                "qadma": "\u05A8",            // [U-1448] ֨
+                "telisha-qetana": "\u05A9",   // [U-1449] ֩
+                "ole": "\u05AB",               // [U-1451] ֫
+                "illuy": "\u05AC",            // [U-1452] ֬
+                "tsinnor": "\u05AE"           // [U-1454] ֮
+            };
+
+            const targetGlyph = ornamentGlyphMap[targetOrnament];
+
+            // 🌐 LOCALHOST FETCH ENGINE: Reads the raw JSON data file safely inside a single scope
+            fetch('ornament_index.json')
+                .then(response => response.json())
+                .then(indexData => {
+                    
+                    // 🔎 Case-Insensitive Key Match to safely align your database properties
+                    const actualOrnamentKey = Object.keys(indexData).find(
+                        key => key.trim().toLowerCase() === targetOrnament
+                    );
+
+                    let allMatches = [];
+                    if (actualOrnamentKey && indexData[actualOrnamentKey]) {
+                        allMatches = indexData[actualOrnamentKey][targetPitch] || [];
+                    }
+                    
+                    if (allMatches.length === 0) {
+                        statusContainer.innerHTML = '<div class="explorer-badge">No records found matching this configuration.</div>';
+                        return;
+                    }
+
+                    // Canonical Sorting Order (Genesis -> Chronicles)
+                    allMatches.sort((a, b) => {
+                        if (a.s !== b.s) return a.s - b.s;
+                        if (parseInt(a.c) !== parseInt(b.c)) return parseInt(a.c) - parseInt(b.c);
+                        return parseInt(a.v) - parseInt(b.v);
+                    });
+
+                    const displayLimit = 80;
+                    statusContainer.innerHTML = `<div class="explorer-badge">Showing ${Math.min(allMatches.length, displayLimit)} of ${allMatches.length} matching rows.</div>`;
+
+                    const htmlBuffer = [];
+                    
+                    // 🔄 The loop code block now sits completely nested inside the file evaluation thread
+                    allMatches.slice(0, displayLimit).forEach(item => {
+                        let rawText = item.t && item.t.trim() ? item.t : "";
+                        let highlightedText = rawText;
+
+                        if (rawText && targetGlyph) {
+                            // Force Canonical Composition (NFC) to match your precise WLC byte arrays
+                            const fusedVerse = rawText.normalize("NFC");
+                            const words = fusedVerse.split(' ');
+                            
+                            const processedWords = words.map(word => {
+                                if (word.includes(targetGlyph)) {
+                                    return `<span class="highlight-word">${word}</span>`;
+                                }
+                                return word;
+                            });
+                            highlightedText = processedWords.join(' ');
+                        } else if (!rawText) {
+                            highlightedText = `<span style="color:#aaa; font-style:italic; font-size:1rem;">Text element missing inside data file node</span>`;
+                        }
+                        
+                        htmlBuffer.push(`
+                            <tr>
+                                <td class="location-cell">${item.b} ${item.c}:${item.v}</td>
+                                <td class="hebrew-cell">${highlightedText}</td>
+                            </tr>
+                        `);
+                    });
+
+                    // Flush text row templates to active DOM tree in a single assignment operation
+                    recordsTable.innerHTML = htmlBuffer.join('');
+                })
+                .catch(err => {
+                    console.error("Fetch Data Loop Crash:", err);
+                    statusContainer.innerHTML = '<div class="explorer-badge" style="border-left-color:red;">Error loading layout index records.</div>';
+                });
+        });
+    </script>
+
+</body>
+</html>
