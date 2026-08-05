@@ -172,13 +172,13 @@ const ornamentGlyphMap = {
     "shalshelet": "\u0593",        // ֣
     "zaqef-qatan": "\u0594",       // ֤
     "zaqef-gadol": "\u0595",       // ֥
-    "revia": "\u0596",             // ֦
+    "revia": "\u0597",             // ֦
     "zarqa": "\u0598",             // ֨
     "pashta": "\u0599",            // ֩
     "telisha-gedola": "\u05A0",    // ֠
     "pazer": "\u05A1",             // ֡
     "azla": "\u059C",              // ֨ 
-    "geresh-muqdam": "\u059D",     // ֝ 
+    "geresh": "\u059D",     // ֝ 
     "tarsin": "\u059E",            // ֞
     "qarne-farah": "\u059F",       // ֟
     "revia-mugrash": "\u05A2",     // ֨
@@ -248,7 +248,7 @@ const ornamentGlyphMap = {
                 // 🎯 HTML DECIMAL ENTITY GLYPH MAP: Matches the raw character text codes inside your files
                 const ornamentEntityMap = {
                     "segol": "&#1426;", "shalshelet": "&#1427;", "zaqef-qatan": "&#1428;",
-                    "zaqef-gadol": "&#1429;", "revia": "&#1430;", "revia-mugrash": "&#1430;", "zarqa": "&#1443;",
+                    "zaqef-gadol": "&#1429;", "revia": "&#1431;", "revia-mugrash": "&#1431;", "zarqa": "&#1432;",
                     "pashta": "&#1433;", "telisha-gedola": "&#1440;", "pazer": "&#1441;",
                     "azla": "&#1436;", "geresh-muqdam": "&#1437;", "tarsin": "&#1438;",
                     "qarne-farah": "&#1439;", "qadma": "&#1448;",
@@ -337,22 +337,75 @@ const ornamentGlyphMap = {
 
                     // 2. Wrap processed text into parent span containers safely.
                     // We split by spaces AND ensure HTML break structures are isolated.
-                    const structuralWordsArray = cleanBaseText.split(/(\s+|<br[^>]*>)/i);
+                    //const structuralWordsArray = cleanBaseText.split(/(\s+|<br[^>]*>)/i);
 
-                    const processedWordsArray = structuralWordsArray.map(word => {
+                    //const processedWordsArray = structuralWordsArray.map(word => {
                         // If the slice is a space or line break tag, return it exactly as-is without processing
-                        if (/^\s*$/g.test(word) || /<br[^>]*>/i.test(word)) {
-                            return word;
-                        }
+                        //if (/^\s*$/g.test(word) || /<br[^>]*>/i.test(word)) {
+                        //    return word;
+                        //}
 
                         // Direct Accent Substitution logic executes exclusively on real textual characters
-                        if (targetGlyph && word.includes(targetGlyph)) {
-                            return `<span class="highlight-accent-word">${word}</span>`;
-                        }
+                        //if (targetGlyph && word.includes(targetGlyph)) {
+                         //   return `<span class="highlight-accent-word">${word}</span>`;
+                        //}
     
-                        return `<span>${word}</span>`;
-                    });
+                        //return `<span>${word}</span>`;
+                    //});
 
+// 2. ADAPTIVE SEARCH GLYPH GENERATOR
+// Safely resolves raw queries into real string-search values
+function getTargetGlyph(ornamentKey) {
+    // Rare Case: Revia-Mugrash is compound text data (Geresh + Revia)
+    if (ornamentKey === "revia-mugrash") {
+        // Fallback search criteria targeting either Unicode or your 7-character strings
+        return {
+            isCompound: true,
+            unicodePattern: /[\u059D\u059C].*?\u0597|\u0597.*?[\u059D\u059C]/gu,
+            htmlEntityPattern: /(&#1437;|&#1436;).*?&#1431;|&#1431;.*?(&#1437;|&#1436;)/g
+        };
+    }
+    
+    const rawGlyph = ornamentGlyphMap[ornamentKey];
+    if (!rawGlyph) return null;
+
+    // Convert raw glyph to its Decimal HTML Entity equivalent (matching your 7-char rule)
+    const decimalCode = rawGlyph.charCodeAt(0);
+    const htmlEntity = `&#${decimalCode};`; 
+
+    return {
+        isCompound: false,
+        raw: rawGlyph,
+        entity: htmlEntity
+    };
+}
+
+// 3. UPDATED TEXT RENDERING ENGINE LOOP
+const target = getTargetGlyph(urlParams.get('ornament')); // e.g. "revia-mugrash" or "revia"
+
+const structuralWordsArray = cleanBaseText.split(/(\s+|<br[^>]*>)/i);
+const processedWordsArray = structuralWordsArray.map(word => {
+    if (/^\s*$/g.test(word) || /<br[^>]*>/i.test(word)) {
+        return word;
+    }
+
+    let isMatch = false;
+
+    if (target) {
+        if (target.isCompound) {
+            // Evaluates compound symbols for Revia-Mugrash structures
+            isMatch = target.unicodePattern.test(word) || target.htmlEntityPattern.test(word);
+        } else {
+            // Checks for raw unicode character match OR literal 7-character string entity match
+            isMatch = word.includes(target.raw) || word.includes(target.entity);
+        }
+    }
+
+    if (isMatch) {
+        return `<span class="highlight-accent-word">${word}</span>`;
+    }
+    return `<span>${word}</span>`;
+});
 
                     // Re-stitch our clean structural textual layout foundation
                     let compiledBaseString = processedWordsArray.join(' ');
