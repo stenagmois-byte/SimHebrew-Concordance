@@ -166,30 +166,116 @@
             const bookFilter = document.getElementById('book-filter');
             const vowelToggle = document.getElementById('vowel-toggle'); // 🎯 Re-bound UI element
 
-// 1. Corrected and validated Unicode mapping table
+// 1. FULLY EXPANDED MAP WITH YOUR EXACT JSON/URL PARAMETER STRINGS
+// Maps both single accents and your exact lower-case double-accent strings
 const ornamentGlyphMap = {
-    "segol": "\u0592",            // ֢
-    "shalshelet": "\u0593",        // ֣
-    "zaqef-qatan": "\u0594",       // ֤
-    "zaqef-gadol": "\u0595",       // ֥
-    "revia": "\u0597",             // ֦
-    "zarqa": "\u0598",             // ֨
-    "pashta": "\u0599",            // ֩
-    "telisha-gedola": "\u05A0",    // ֠
-    "pazer": "\u05A1",             // ֡
-    "azla": "\u059C",              // ֨ 
-    "geresh": "\u059D",     // ֝ 
-    "tarsin": "\u059E",            // ֞
-    "qarne-farah": "\u059F",       // ֟
-    "revia-mugrash": "\u05A2",     // ֨
-    "qadma": "\u05A8",             // ֨
-    "telisha-qetana": "\u05A9",    // ֩
-    "ole": "\u05AB",               // ֫
-    "illuy": "\u05AC",             // ֬
-    "tsinnor": "\u05AE"            // ֮
+    // --- Core Single Accents ---
+    "segol": { isCompound: false, raw: "\u0592", entity: "&#1426;" },
+    "shalshelet": { isCompound: false, raw: "\u0593", entity: "&#1427;" },
+    "zaqef-qatan": { isCompound: false, raw: "\u0594", entity: "&#1428;" },
+    "zaqef-gadol": { isCompound: false, raw: "\u0595", entity: "&#1429;" },
+    "tifha": { isCompound: false, raw: "\u0596", entity: "&#1430;" },
+    "revia": { isCompound: false, raw: "\u0597", entity: "&#1431;" },
+    "zarqa": { isCompound: false, raw: "\u0598", entity: "&#1432;" },
+    "pashta": { isCompound: false, raw: "\u0599", entity: "&#1433;" },
+    "telisha-gedola": { isCompound: false, raw: "\u05A0", entity: "&#1440;" },
+    "pazer": { isCompound: false, raw: "\u05A1", entity: "&#1441;" },
+    "azla": { isCompound: false, raw: "\u059C", entity: "&#1436;" },
+    "geresh": { isCompound: false, raw: "\u059C", entity: "&#1436;" }, // Synced with calling program
+    "geresh-muqdam": { isCompound: false, raw: "\u059D", entity: "&#1437;" },
+    "tarsin": { isCompound: false, raw: "\u059E", entity: "&#1438;" },
+    "qarne-farah": { isCompound: false, raw: "\u059F", entity: "&#1439;" },
+    "qadma": { isCompound: false, raw: "\u05A8", entity: "&#1448;" },
+    "telisha-qetana": { isCompound: false, raw: "\u05A9", entity: "&#1449;" },
+    "ole": { isCompound: false, raw: "\u05AB", entity: "&#1451;" },
+    "illuy": { isCompound: false, raw: "\u05AC", entity: "&#1452;" },
+    "tsinnor": { isCompound: false, raw: "\u05AE", entity: "&#1454;" },
+
+    // --- Poetic Compound ---
+    "revia-mugrash": {
+        isCompound: true,
+        unicodePattern: /[\u059D\u059C].*?\u0597|\u0597.*?[\u059D\u059C]/gu,
+        htmlEntityPattern: /(&#1437;|&#1436;).*?&#1431;|&#1431;.*?(&#1437;|&#1436;)/g
+    },
+
+// --- Decalogue & Unique Double Accents ---
+// Updated regex constraints allow any number of intermediate characters (consonants/vowels) 
+// to sit between the two targeted musical ornaments.
+
+"revia z-qatan": {
+    isCompound: true,
+    unicodePattern: /(?=.*\u0597)(?=.*\u0594)/gu, // Employs lookaheads: word contains BOTH marks
+    htmlEntityPattern: /(?=.*&#1431;)(?=.*&#1428;)/g
+},
+"z-gadol pashta": {
+    isCompound: true,
+    // Fixes the wedge bug: allows consonants to separate the Zaqef-Gadol and Pashta marks
+    unicodePattern: /(?=.*\u0595)(?=.*\u0599)/gu, 
+    htmlEntityPattern: /(?=.*&#1429;)(?=.*&#1433;)/g
+},
+"pashta pashta": {
+    isCompound: true,
+    // Ensures the same word includes at least TWO distinct instances of Pashta
+    unicodePattern: /\u0599.*\u0599/gu, 
+    htmlEntityPattern: /&#1433;.*&#1433;/g
+},
+"pazer azla": {
+    isCompound: true,
+    unicodePattern: /(?=.*\u05A1)(?=.*\u059C)/gu,
+    htmlEntityPattern: /(?=.*&#1441;)(?=.*&#1436;)/g
+},
+"pazer z-qatan": {
+    isCompound: true,
+    unicodePattern: /(?=.*\u05A1)(?=.*\u0594)/gu,
+    htmlEntityPattern: /(?=.*&#1441;)(?=.*&#1428;)/g
+},
+"z-qatan azla": {
+    isCompound: true,
+    unicodePattern: /(?=.*\u0594)(?=.*\u059C)/gu,
+    htmlEntityPattern: /(?=.*&#1428;)(?=.*&#1436;)/g
+},
+"z-qatan tsinnor": {
+    isCompound: true,
+    unicodePattern: /(?=.*\u0594)(?=.*\u05AE)/gu,
+    htmlEntityPattern: /(?=.*&#1428;)(?=.*&#1454;)/g
+},
+"azla pashta": {
+    isCompound: true,
+    unicodePattern: /(?=.*\u059C)(?=.*\u0599)/gu,
+    htmlEntityPattern: /(?=.*&#1436;)(?=.*&#1433;)/g
+},
+"azla t-qetana": {
+    isCompound: true,
+    unicodePattern: /(?=.*\u059C)(?=.*\u05A9)/gu,
+    htmlEntityPattern: /(?=.*&#1436;)(?=.*&#1449;)/g
+},
+"z-qatan pazer": {
+    isCompound: true,
+    unicodePattern: /(?=.*\u0594)(?=.*\u05A1)/gu,
+    htmlEntityPattern: /(?=.*&#1428;)(?=.*&#1441;)/g
+},
+"azla z-qatan": {
+    isCompound: true,
+    unicodePattern: /(?=.*\u059C)(?=.*\u0594)/gu,
+    htmlEntityPattern: /(?=.*&#1436;)(?=.*&#1428;)/g
+},
+"tarsin revia": {
+    isCompound: true,
+    unicodePattern: /(?=.*\u059E)(?=.*\u0597)/gu,
+    htmlEntityPattern: /(?=.*&#1438;)(?=.*&#1431;)/g
+},
+"geresh t-gedola": {
+    isCompound: true,
+    unicodePattern: /(?=.*\u059C)(?=.*\u05A0)/gu,
+    htmlEntityPattern: /(?=.*&#1436;)(?=.*&#1440;)/g
+},
+"telisha-gedola azla": {
+    isCompound: true,
+    unicodePattern: /(?=.*\u05A0)(?=.*\u059C)/gu,
+    htmlEntityPattern: /(?=.*&#1440;)(?=.*&#1436;)/g
+}
 };
 
-            const targetGlyph = ornamentGlyphMap[targetOrnament];
 
             // 📖 Book name text string maps to Oracle sequential integer index numbers
             const bookNumberMap = {
@@ -245,17 +331,6 @@ const ornamentGlyphMap = {
                     bookFilter.appendChild(opt);
                 });
 
-                // 🎯 HTML DECIMAL ENTITY GLYPH MAP: Matches the raw character text codes inside your files
-                const ornamentEntityMap = {
-                    "segol": "&#1426;", "shalshelet": "&#1427;", "zaqef-qatan": "&#1428;",
-                    "zaqef-gadol": "&#1429;", "revia": "&#1431;", "revia-mugrash": "&#1431;", "zarqa": "&#1432;",
-                    "pashta": "&#1433;", "telisha-gedola": "&#1440;", "pazer": "&#1441;",
-                    "azla": "&#1436;", "geresh-muqdam": "&#1437;", "tarsin": "&#1438;",
-                    "qarne-farah": "&#1439;", "qadma": "&#1448;",
-                    "telisha-qetana": "&#1449;", "ole": "&#1451;", "illuy": "&#1452;", "tsinnor": "&#1454;"
-                };
-
-                const targetEntityCode = ornamentEntityMap[targetOrnament];
 
                 // MAP 1: Map Oracle translation items strictly by nested query index
                 const englishLookupMap = {};
@@ -335,54 +410,12 @@ const ornamentGlyphMap = {
                     }
 
 
-                    // 2. Wrap processed text into parent span containers safely.
-                    // We split by spaces AND ensure HTML break structures are isolated.
-                    //const structuralWordsArray = cleanBaseText.split(/(\s+|<br[^>]*>)/i);
+// 2. ULTRA-LEAN EXTRACTOR
+// Directly reads the incoming URL param (decoded natively by the browser)
+const rawParam = urlParams.get('ornament'); 
+const target = rawParam ? ornamentGlyphMap[rawParam.toLowerCase().trim()] : null;
 
-                    //const processedWordsArray = structuralWordsArray.map(word => {
-                        // If the slice is a space or line break tag, return it exactly as-is without processing
-                        //if (/^\s*$/g.test(word) || /<br[^>]*>/i.test(word)) {
-                        //    return word;
-                        //}
-
-                        // Direct Accent Substitution logic executes exclusively on real textual characters
-                        //if (targetGlyph && word.includes(targetGlyph)) {
-                         //   return `<span class="highlight-accent-word">${word}</span>`;
-                        //}
-    
-                        //return `<span>${word}</span>`;
-                    //});
-
-// 2. ADAPTIVE SEARCH GLYPH GENERATOR
-// Safely resolves raw queries into real string-search values
-function getTargetGlyph(ornamentKey) {
-    // Rare Case: Revia-Mugrash is compound text data (Geresh + Revia)
-    if (ornamentKey === "revia-mugrash") {
-        // Fallback search criteria targeting either Unicode or your 7-character strings
-        return {
-            isCompound: true,
-            unicodePattern: /[\u059D\u059C].*?\u0597|\u0597.*?[\u059D\u059C]/gu,
-            htmlEntityPattern: /(&#1437;|&#1436;).*?&#1431;|&#1431;.*?(&#1437;|&#1436;)/g
-        };
-    }
-    
-    const rawGlyph = ornamentGlyphMap[ornamentKey];
-    if (!rawGlyph) return null;
-
-    // Convert raw glyph to its Decimal HTML Entity equivalent (matching your 7-char rule)
-    const decimalCode = rawGlyph.charCodeAt(0);
-    const htmlEntity = `&#${decimalCode};`; 
-
-    return {
-        isCompound: false,
-        raw: rawGlyph,
-        entity: htmlEntity
-    };
-}
-
-// 3. UPDATED TEXT RENDERING ENGINE LOOP
-const target = getTargetGlyph(urlParams.get('ornament')); // e.g. "revia-mugrash" or "revia"
-
+// 3. WORD PARSING ENGINE
 const structuralWordsArray = cleanBaseText.split(/(\s+|<br[^>]*>)/i);
 const processedWordsArray = structuralWordsArray.map(word => {
     if (/^\s*$/g.test(word) || /<br[^>]*>/i.test(word)) {
@@ -393,10 +426,10 @@ const processedWordsArray = structuralWordsArray.map(word => {
 
     if (target) {
         if (target.isCompound) {
-            // Evaluates compound symbols for Revia-Mugrash structures
+            // Test if BOTH targets exist inside the string layout
             isMatch = target.unicodePattern.test(word) || target.htmlEntityPattern.test(word);
         } else {
-            // Checks for raw unicode character match OR literal 7-character string entity match
+            // Standard single-accent match
             isMatch = word.includes(target.raw) || word.includes(target.entity);
         }
     }
@@ -407,18 +440,9 @@ const processedWordsArray = structuralWordsArray.map(word => {
     return `<span>${word}</span>`;
 });
 
+
                     // Re-stitch our clean structural textual layout foundation
                     let compiledBaseString = processedWordsArray.join(' ');
-
-                    // 2. Inject structural phrase breaks and cadence commas directly behind the parent word tags
-                    //if (compiledBaseString.includes(zaqefGlyph)) {
-                    //    const zaqefRegex = new RegExp(`(<span>[^<]*${zaqefGlyph}[^]*?<\\/span>)`, 'g');
-                    //    compiledBaseString = compiledBaseString.replace(zaqefRegex, '$1,');
-                    //}
-                    //if (compiledBaseString.includes(atnahGlyph)) {
-                    //    const atnahRegex = new RegExp(`(<span>[^<]*${atnahGlyph}[^]*?<\\/span>)`, 'g');
-                    //    compiledBaseString = compiledBaseString.replace(atnahRegex, '$1<br>');
-                    //}
 
                     // ==========================================
                     // 3. TRACK A: FULLY VOWELED VIEW (Maintains Highlights + Niqqud)
