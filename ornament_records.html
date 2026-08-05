@@ -99,6 +99,11 @@
     font-size: 1.1em;
 }
 
+.highlight-accent-word {
+    background-color: #fff3cd; /* Soft gold background highlight */
+    border-radius: 3px;
+    padding: 0 2px;
+}
 </style>
 </head>
 <body>
@@ -161,14 +166,28 @@
             const bookFilter = document.getElementById('book-filter');
             const vowelToggle = document.getElementById('vowel-toggle'); // 🎯 Re-bound UI element
 
-            const ornamentGlyphMap = {
-                "segol": "\u0592", "shalshelet": "\u0593", "zaqef-qatan": "\u0594",
-                "zaqef-gadol": "\u0595", "revia": "\u0596", "zarqa": "\u0598",
-                "pashta": "\u0599", "telisha-gedola": "\u05A0", "pazer": "\u05A1",
-                "azla": "\u059C", "geresh-muqdam": "\u059D", "tarsin": "\u059E",
-                "qarne-farah": "\u059F", "revia-mugrash": "\u059D", "qadma": "\u05A8",
-                "telisha-qetana": "\u05A9", "ole": "\u05AB", "illuy": "\u05AC", "tsinnor": "\u05AE"
-            };
+// 1. Corrected and validated Unicode mapping table
+const ornamentGlyphMap = {
+    "segol": "\u0592",            // ֢
+    "shalshelet": "\u0593",        // ֣
+    "zaqef-qatan": "\u0594",       // ֤
+    "zaqef-gadol": "\u0595",       // ֥
+    "revia": "\u0596",             // ֦
+    "zarqa": "\u0598",             // ֨
+    "pashta": "\u0599",            // ֩
+    "telisha-gedola": "\u05A0",    // ֠
+    "pazer": "\u05A1",             // ֡
+    "azla": "\u059C",              // ֨ 
+    "geresh-muqdam": "\u059D",     // ֝ 
+    "tarsin": "\u059E",            // ֞
+    "qarne-farah": "\u059F",       // ֟
+    "revia-mugrash": "\u05A2",     // ֨
+    "qadma": "\u05A8",             // ֨
+    "telisha-qetana": "\u05A9",    // ֩
+    "ole": "\u05AB",               // ֫
+    "illuy": "\u05AC",             // ֬
+    "tsinnor": "\u05AE"            // ֮
+};
 
             const targetGlyph = ornamentGlyphMap[targetOrnament];
 
@@ -229,10 +248,10 @@
                 // 🎯 HTML DECIMAL ENTITY GLYPH MAP: Matches the raw character text codes inside your files
                 const ornamentEntityMap = {
                     "segol": "&#1426;", "shalshelet": "&#1427;", "zaqef-qatan": "&#1428;",
-                    "zaqef-gadol": "&#1429;", "revia": "&#1430;", "zarqa": "&#1443;",
+                    "zaqef-gadol": "&#1429;", "revia": "&#1430;", "revia-mugrash": "&#1430;", "zarqa": "&#1443;",
                     "pashta": "&#1433;", "telisha-gedola": "&#1440;", "pazer": "&#1441;",
                     "azla": "&#1436;", "geresh-muqdam": "&#1437;", "tarsin": "&#1438;",
-                    "qarne-farah": "&#1439;", "revia-mugrash": "&#1437;", "qadma": "&#1448;",
+                    "qarne-farah": "&#1439;", "qadma": "&#1448;",
                     "telisha-qetana": "&#1449;", "ole": "&#1451;", "illuy": "&#1452;", "tsinnor": "&#1454;"
                 };
 
@@ -315,19 +334,25 @@
                         cleanBaseText = cleanBaseText.replace(atnahRegex, '$1<br>');
                     }
 
-                    // 2. Now wrap the processed text into parent span containers for the HTML layout.
-                    // We split by spaces but preserve any newly injected <br> tags.
-                    const structuralWordsArray = cleanBaseText.split(' ');
+
+                    // 2. Wrap processed text into parent span containers safely.
+                    // We split by spaces AND ensure HTML break structures are isolated.
+                    const structuralWordsArray = cleanBaseText.split(/(\s+|<br[^>]*>)/i);
+
                     const processedWordsArray = structuralWordsArray.map(word => {
-                        // Direct Accent Substitution: Wrap only the target highlight glyph
-                        if (targetGlyph && word.includes(targetGlyph)) {
-                            const escapedGlyph = targetGlyph.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-                            const glyphRegex = new RegExp(escapedGlyph, 'g');
-                            const innerWrappedWord = word.replace(glyphRegex, `<span class="highlight-accent">${targetGlyph}</span>`);
-                            return `<span>${innerWrappedWord}</span>`;
+                        // If the slice is a space or line break tag, return it exactly as-is without processing
+                        if (/^\s*$/g.test(word) || /<br[^>]*>/i.test(word)) {
+                            return word;
                         }
+
+                        // Direct Accent Substitution logic executes exclusively on real textual characters
+                        if (targetGlyph && word.includes(targetGlyph)) {
+                            return `<span class="highlight-accent-word">${word}</span>`;
+                        }
+    
                         return `<span>${word}</span>`;
                     });
+
 
                     // Re-stitch our clean structural textual layout foundation
                     let compiledBaseString = processedWordsArray.join(' ');
@@ -350,26 +375,26 @@
                     // ==========================================
                     // 4. TRACK B: CANTORIAL DISPLAY VIEW (Selective Niqqud + Shin Dot Stripping)
                     // ==========================================
-let plainTrackOutput = compiledBaseString;
+                    let plainTrackOutput = compiledBaseString;
 
-// 🎯 VOWELS & PRONUNCIATION DOTS ONLY (Preserves Cantillation Accents \u0591-\u05AF)
-// \u05B0-\u05BB -> All standard Hebrew vowel points (Niqqud)
-// \u05BC        -> Dagesh or Mapiq (emphasis dot)
-// \u05C1-\u05C2 -> Shin and Sin diacritic dots
-// \u05C7        -> Qamats Qatan
-const stripVowelsOnlyRegex = /[\u05B0-\u05BB\u05BC\u05C1\u05C2\u05C7]/gu;
+                    // 🎯 VOWELS & PRONUNCIATION DOTS ONLY (Preserves Cantillation Accents \u0591-\u05AF)
+                    // \u05B0-\u05BB -> All standard Hebrew vowel points (Niqqud)
+                    // \u05BC        -> Dagesh or Mapiq (emphasis dot)
+                    // \u05C1-\u05C2 -> Shin and Sin diacritic dots
+                    // \u05C7        -> Qamats Qatan
+                    const stripVowelsOnlyRegex = /[\u05B0-\u05BB\u05BC\u05C1\u05C2\u05C7]/gu;
 
-// 1. Decompose the string to decouple stacked marks safely
-plainTrackOutput = plainTrackOutput.normalize("NFD");
+                    // 1. Decompose the string to decouple stacked marks safely
+                    plainTrackOutput = plainTrackOutput.normalize("NFD");
 
-// 2. Erase the vowels directly (remove span code wrapper if text is not inside <span>)
-plainTrackOutput = plainTrackOutput.replace(stripVowelsOnlyRegex, '');
+                    // 2. Erase the vowels directly (remove span code wrapper if text is not inside <span>)
+                    plainTrackOutput = plainTrackOutput.replace(stripVowelsOnlyRegex, '');
 
-// ==========================================
-// 5. WRAPPER ELEMENT ASSEMBLY
-// ==========================================
-const wrapWithoutVowels = `<div title="${fullEnglishTranslation}" style="cursor:help; display:inline-block; width:100%; line-height: 1.8;">${plainTrackOutput}</div>`;
-const wrapWithVowels = `<div title="${fullEnglishTranslation}" style="cursor:help; display:inline-block; width:100%; line-height: 1.8;">${voweledTrackOutput}</div>`;
+                    // ==========================================
+                    // 5. WRAPPER ELEMENT ASSEMBLY
+                    // ==========================================
+                    const wrapWithoutVowels = `<div title="${fullEnglishTranslation}" style="cursor:help; display:inline-block; width:100%; line-height: 1.8;">${plainTrackOutput}</div>`;
+                    const wrapWithVowels = `<div title="${fullEnglishTranslation}" style="cursor:help; display:inline-block; width:100%; line-height: 1.8;">${voweledTrackOutput}</div>`;
 
                     recordsCache.push({
                         book: item.b,
