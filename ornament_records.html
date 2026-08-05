@@ -300,10 +300,26 @@
                     // Clean lingering spacing glitches around hyphens/Maqafs cleanly on the raw base string
                     let cleanBaseText = rawText.replace(/[\s\u00A0]*[־\-][\s\u00A0]*/g, '־');
 
-                    // 1. Wrap each structural word item block inside its own parent span container tag layout.
+                    // 🎯 FIX: Apply the structural pauses directly to the RAW text before wrapping words!
+                    // This ensures Maqafs and spaces are evaluated at the exact character position.
+                    
+                    // A. Inject comma directly after the Zaqef-Qatan word boundary
+                    if (cleanBaseText.includes(zaqefGlyph)) {
+                        const zaqefRegex = new RegExp(`([^\\s־]*${zaqefGlyph}[^\\s־]*)`, 'g');
+                        cleanBaseText = cleanBaseText.replace(zaqefRegex, '$1,');
+                    }
+
+                    // B. Inject the <br> line break directly after the Atnah word boundary
+                    if (cleanBaseText.includes(atnahGlyph)) {
+                        const atnahRegex = new RegExp(`([^\\s־]*${atnahGlyph}[^\\s־]*)`, 'g');
+                        cleanBaseText = cleanBaseText.replace(atnahRegex, '$1<br>');
+                    }
+
+                    // 2. Now wrap the processed text into parent span containers for the HTML layout.
+                    // We split by spaces but preserve any newly injected <br> tags.
                     const structuralWordsArray = cleanBaseText.split(' ');
                     const processedWordsArray = structuralWordsArray.map(word => {
-                        // DIRECT ACCENT SUBSTITUTION: Wrap ONLY the target glyph itself inside a class token
+                        // Direct Accent Substitution: Wrap only the target highlight glyph
                         if (targetGlyph && word.includes(targetGlyph)) {
                             const escapedGlyph = targetGlyph.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
                             const glyphRegex = new RegExp(escapedGlyph, 'g');
@@ -317,14 +333,14 @@
                     let compiledBaseString = processedWordsArray.join(' ');
 
                     // 2. Inject structural phrase breaks and cadence commas directly behind the parent word tags
-                    if (compiledBaseString.includes(zaqefGlyph)) {
-                        const zaqefRegex = new RegExp(`(<span>[^<]*${zaqefGlyph}[^]*?<\\/span>)`, 'g');
-                        compiledBaseString = compiledBaseString.replace(zaqefRegex, '$1,');
-                    }
-                    if (compiledBaseString.includes(atnahGlyph)) {
-                        const atnahRegex = new RegExp(`(<span>[^<]*${atnahGlyph}[^]*?<\\/span>)`, 'g');
-                        compiledBaseString = compiledBaseString.replace(atnahRegex, '$1<br>');
-                    }
+                    //if (compiledBaseString.includes(zaqefGlyph)) {
+                    //    const zaqefRegex = new RegExp(`(<span>[^<]*${zaqefGlyph}[^]*?<\\/span>)`, 'g');
+                    //    compiledBaseString = compiledBaseString.replace(zaqefRegex, '$1,');
+                    //}
+                    //if (compiledBaseString.includes(atnahGlyph)) {
+                    //    const atnahRegex = new RegExp(`(<span>[^<]*${atnahGlyph}[^]*?<\\/span>)`, 'g');
+                    //    compiledBaseString = compiledBaseString.replace(atnahRegex, '$1<br>');
+                    //}
 
                     // ==========================================
                     // 3. TRACK A: FULLY VOWELED VIEW (Maintains Highlights + Niqqud)
@@ -334,25 +350,26 @@
                     // ==========================================
                     // 4. TRACK B: CANTORIAL DISPLAY VIEW (Selective Niqqud + Shin Dot Stripping)
                     // ==========================================
-                    let plainTrackOutput = compiledBaseString;
+let plainTrackOutput = compiledBaseString;
 
-                    // 🎯 NIQQUD, SHIN DOT & SIN DOT COMBINED STRIPPER REGEX:
-                    // \u05B0-\u05BB -> All standard historic Hebrew vowel marks
-                    // \u05C1        -> The Shin Dot character diacritic marker
-                    // \u05C2        -> The Sin Dot character diacritic marker
-                    // \u05C7        -> The Qamats Qatan vowel point
-                    const stripVowelsAndDotsRegex = /[\u05B0-\u05BB\u05C1\u05C2\u05C7]/g;
-                    
-                    // Direct targeting engine processes values inside our spatial tags safely
-                    plainTrackOutput = plainTrackOutput.replace(/(<span>[\s\S]*?<\/span>)/g, (match) => {
-                        return match.replace(stripVowelsAndDotsRegex, '');
-                    });
+// 🎯 VOWELS & PRONUNCIATION DOTS ONLY (Preserves Cantillation Accents \u0591-\u05AF)
+// \u05B0-\u05BB -> All standard Hebrew vowel points (Niqqud)
+// \u05BC        -> Dagesh or Mapiq (emphasis dot)
+// \u05C1-\u05C2 -> Shin and Sin diacritic dots
+// \u05C7        -> Qamats Qatan
+const stripVowelsOnlyRegex = /[\u05B0-\u05BB\u05BC\u05C1\u05C2\u05C7]/gu;
 
-                    // ==========================================
-                    // 5. WRAPPER ELEMENT ASSEMBLY
-                    // ==========================================
-                    const wrapWithoutVowels = `<div title="${fullEnglishTranslation}" style="cursor:help; display:inline-block; width:100%; line-height: 1.8;">${plainTrackOutput}</div>`;
-                    const wrapWithVowels = `<div title="${fullEnglishTranslation}" style="cursor:help; display:inline-block; width:100%; line-height: 1.8;">${voweledTrackOutput}</div>`;
+// 1. Decompose the string to decouple stacked marks safely
+plainTrackOutput = plainTrackOutput.normalize("NFD");
+
+// 2. Erase the vowels directly (remove span code wrapper if text is not inside <span>)
+plainTrackOutput = plainTrackOutput.replace(stripVowelsOnlyRegex, '');
+
+// ==========================================
+// 5. WRAPPER ELEMENT ASSEMBLY
+// ==========================================
+const wrapWithoutVowels = `<div title="${fullEnglishTranslation}" style="cursor:help; display:inline-block; width:100%; line-height: 1.8;">${plainTrackOutput}</div>`;
+const wrapWithVowels = `<div title="${fullEnglishTranslation}" style="cursor:help; display:inline-block; width:100%; line-height: 1.8;">${voweledTrackOutput}</div>`;
 
                     recordsCache.push({
                         book: item.b,
