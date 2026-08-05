@@ -129,7 +129,7 @@ def run_distribution_analysis():
         pitch_counts = [pitches[lbl] for lbl in PITCH_LABELS]
         sorted_rows.append((total, orn, pitch_counts))
         
-    sorted_rows.sort(key=lambda x: x[0]) # Sort by total frequency ascending
+    sorted_rows.sort(key=lambda x: x[0], reverse=True) # Sort by total frequency ascending
     
     #return sorted_rows # Make sure to return your data to build the webpage!
 
@@ -196,7 +196,7 @@ def run_distribution_analysis():
     </div>
 
     <h1>Ornament Usage by Recitation Pitch</h1>
-    <p>This critical concordance matrix outlines the distribution frequency of traditional cantillation ornaments aligned against their verified scriptural recitation pitch center foundations.</p>
+    <p>This concordance matrix outlines the distribution frequency of accents above the text aligned against the accent below the text that immediately precedes them defining the recitation pitch that governs the ornaments.</p>
 
     <table>
         <thead>
