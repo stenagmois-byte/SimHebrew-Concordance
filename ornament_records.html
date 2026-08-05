@@ -53,6 +53,9 @@
             line-height: 2.2;
             width: 75%;
             padding-right: 20px;
+    font-variant-ligatures: none;
+    font-feature-settings: "ccmp" 1, "mark" 1, "mkmk" 1;
+    text-rendering: optimizeLegibility;
         }
         
         /* 🏷️ THE GOLD ACCENT HIGHLIGHT RULE */
@@ -81,7 +84,22 @@
 .toggle-label {
     color: #444;
     font-weight: bold;
-}    </style>
+}    
+/* 🎯 THE LEXICAL UNIT HIGHLIGHT FIX (Yellow Background Block) */
+/* When a parent word tracking container holds our target accent, highlight its background! */
+.hebrew-cell span:has(.highlight-accent) {
+    background-color: #fff59d;   /* A clean, highly legible soft pastel yellow block */
+    padding: 0 4px;              /* Adds a small spatial margin cushion around the highlighted word */
+    border-radius: 3px;          /* Smooths out the box border edges visually */
+    display: inline-block;       /* Ensures the layout padding registers cleanly around the characters */
+}
+
+/* Keeps the target cantillation glyph accent mark sizing structurally clear and sharp */
+.highlight-accent {
+    font-size: 1.1em;
+}
+
+</style>
 </head>
 <body>
 
@@ -96,7 +114,7 @@
 <div class="diacritic-control-panel" style="display: flex; gap: 30px; align-items: center;">
     <label class="toggle-switch">
         <input type="checkbox" id="vowel-toggle" checked>
-        <span class="toggle-label">Show Niqqud (Vowels)</span>
+        <span class="toggle-label">Hide Niqqud (Vowels)</span>
     </label>
     
     <!-- 📖 NEW BOOK FILTER DROPDOWN -->
@@ -140,10 +158,9 @@
 
             const recordsTable = document.getElementById('records-table-body');
             const statusContainer = document.getElementById('explorer-status');
-            const vowelToggle = document.getElementById('vowel-toggle');
             const bookFilter = document.getElementById('book-filter');
+            const vowelToggle = document.getElementById('vowel-toggle'); // 🎯 Re-bound UI element
 
-            // 🎯 STRICT NON-DUPLICATING WLC SINGLE-CHARACTER GLYPH MAP
             const ornamentGlyphMap = {
                 "segol": "\u0592", "shalshelet": "\u0593", "zaqef-qatan": "\u0594",
                 "zaqef-gadol": "\u0595", "revia": "\u0596", "zarqa": "\u0598",
@@ -155,128 +172,237 @@
 
             const targetGlyph = ornamentGlyphMap[targetOrnament];
 
-            // 🌐 LOCALHOST FETCH ENGINE: Reads raw JSON data
-            fetch('ornament_index.json')
-                .then(response => response.json())
-                .then(indexData => {
-                    
-                    const actualOrnamentKey = Object.keys(indexData).find(
-                        key => key.trim().toLowerCase() === targetOrnament
-                    );
+            // 📖 Book name text string maps to Oracle sequential integer index numbers
+            const bookNumberMap = {
+                "Genesis": 1, "Exodus": 2, "Leviticus": 3, "Numbers": 4, "Deuteronomy": 5,
+                "Joshua": 6, "Judges": 7, "1 Samuel": 8, "2 Samuel": 9, "1 Kings": 10,
+                "2 Kings": 11, "Isaiah": 12, "Jeremiah": 13, "Ezekiel": 14, "Hosea": 15,
+                "Joel": 16, "Amos": 17, "Obadiah": 18, "Jonah": 19, "Micah": 20,
+                "Nahum": 21, "Habakkuk": 22, "Zephaniah": 23, "Haggai": 24, "Zechariah": 25,
+                "Malachi": 26, "Psalms": 27, "Proverbs": 28, "Job": 29, "Song of Songs": 30,
+                "Ruth": 31, "Lamentations": 32, "Ecclesiastes": 33, "Esther": 34, "Daniel": 35,
+                "Ezra": 36, "Nehemiah": 37, "1 Chronicles": 38, "2 Chronicles": 39
+            };
 
-                    let allMatches = [];
-                    if (actualOrnamentKey && indexData[actualOrnamentKey]) {
-                        allMatches = indexData[actualOrnamentKey][targetPitch] || [];
-                    }
-                    
-                    if (allMatches.length === 0) {
-                        statusContainer.innerHTML = '<div class="explorer-badge">No records found matching this configuration.</div>';
+            // 🌐 FETCH ENGINE: Loads all data resources cleanly via asynchronous background promises
+            Promise.all([
+                fetch('ornament_index.json').then(res => res.json()),
+                fetch('translation.json').then(res => res.json()),
+                fetch('interlin.json').then(res => res.json())
+            ])
+            .then(([indexData, englishData, interlinData]) => {
+                
+                const actualOrnamentKey = Object.keys(indexData).find(
+                    key => key.trim().toLowerCase() === targetOrnament
+                );
+
+                let allMatches = [];
+                if (actualOrnamentKey && indexData[actualOrnamentKey]) {
+                    allMatches = indexData[actualOrnamentKey][targetPitch] || [];
+                }
+                
+                if (allMatches.length === 0) {
+                    statusContainer.innerHTML = '<div class="explorer-badge">No records found matching this configuration.</div>';
+                    return;
+                }
+
+                // Canonical Sorting Order (Genesis -> Chronicles)
+                allMatches.sort((a, b) => {
+                    if (a.s !== b.s) return a.s - b.s;
+                    if (parseInt(a.c) !== parseInt(b.c)) return parseInt(a.c) - parseInt(b.c);
+                    return parseInt(a.v) - parseInt(b.v);
+                });
+
+                // Populate Book Filter Dropdown
+                const uniqueBooks = [];
+                allMatches.forEach(item => {
+                    if (!uniqueBooks.includes(item.b)) uniqueBooks.push(item.b);
+                });
+                
+                uniqueBooks.forEach(book => {
+                    const opt = document.createElement('option');
+                    opt.value = book;
+                    opt.innerText = book;
+                    bookFilter.appendChild(opt);
+                });
+
+                // 🎯 HTML DECIMAL ENTITY GLYPH MAP: Matches the raw character text codes inside your files
+                const ornamentEntityMap = {
+                    "segol": "&#1426;", "shalshelet": "&#1427;", "zaqef-qatan": "&#1428;",
+                    "zaqef-gadol": "&#1429;", "revia": "&#1430;", "zarqa": "&#1443;",
+                    "pashta": "&#1433;", "telisha-gedola": "&#1440;", "pazer": "&#1441;",
+                    "azla": "&#1436;", "geresh-muqdam": "&#1437;", "tarsin": "&#1438;",
+                    "qarne-farah": "&#1439;", "revia-mugrash": "&#1437;", "qadma": "&#1448;",
+                    "telisha-qetana": "&#1449;", "ole": "&#1451;", "illuy": "&#1452;", "tsinnor": "&#1454;"
+                };
+
+                const targetEntityCode = ornamentEntityMap[targetOrnament];
+
+                // MAP 1: Map Oracle translation items strictly by nested query index
+                const englishLookupMap = {};
+                if (englishData && englishData.results && englishData.results[0] && englishData.results[0].items) {
+                    englishData.results[0].items.forEach(item => {
+                        const bSeq = parseInt(item.book_seq_no);
+                        const cKey = String(item.chapter_cd).padStart(3, '0');
+                        const vKey = String(item.verse_cd).padStart(3, '0');
+                        englishLookupMap[`${bSeq}_${cKey}:${vKey}`] = item.eng_text || "";
+                    });
+                }
+
+                // MAP 2: Map interlin database components directly by their exact native "k" keys
+                const niqqudLookupMap = {};
+                if (interlinData && interlinData.items) {
+                    interlinData.items.forEach(item => {
+                        if (item.k && item.h) {
+                            niqqudLookupMap[item.k.trim()] = item.h.trim();
+                        }
+                    });
+                }
+                // 🧠 CACHE COMPILATION LOOP (Generates layouts accurately ahead of rendering calls)
+                const recordsCache = [];
+                
+                // Define the absolute native Unicode glyph representations for structural pause tracking
+                const zaqefGlyph  = "\u0594"; // ֔ (Zaqef-Qatan)
+                const atnahGlyph  = "\u0591"; // ֑ (Atnah)
+
+                allMatches.forEach(item => {
+                    // Extract the text that already contains the vowels from your main database file
+                    const rawText = item.t && item.t.trim() ? item.t : "";
+                    if (!rawText) {
+                        const errMsg = `<span style="color:#aaa; font-style:italic; font-size:1rem;">Text element missing inside data file node</span>`;
+                        recordsCache.push({ book: item.b, location: `${item.b} ${item.c}:${item.v}`, withVowels: errMsg, withoutVowels: errMsg });
                         return;
                     }
 
-                    // Canonical Sorting Order (Genesis -> Chronicles)
-                    allMatches.sort((a, b) => {
-                        if (a.s !== b.s) return a.s - b.s;
-                        if (parseInt(a.c) !== parseInt(b.c)) return parseInt(a.c) - parseInt(b.c);
-                        return parseInt(a.v) - parseInt(b.v);
-                    });
-
-                    // 🗺️ DYNAMICALLY POPULATE BOOK FILTER DROPDOWN
-                    // Extracts a unique, ordered list of books present in this specific result set
-                    const uniqueBooks = [];
-                    allMatches.forEach(item => {
-                        if (!uniqueBooks.includes(item.b)) {
-                            uniqueBooks.push(item.b);
-                        }
-                    });
+                    // Build lookup keys for the English translation matching your Oracle tables
+                    const bSeqNum = bookNumberMap[item.b] || 0;
+                    const cKey = String(item.c).padStart(3, '0');
+                    const vKey = String(item.v).padStart(3, '0');
                     
-                    uniqueBooks.forEach(book => {
-                        const opt = document.createElement('option');
-                        opt.value = book;
-                        opt.innerText = book;
-                        bookFilter.appendChild(opt);
-                    });
+                    // DECALOGUE COORDINATE PATCH: Adjusts potential coordinate mismatches in Exodus 20 and Deut 5
+                    let englishToken = `${bSeqNum}_${cKey}:${vKey}`;
+                    let fullEnglishTranslation = englishLookupMap[englishToken];
 
-                    // 🧠 CACHE COMPILATION LOOP FOR ALL RECORDS
-                    const recordsCache = [];
-                    
-                    allMatches.forEach(item => {
-                        let rawText = item.t && item.t.trim() ? item.t : "";
-                        let textWithVowels = rawText;
-                        let textWithoutVowels = rawText;
-
-                        if (rawText && targetGlyph) {
-                            // 1. Process full text standard
-                            const wordsWith = rawText.split(' ');
-                            const processedWith = wordsWith.map(word => {
-                                if (word.includes(targetGlyph)) return `<span class="highlight-word">${word}</span>`;
-                                return word;
-                            });
-                            textWithVowels = processedWith.join(' ');
-
-                            // 2. Oracle-style native vowel strip
-                            const stripVowelsRegex = /[\u05B0-\u05B9\u05BB\u05C1\u05C2]/g;
-                            const plainAccentVerse = rawText.replace(stripVowelsRegex, '');
-                            
-                            const wordsWithout = plainAccentVerse.split(' ');
-                            const processedWithout = wordsWithout.map(word => {
-                                if (word.includes(targetGlyph)) return `<span class="highlight-word">${word}</span>`;
-                                return word;
-                            });
-                            textWithoutVowels = processedWithout.join(' ');
-                        } else if (!rawText) {
-                            const errMsg = `<span style="color:#aaa; font-style:italic; font-size:1rem;">Text element missing inside data file node</span>`;
-                            textWithVowels = errMsg;
-                            textWithoutVowels = errMsg;
+                    if (!fullEnglishTranslation) {
+                        // Fallback logic for potential Decalogue alternate verse schemes
+                        if (bSeqNum === 2 && cKey === "020") { // Exodus 20
+                            const altVerse = String(parseInt(item.v) + 1).padStart(3, '0'); 
+                            fullEnglishTranslation = englishLookupMap[`${bSeqNum}_${cKey}:${altVerse}`];
+                        } else if (bSeqNum === 5 && cKey === "005") { // Deuteronomy 5
+                            const altVerse = String(parseInt(item.v) + 1).padStart(3, '0');
+                            fullEnglishTranslation = englishLookupMap[`${bSeqNum}_${cKey}:${altVerse}`];
                         }
+                    }
+                    
+                    // Final string validation wrap
+                    fullEnglishTranslation = (fullEnglishTranslation || "Translation missing").replace(/"/g, '&quot;');
 
-                        recordsCache.push({
-                            book: item.b, // Used for live drop-down filtering evaluation
-                            location: `${item.b} ${item.c}:${item.v}`,
-                            withVowels: textWithVowels,
-                            withoutVowels: textWithoutVowels
-                        });
+                    // Clean lingering spacing glitches around hyphens/Maqafs cleanly on the raw base string
+                    let cleanBaseText = rawText.replace(/[\s\u00A0]*[־\-][\s\u00A0]*/g, '־');
+
+                    // 1. Wrap each structural word item block inside its own parent span container tag layout.
+                    const structuralWordsArray = cleanBaseText.split(' ');
+                    const processedWordsArray = structuralWordsArray.map(word => {
+                        // DIRECT ACCENT SUBSTITUTION: Wrap ONLY the target glyph itself inside a class token
+                        if (targetGlyph && word.includes(targetGlyph)) {
+                            const escapedGlyph = targetGlyph.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                            const glyphRegex = new RegExp(escapedGlyph, 'g');
+                            const innerWrappedWord = word.replace(glyphRegex, `<span class="highlight-accent">${targetGlyph}</span>`);
+                            return `<span>${innerWrappedWord}</span>`;
+                        }
+                        return `<span>${word}</span>`;
                     });
 
-                    // ⚙️ LIVE RENDERING & FILTERING ENGINE
-                    function drawTableRows() {
-                        const selectedBook = bookFilter.value;
-                        const showVowels = vowelToggle.checked;
-                        
-                        // Apply the book filter step
-                        const filteredRecords = recordsCache.filter(item => {
-                            return selectedBook === 'all' || item.book === selectedBook;
-                        });
+                    // Re-stitch our clean structural textual layout foundation
+                    let compiledBaseString = processedWordsArray.join(' ');
 
-                        // Enforce your maximum 10-record safety cap limit on the filtered subset
-                        const displayLimit = 150;
-                        statusContainer.innerHTML = `<div class="explorer-badge">Showing ${Math.min(filteredRecords.length, displayLimit)} of ${filteredRecords.length} filtered rows.</div>`;
-
-                        const htmlBuffer = [];
-                        filteredRecords.slice(0, displayLimit).forEach(item => {
-                            const activeText = showVowels ? item.withVowels : item.withoutVowels;
-                            htmlBuffer.push(`
-                                <tr>
-                                    <td class="location-cell">${item.location}</td>
-                                    <td class="hebrew-cell">${activeText}</td>
-                                </tr>
-                            `);
-                        });
-                        recordsTable.innerHTML = htmlBuffer.join('');
+                    // 2. Inject structural phrase breaks and cadence commas directly behind the parent word tags
+                    if (compiledBaseString.includes(zaqefGlyph)) {
+                        const zaqefRegex = new RegExp(`(<span>[^<]*${zaqefGlyph}[^]*?<\\/span>)`, 'g');
+                        compiledBaseString = compiledBaseString.replace(zaqefRegex, '$1,');
+                    }
+                    if (compiledBaseString.includes(atnahGlyph)) {
+                        const atnahRegex = new RegExp(`(<span>[^<]*${atnahGlyph}[^]*?<\\/span>)`, 'g');
+                        compiledBaseString = compiledBaseString.replace(atnahRegex, '$1<br>');
                     }
 
-                    // Bind active listeners to both user controls
-                    vowelToggle.addEventListener('change', drawTableRows);
-                    bookFilter.addEventListener('change', drawTableRows);
+                    // ==========================================
+                    // 3. TRACK A: FULLY VOWELED VIEW (Maintains Highlights + Niqqud)
+                    // ==========================================
+                    let voweledTrackOutput = compiledBaseString;
+
+                    // ==========================================
+                    // 4. TRACK B: CANTORIAL DISPLAY VIEW (Selective Niqqud + Shin Dot Stripping)
+                    // ==========================================
+                    let plainTrackOutput = compiledBaseString;
+
+                    // 🎯 NIQQUD, SHIN DOT & SIN DOT COMBINED STRIPPER REGEX:
+                    // \u05B0-\u05BB -> All standard historic Hebrew vowel marks
+                    // \u05C1        -> The Shin Dot character diacritic marker
+                    // \u05C2        -> The Sin Dot character diacritic marker
+                    // \u05C7        -> The Qamats Qatan vowel point
+                    const stripVowelsAndDotsRegex = /[\u05B0-\u05BB\u05C1\u05C2\u05C7]/g;
                     
-                    // Initial rendering execution
-                    drawTableRows();
-                })
-                .catch(err => {
-                    console.error("Fetch Data Loop Crash:", err);
-                    statusContainer.innerHTML = '<div class="explorer-badge" style="border-left-color:red;">Error loading layout index records.</div>';
+                    // Direct targeting engine processes values inside our spatial tags safely
+                    plainTrackOutput = plainTrackOutput.replace(/(<span>[\s\S]*?<\/span>)/g, (match) => {
+                        return match.replace(stripVowelsAndDotsRegex, '');
+                    });
+
+                    // ==========================================
+                    // 5. WRAPPER ELEMENT ASSEMBLY
+                    // ==========================================
+                    const wrapWithoutVowels = `<div title="${fullEnglishTranslation}" style="cursor:help; display:inline-block; width:100%; line-height: 1.8;">${plainTrackOutput}</div>`;
+                    const wrapWithVowels = `<div title="${fullEnglishTranslation}" style="cursor:help; display:inline-block; width:100%; line-height: 1.8;">${voweledTrackOutput}</div>`;
+
+                    recordsCache.push({
+                        book: item.b,
+                        location: `${item.b} ${item.c}:${item.v}`,
+                        withVowels: wrapWithVowels,      // Checked State (Vowels, All Accents, Shin Dots, and <br>)
+                        withoutVowels: wrapWithoutVowels // Unchecked State (Initial Display: No Vowels, No Shin Dots, Highlighting, and <br>)
+                    });
                 });
+
+                // ⚙️ LIVE RENDERING & FILTERING ENGINE
+                function drawTableRows() {
+                    const selectedBook = bookFilter.value;
+                    
+                    // 🎯 INITIAL DISPLAY FIX: Default to false (unchecked layout format) if element properties miss definition values
+                    const showVowels = vowelToggle ? vowelToggle.checked : false; 
+                    
+                    const filteredRecords = recordsCache.filter(item => {
+                        return selectedBook === 'all' || item.book === selectedBook;
+                    });
+
+                    const displayLimit = 150;
+                    statusContainer.innerHTML = `<div class="explorer-badge">Showing ${Math.min(filteredRecords.length, displayLimit)} of ${filteredRecords.length} filtered rows.</div>`;
+
+                    const htmlBuffer = [];
+                    filteredRecords.slice(0, displayLimit).forEach(item => {
+                        const activeText = showVowels ? item.withVowels : item.withoutVowels;
+                        htmlBuffer.push(`
+                            <tr>
+                                <td class="location-cell">${item.location}</td>
+                                <td class="hebrew-cell" style="direction: rtl; text-align: right;">${activeText}</td>
+                            </tr>
+                        `);
+                    });
+                    recordsTable.innerHTML = htmlBuffer.join('');
+                }
+
+                bookFilter.addEventListener('change', drawTableRows);
+                if (vowelToggle) {
+                    vowelToggle.addEventListener('change', drawTableRows);
+                }
+                
+                // Initial execution call draws the layout smoothly right away
+                drawTableRows();
+            })
+            .catch(err => {
+                console.error("Fetch Data Loop Crash:", err);
+                statusContainer.innerHTML = '<div class="explorer-badge" style="color:red;">Error loading resource data libraries.</div>';
+            });
         });
+
     </script>
 
 </body>
