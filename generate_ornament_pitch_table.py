@@ -192,7 +192,7 @@ def run_distribution_analysis():
 <body>
 
     <div class="nav">
-        <a href="./index.html">← Back to Project Homepage</a>
+        <a href="./musicscores/index.html">← Back to Volume Index</a>
     </div>
 
     <h1>Ornament Usage by Recitation Pitch</h1>
