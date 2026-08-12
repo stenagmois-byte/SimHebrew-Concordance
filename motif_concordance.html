@@ -131,18 +131,52 @@
         
         console.log("⏳ Initializing asset streaming from GitHub repository repositories...");
         
+        // Stream the Motif Relationship Matrix
         const motifRes = await fetch(`motif_relationship_matrix.json${cacheBuster}`);
         if (!motifRes.ok) {
             throw new Error(`HTTP network error! Matrix file status: ${motifRes.status} ${motifRes.statusText}`);
         }
         motifMatrix = await motifRes.json();
         
+        // Stream the Book Sequence Matrix
         const seqRes = await fetch(`bookseq.json${cacheBuster}`);
         if (!seqRes.ok) {
             throw new Error(`HTTP network error! Book sequence file status: ${seqRes.status} ${seqRes.statusText}`);
         }
         const seqData = await seqRes.json();
-        
+
+        // 1. ADDED: Stream your pure Oracle-sourced translation database
+        const transRes = await fetch(`translation.json${cacheBuster}`);
+        if (!transRes.ok) {
+            throw new Error(`HTTP network error! Translation database status: ${transRes.status} ${transRes.statusText}`);
+        }
+        const translationData = await transRes.json();
+
+        // 1. Establish the global lookup map in browser memory
+        window.translationLookup = {};
+
+        // 2. Target the exact Oracle nested array layer: results -> index 0 -> items
+        if (translationData && translationData.results && translationData.results[0] && translationData.results[0].items) {
+            const itemsList = translationData.results[0].items;
+            
+            for (let i = 0; i < itemsList.length; i++) {
+                let item = itemsList[i];
+                if (item.book_cd && item.chapter_cd && item.verse_cd) {
+                    
+                    // Force book name format spaces to underscores (e.g., "2 CHRONICLES" -> "2_CHRONICLES")
+                    let bookClean = item.book_cd.toUpperCase().replace(/ /g, "_").trim();
+                    
+                    // Generate the precise uppercase lookup key (e.g., "2_CHRONICLES_036_023")
+                    let key = `${bookClean}_${item.chapter_cd.trim()}_${item.verse_cd.trim()}`;
+                    
+                    // Map the translation string directly to the dictionary key
+                    window.translationLookup[key] = item.eng_text || "[English text entry missing]";
+                }
+            }
+            console.log(`✅ Successfully mapped ${Object.keys(window.translationLookup).length} translation verses to the memory lookup grid.`);
+        } else {
+            console.warn("⚠️ Warning: Could not locate the 'results[0].items' data layer inside translation.json.");
+        }
         let seqItems = seqData.results?.items || seqData.items || [];
         seqItems.forEach(item => {
             if (item.book_cd) {
@@ -332,14 +366,21 @@
     let parts = occ.reference.split('_');
     let vsNum = parseInt(parts.pop()); 
     let chNum = parseInt(parts.pop()); 
+    
+    // REFIXED STITCHING LOGIC: Protects leading numbers and underscores
     let rawBookCode = parts.join('_').toUpperCase().trim(); 
 
     if (currentSelectedBook !== 'ALL' && currentSelectedBook !== rawBookCode) continue;
 
     displayCount++;
     
-    let textLine = occ.english_text || "[Translation text entry missing]";
-    let bookDisplay = rawBookCode.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    let textLine = window.translationLookup[occ.reference] || "[Translation text entry missing in dictionary]";
+    
+    // REFIXED DISPLAY FORMATTER: Correctly handles leading numbers (e.g., "1_kings" -> "1 Kings")
+    let bookDisplay = rawBookCode.toLowerCase()
+                        .replace(/_/g, ' ')
+                        .replace(/(^\w|\b\w)/g, c => c.toUpperCase());
+                        
     let refDisplay = `${bookDisplay} ${chNum}:${vsNum}`;
 
     let paddedCh = String(chNum).padStart(3, '0');

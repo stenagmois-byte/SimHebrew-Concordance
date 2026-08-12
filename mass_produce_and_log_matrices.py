@@ -722,7 +722,7 @@ def extract_motif_concordance(accumulated_verse_phrases, translation_lookup):
         
         # Cross-reference with your translation data engine
         text_meta = translation_lookup.get(verse_key, {})
-        eng_text = text_meta.get("eng_text", "[Translation missing]")
+        # eng_text = text_meta.get("eng_text", "[Translation missing]")
         is_poetry = text_meta.get("poetry", "0")
         
         # 2. Extract rolling window sub-motifs of length 3 to 5 from your verified shapes
@@ -737,7 +737,6 @@ def extract_motif_concordance(accumulated_verse_phrases, translation_lookup):
                 motif_occurrences[motif_str].append({
                     "reference": verse_key,
                     "poetry_flag": is_poetry,
-                    "english_text": eng_text,
                     "note_sequence": motif_slice,
                     "start_index": i
                 })
@@ -963,14 +962,14 @@ if __name__ == "__main__":
         items_list = translation_data["results"][0]["items"]
 
         # Map objects for fast index lookups (Key format: "GENESIS_001_001")
-        text_lookup = {}
-        for item in items_list:
-            if "book_cd" in item and "chapter_cd" in item and "verse_cd" in item:
-                k = f"{item['book_cd'].upper()}_{item['chapter_cd']}_{item['verse_cd']}"
-                raw_text = item.get("eng_text", "[Text Missing]")
-                clean_text = raw_text.replace("<br>", " ‖ ").replace("<br/>", " ‖ ")
+        #text_lookup = {}
+        #for item in items_list:
+            #if "book_cd" in item and "chapter_cd" in item and "verse_cd" in item:
+                #k = f"{item['book_cd'].upper()}_{item['chapter_cd']}_{item['verse_cd']}"
+                #raw_text = item.get("eng_text", "[Text Missing]")
+                #clean_text = raw_text.replace("<br>", " ‖ ").replace("<br/>", " ‖ ")
                 
-                text_lookup[k] = clean_text
+                #text_lookup[k] = clean_text
                 
         motif_counts = defaultdict(int)
         motif_distribution = defaultdict(lambda: defaultdict(int))
@@ -1006,7 +1005,7 @@ if __name__ == "__main__":
             
             # NOW THE LOOKUP WILL MATCH PERFECTLY:
             # "1_CHRONICLES_001_001" locks cleanly into "1_CHRONICLES_001_001"
-            eng_text = text_lookup.get(verse_key, "[Text missing in translation.json]")
+            # eng_text = text_lookup.get(verse_key, "[Text missing in translation.json]") -- no longer used
             is_poetry = str(entry.get("is_poetry", "0"))
             
             for size in range(3, 6):
@@ -1021,8 +1020,7 @@ if __name__ == "__main__":
                         "reference": verse_key,
                         "poetry_flag": is_poetry,
                         "type": entry.get("type", "General"),
-                        "start_index": i,
-                        "english_text": eng_text  # Added this field back into the index file
+                        "start_index": i
                     })
                     
         # Format the final output matrix
