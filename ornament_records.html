@@ -473,13 +473,42 @@ const processedWordsArray = structuralWordsArray.map(word => {
                     const wrapWithoutVowels = `<div title="${fullEnglishTranslation}" style="cursor:help; display:inline-block; width:100%; line-height: 1.8;">${plainTrackOutput}</div>`;
                     const wrapWithVowels = `<div title="${fullEnglishTranslation}" style="cursor:help; display:inline-block; width:100%; line-height: 1.8;">${voweledTrackOutput}</div>`;
 
+                    const matrixLinkUrl = getVolumeLink(item.b, item.c);
                     recordsCache.push({
                         book: item.b,
                         location: `${item.b} ${item.c}:${item.v}`,
+                        musicLink: matrixLinkUrl, // Saved directly to cache node array
                         withVowels: wrapWithVowels,      // Checked State (Vowels, All Accents, Shin Dots, and <br>)
                         withoutVowels: wrapWithoutVowels // Unchecked State (Initial Display: No Vowels, No Shin Dots, Highlighting, and <br>)
                     });
                 });
+
+function getVolumeLink(bookCd, chapterCd) {
+    const bookUpper = bookCd.toUpperCase().trim();
+    const chPad = String(chapterCd).padStart(3, '0');
+    let volumeDir = "";
+
+    // 🎯 Replicating your PL/SQL CASE WHEN logic exactly
+    if (['JOSHUA', 'JUDGES'].includes(bookUpper)) {
+        volumeDir = 'Joshua-Judges';
+    } else if (['HOSEA','JOEL','AMOS','OBADIAH','JONAH','MICAH','NAHUM','HABAKKUK','ZEPHANIAH','HAGGAI','ZECHARIAH','MALACHI'].includes(bookUpper)) {
+        volumeDir = 'The%20Twelve'; // Note: Fixed &20 typo from your PL/SQL to %20 for a clean web space
+    } else if (bookUpper === 'PSALMS') {
+        volumeDir = 'The%20Psalms';
+    } else if (['SONG', 'RUTH', 'LAMENTATIONS', 'QOHELET', 'ESTHER', 'SONG OF SONGS'].includes(bookUpper)) {
+        volumeDir = 'The%20Five%20Scrolls';
+    } else if (['2 CHRONICLES', 'NEHEMIAH', '1 CHRONICLES'].includes(bookUpper)) {
+        volumeDir = 'Daniel-Ezra-Nehemiah';
+    } else {
+        // Replicates Initcap(replace(replace(p_book_cd,'1 '),'2 '))
+        let cleanBook = bookUpper.replace('1 ', '').replace('2 ', '');
+        volumeDir = cleanBook.charAt(0).toUpperCase() + cleanBook.slice(1).toLowerCase();
+    }
+
+    // Replicates replace(p_book_cd,' ','_')||'_'||p_chapter_cd||'_matrix.html'
+    const fileBook = bookUpper.replace(/ /g, '_');
+    return `./musicscores/${volumeDir}/${fileBook}_${chPad}_matrix.html`;
+}
 
                 // ⚙️ LIVE RENDERING & FILTERING ENGINE
                 function drawTableRows() {
@@ -492,7 +521,7 @@ const processedWordsArray = structuralWordsArray.map(word => {
                         return selectedBook === 'all' || item.book === selectedBook;
                     });
 
-                    const displayLimit = 350;
+                    const displayLimit = 9999;
                     statusContainer.innerHTML = `<div class="explorer-badge">Showing ${Math.min(filteredRecords.length, displayLimit)} of ${filteredRecords.length} filtered rows.</div>`;
 
                     const htmlBuffer = [];
@@ -500,9 +529,14 @@ const processedWordsArray = structuralWordsArray.map(word => {
                         const activeText = showVowels ? item.withVowels : item.withoutVowels;
                         htmlBuffer.push(`
                             <tr>
-                                <td class="location-cell">${item.location}</td>
+                         <!-- 🎯 LIVE MATRIX LINK INJECTION -->
+                                <td class="location-cell">
+                                    <a href="${item.musicLink}" target="_blank" title="Open Music Score Matrix" style="text-decoration: none; color: #1a73e8; font-weight: bold;">
+                                        ${item.location}
+                                    </a>
+                                </td>
                                 <td class="hebrew-cell" style="direction: rtl; text-align: right;">${activeText}</td>
-                            </tr>
+                                 </tr>
                         `);
                     });
                     recordsTable.innerHTML = htmlBuffer.join('');
