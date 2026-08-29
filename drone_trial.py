@@ -28,6 +28,44 @@ def get_musescore_tpc(midi_pitch):
     }
     return str(tpc_map.get(midi_pitch % 12, 14))
 
+def change_staff1_to_mezzo_soprano(root_xml):
+    score_node = root_xml.find("Score")
+    if score_node is None:
+        return False
+        
+    # Robust search: Find the very first Part element in the file
+    part1 = score_node.find(".//Part")
+    if part1 is None:
+        return False
+        
+    inst = part1.find("Instrument")
+    if inst is None:
+        return False
+        
+    # Update naming markers
+    for tag, text in [("longName", "Mezzo-soprano"), ("shortName", "M-S."), ("trackName", "Mezzo-soprano")]:
+        node = inst.find(tag)
+        if node is not None: node.text = text
+        else: ET.SubElement(inst, tag).text = text
+    
+    # Force MuseScore 4 Core playback ID swap away from piano
+    inst_id = inst.find("instrumentId")
+    if inst_id is not None: 
+        inst_id.text = "voice.mezzo-soprano"
+    else:
+        ET.SubElement(inst, "instrumentId").text = "voice.mezzo-soprano"
+
+    # Set appropriate channel parameters for standard synth vocal playback
+    channel = inst.find("Channel")
+    if channel is not None:
+        program = channel.find("program")
+        if program is not None:
+            program.set("value", "52")
+        else:
+            ET.SubElement(channel, "program", {"value": "52"})
+            
+    return True
+
 def inject_native_musescore4_drone(root_xml, target_pitch=None):
     score_node = root_xml.find("Score")
     if score_node is None:
@@ -191,7 +229,8 @@ def run_flexible_geographic_trial():
             if not f_path.is_file() or f_path.suffix.lower() != ".mscz": continue
             if not re.match(f"^{t['book']}-{t['chapter']}", f_path.name.lower()): continue
 
-            mp3_out = f_path.with_suffix(".mp3")
+            #mp3_out = f_path.with_suffix(".mp3")
+            mp3_out = f_path.with_name(f"{f_path.stem}_drone.mp3")
             print(f"\n[TARGET MATCH] Processing: {m_folder.name}/{f_path.name}")
             
             t_dir = f_path.parent / f"temp_inspect_{f_path.stem}"
@@ -204,6 +243,10 @@ def run_flexible_geographic_trial():
                 if not mscx_file: continue
                 
                 tree = ET.parse(mscx_file); root = tree.getroot(); modified = False
+
+                if change_staff1_to_mezzo_soprano(root):
+                    print("   -> Voice instrument successfully changed to Mezzo-soprano.")
+                    modified = True
 
                 # Update Breath & Caesura Playback Pauses
                 for b_node in root.findall(".//Breath"):

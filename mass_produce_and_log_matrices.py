@@ -3,6 +3,8 @@ import json
 import html
 import pandas as pd
 from collections import Counter
+import json
+from pathlib import Path
 
 # Define a distinct, vibrant color palette for each scale degree (Tonic E4 = 1)
 COLOR_PALETTE = {
@@ -24,6 +26,9 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
     """
     Processes the DataFrame and returns a string of HTML content.
     """
+
+    with open("book_map.json", "r", encoding="utf-8") as f:
+        book_map = json.load(f)
 
     w_col1 = "3%"   # Compressed number space
     w_col2 = "40%"  # Maximum space for full Hebrew lines
@@ -67,6 +72,9 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
     prev_button = f'<a href="{prev_file}" class="nav-btn">◀ Prev</a>' if current_ch > 1 else '<span class="nav-btn disabled">◀ Prev</span>'
     home_button = '<a href="../index.html" class="nav-btn home-btn">📁 Index</a>'
     next_button = f'<a href="{next_file}" class="nav-btn">Next ▶</a>' if current_ch < max_chapter else '<span class="nav-btn disabled">Next ▶</span>'
+
+    book_key = book_id.upper()
+    target_folder = book_map.get(book_key, book_key.replace('_', ' ').title())
 
     html_content = f"""<!DOCTYPE html>
 <html lang="en">
@@ -169,6 +177,13 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         📖 {book_id.replace('_', ' ').title()} — Chapter {current_ch}
     </div>
     
+    <!-- Centered Compact Audio Player Integration -->
+    <div class="nav-audio" style="display: flex; align-items: center; gap: 8px; margin: 0 10px;">
+        <span style="font-size: 0.85rem; color: #666; font-family: sans-serif; white-space: nowrap;">🎵 Audio:</span>
+        <audio controls preload="none" style="height: 30px; width: 220px;">
+            <source src="../../musicscores/{target_folder}/{book_id.upper()}-{str(current_ch).zfill(3)}.mp3" type="audio/mpeg">
+        </audio>
+    </div>
     <!-- Right Hand Action Controls Alignment Cluster -->
     <div class="nav-cluster" style="display: flex; gap: 8px; align-items: center;">
         {prev_button}
