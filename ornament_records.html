@@ -43,15 +43,17 @@
         table.explorer-table th { background-color: #f3f0e8; color: #800000; font-weight: bold; padding: 12px; font-size: 0.9rem; text-transform: uppercase; }
         table.explorer-table td { padding: 15px; border-bottom: 1px solid #eaeaea; }
         
-        .location-cell { font-weight: bold; color: #800000; width: 25%; text-align: left; vertical-align: top; }
+        .location-cell { font-weight: bold; color: #800000; width: 20%; text-align: left; vertical-align: top; }
         
+        .audio-cell {width: 20%; }
+        .gematria-cell {width: 15%; text-align: right;}
         .hebrew-cell { 
             direction: rtl; 
             text-align: right; 
             font-family: 'SBL Hebrew', 'Ezra SIL', 'Times New Roman', serif; 
             font-size: 1.6rem; 
             line-height: 2.2;
-            width: 75%;
+            width: 45%;
             padding-right: 20px;
     font-variant-ligatures: none;
     font-feature-settings: "ccmp" 1, "mark" 1, "mkmk" 1;
@@ -135,6 +137,7 @@
             <tr>
                 <th style="text-align: left; padding-left: 15px;">Location</th>
                 <th style="text-align: right; padding-right: 15px;">Hebrew Text Segment</th>
+                 <th>Audio</th>
             </tr>
         </thead>
         <tbody id="records-table-body">
@@ -533,6 +536,10 @@ function getVolumeLink(bookCd, chapterCd) {
                     const htmlBuffer = [];
                     filteredRecords.slice(0, displayLimit).forEach(item => {
                         const activeText = showVowels ? item.withVowels : item.withoutVowels;
+                        const gematriaValue = calculateGematria(item.withoutVowels);
+                        const bookDir = item.book.trim(); 
+                        const audioUrl = `../../musicscores/audio/${bookDir}/${item.location.replace(/[\s:]/g, '_')}.mp3`;
+
                         htmlBuffer.push(`
                             <tr>
                          <!-- 🎯 LIVE MATRIX LINK INJECTION -->
@@ -542,7 +549,14 @@ function getVolumeLink(bookCd, chapterCd) {
                                     </a>
                                 </td>
                                 <td class="hebrew-cell" style="direction: rtl; text-align: right;">${activeText}</td>
-                                 </tr>
+    <!--           //<th>Gematria</th> -->
+    <!--                            //<td class="gematria-cell">${gematriaValue}</td> -->
+        <td style="width: 120px; text-align: center;">
+            <audio controls preload="none" style="width: 100%; max-width: 120px; height: 30px;">
+                <source src="${audioUrl}" type="audio/mpeg">
+            </audio>
+        </td>
+                             </tr>
                         `);
                     });
                     recordsTable.innerHTML = htmlBuffer.join('');
@@ -562,6 +576,27 @@ function getVolumeLink(bookCd, chapterCd) {
             });
         });
 
+// Helper mapping for Standard Hebrew Gematria
+function calculateGematria(text) {
+    const gematriaMap = {
+        'א': 1, 'ב': 2, 'ג': 3, 'ד': 4, 'ה': 5, 'ו': 6, 'ז': 7, 'ח': 8, 'ט': 9,
+        'י': 10, 'כ': 20, 'ל': 30, 'מ': 40, 'נ': 50, 'ס': 60, 'ע': 70, 'פ': 80, 'צ': 90,
+        'ק': 100, 'ר': 200, 'ש': 300, 'ת': 400,
+        // Final forms (Sophit) mapped to their standard base values
+        'ך': 20, 'ם': 40, 'ן': 50, 'ף': 80, 'ץ': 90
+    };
+    
+    let total = 0;
+    // Strip Niqqud/vowels/taamim to isolate base consonants
+    const cleanText = text.replace(/[\u0591-\u05C7]/g, ''); 
+    
+    for (let char of cleanText) {
+        if (gematriaMap[char]) {
+            total += gematriaMap[char];
+        }
+    }
+    return total;
+}
     </script>
 
 </body>
