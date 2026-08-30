@@ -537,7 +537,8 @@ function getVolumeLink(bookCd, chapterCd) {
                     filteredRecords.slice(0, displayLimit).forEach(item => {
                         const activeText = showVowels ? item.withVowels : item.withoutVowels;
                         const gematriaValue = calculateGematria(item.withoutVowels);
-                        const bookDir = item.book.trim(); 
+
+                        const bookDir = item.book.trim().toUpperCase(); 
                         const audioUrl = `../../musicscores/audio/${bookDir}/${item.location.replace(/[\s:]/g, '_')}.mp3`;
 
                         htmlBuffer.push(`
