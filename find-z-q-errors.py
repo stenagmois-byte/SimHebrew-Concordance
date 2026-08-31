@@ -10,13 +10,15 @@ ATNAH = "\u0591"
 CAESURA_ENTITY = "&#119059;"
 
 # Targeted processing for These books prose
-SCROLLS = [    "DEUTERONOMY",
+SCROLLS = [ "GENESIS", "EXODUS", "LEVITICUS", "NUMBERS",    "DEUTERONOMY",
     # The Twelve Minor Prophets (Standard uppercase snake_case format)
     "HOSEA", "JOEL", "AMOS", "OBADIAH", "JONAH", "MICAH", 
     "NAHUM", "HABAKKUK", "ZEPHANIAH", "HAGGAI", "ZECHARIAH", "MALACHI",
-    "SONG","RUTH","LAMENTATIONS","QOHELET","ESTHER"
+    "SONG","RUTH","LAMENTATIONS","QOHELET","ESTHER","PSALMS","PROVERBS","JOB",
+    "JOSHUA","JUDGES","1_SAMUEL","2_SAMUEL","1_KINGS","2_KINGS","ISAIAH","JEREMIAH",
+    "EZEKIEL","DANIEL","EZRA","NEHEMIAH","1_CHRONICLES","2_CHRONICLES"
 ]
-# "GENESIS", "EXODUS", "LEVITICUS", "NUMBERS", 
+# 
 def load_data():
     with open('translation.json', 'r', encoding='utf-8') as f:
         translation_data = json.load(f)
