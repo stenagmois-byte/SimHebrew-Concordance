@@ -85,7 +85,7 @@
           <td class="matrix-hdr">Book</td>
           <td class="matrix-hdr">Location</td>
           <td class="matrix-hdr">English Text</td>
-          <td class="matrix-hdr">Audio</td>
+          <td class="matrix-hdr" style="width: 18%;">Audio</td>
         </tr>
       </thead>
       <tbody id="matrixTableBody"></tbody>
@@ -438,11 +438,13 @@ const toProperCase = (str) => {
             <td class="text-cell">
               <div style="font-size: 1.1rem;">${textLine}</div>
             </td>
-            <td style="text-align: center;">
-                <audio controls preload="none">
-                    <source src="${audioUrl}"  type="audio/mpeg">
-                </audio>
-             </td>
+<!-- The <th> controls the column width (e.g., width: 15%) -->
+<td style="text-align: center; vertical-align: middle;">
+    <!-- max-width stops it from becoming too wide on large screens -->
+    <audio controls preload="none" style="width: 100%; max-width: 250px; display: block; margin: 0 auto;">
+        <source src="${audioUrl || ''}" type="audio/mpeg">
+    </audio>
+</td>
           </tr>
         `;
   }
