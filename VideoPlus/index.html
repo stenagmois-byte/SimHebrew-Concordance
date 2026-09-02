@@ -30,5 +30,16 @@ Anyone using the latest version of Musescore can export the music files to MP4. 
     <li>Author's <a href="https://www.youtube.com/@BobMacDonald" target="blank">Youtube channel</a></li>
   </ul>
 <p> The Biblical Chant Library is also available in other locations. The copy referenced <a href="https://archive.org/details/@bob_macdonald" target = "_blank">here</a> contains a large collection of Suzanne Haïk-Vantoura's working papers from the editor of her English book, John Wheeler.</p>
-</body>
+<script>
+    // Global listener to ensure only one audio track plays at a time
+    document.addEventListener('play', function(e) {
+        const audios = document.getElementsByTagName('audio');
+        for (let i = 0; i < audios.length; i++) {
+            if (audios[i] !== e.target) {
+                audios[i].pause();
+            }
+        }
+    }, true); // The 'true' flag ensures the event is caught during the capturing phase
+</script>
+s</body>
 </html>
