@@ -32,6 +32,17 @@
     <h1>Ornament Usage by Recitation Pitch</h1>
     <p>This concordance matrix outlines the distribution frequency of accents above the text aligned against the accent below the text that immediately precedes them defining the recitation pitch that governs the ornaments.</p>
 
+    <form id="chapter-explorer-form" style="margin: 25px 0; padding: 18px; background: #f3f0e8; border-left: 4px solid #800000; font-family: sans-serif;">
+        <strong style="color: #800000;">Explore a chapter</strong>
+        <label style="margin-left: 18px;">Book
+            <select id="chapter-book" required style="margin-left: 6px; padding: 5px;"></select>
+        </label>
+        <label style="margin-left: 12px;">Chapter
+            <input id="chapter-number" type="number" min="1" required style="width: 4.5rem; margin-left: 6px; padding: 5px;">
+        </label>
+        <button type="submit" style="margin-left: 12px; padding: 6px 12px; color: white; background: #800000; border: 0; border-radius: 3px; cursor: pointer;">Show chapter</button>
+    </form>
+
     <table>
         <thead>
             <tr>
@@ -911,5 +922,16 @@
     </p>
     </div>
 
+<script>
+const chapterBooks = ["Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua", "Judges", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings", "Isaiah", "Jeremiah", "Ezekiel", "Hosea", "Joel", "Amos", "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi", "Psalms", "Proverbs", "Job", "Song", "Ruth", "Lamentations", "Qohelet", "Esther", "Daniel", "Ezra", "Nehemiah", "1 Chronicles", "2 Chronicles"];
+const chapterBookSelect = document.getElementById("chapter-book");
+chapterBooks.forEach(book => chapterBookSelect.add(new Option(book, book)));
+document.getElementById("chapter-explorer-form").addEventListener("submit", event => {
+    event.preventDefault();
+    const book = chapterBookSelect.value;
+    const chapter = document.getElementById("chapter-number").value;
+    window.location.href = `ornament_chapter.html?book=${encodeURIComponent(book)}&chapter=${encodeURIComponent(chapter)}`;
+});
+</script>
 </body>
 </html>

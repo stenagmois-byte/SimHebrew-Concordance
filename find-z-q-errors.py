@@ -1,263 +1,289 @@
+"""Build a review queue for punctuation associated with zaqef-qatan.
+
+Reads translation.json and ornament_index.json from the repository root. It
+does not edit either source. Running it creates a CSV, JSONL, and text report.
+"""
+
+import csv
 import json
 import re
 import sys
+from datetime import datetime
+from pathlib import Path
 
-# Force the standard output stream to use UTF-8 coding when piped to a file
-sys.stdout.reconfigure(encoding='utf-8')
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 ZAQEF_QATAN = "\u0594"
 ATNAH = "\u0591"
 CAESURA_ENTITY = "&#119059;"
+OUTPUT_CSV = Path("zaqef_review_queue.csv")
+OUTPUT_JSONL = Path("zaqef_review_queue.jsonl")
+OUTPUT_REPORT = Path("zaqef_review_report.txt")
 
-# Targeted processing for These books prose
-SCROLLS = [ "GENESIS", "EXODUS", "LEVITICUS", "NUMBERS",    "DEUTERONOMY",
-    # The Twelve Minor Prophets (Standard uppercase snake_case format)
-    "HOSEA", "JOEL", "AMOS", "OBADIAH", "JONAH", "MICAH", 
-    "NAHUM", "HABAKKUK", "ZEPHANIAH", "HAGGAI", "ZECHARIAH", "MALACHI",
-    "SONG","RUTH","LAMENTATIONS","QOHELET","ESTHER","PSALMS","PROVERBS","JOB",
-    "JOSHUA","JUDGES","1_SAMUEL","2_SAMUEL","1_KINGS","2_KINGS","ISAIAH","JEREMIAH",
-    "EZEKIEL","DANIEL","EZRA","NEHEMIAH","1_CHRONICLES","2_CHRONICLES"
-]
-# 
+SCROLLS = {
+    "GENESIS", "EXODUS", "LEVITICUS", "NUMBERS", "DEUTERONOMY",
+    "HOSEA", "JOEL", "AMOS", "OBADIAH", "JONAH", "MICAH", "NAHUM",
+    "HABAKKUK", "ZEPHANIAH", "HAGGAI", "ZECHARIAH", "MALACHI", "SONG",
+    "RUTH", "LAMENTATIONS", "QOHELET", "ESTHER", "PSALMS", "PROVERBS",
+    "JOB", "JOSHUA", "JUDGES", "1_SAMUEL", "2_SAMUEL", "1_KINGS",
+    "2_KINGS", "ISAIAH", "JEREMIAH", "EZEKIEL", "DANIEL", "EZRA",
+    "NEHEMIAH", "1_CHRONICLES", "2_CHRONICLES",
+}
+
+
 def load_data():
-    with open('translation.json', 'r', encoding='utf-8') as f:
-        translation_data = json.load(f)
-    with open('ornament_index.json', 'r', encoding='utf-8') as f:
-        ornament_data = json.load(f)
+    with open("translation.json", encoding="utf-8") as source:
+        translation_data = json.load(source)
+    with open("ornament_index.json", encoding="utf-8") as source:
+        ornament_data = json.load(source)
     return translation_data, ornament_data
 
+
 def extract_items(translation_data):
-    results_container = translation_data.get("results", [])
-    if isinstance(results_container, list):
-        for block in results_container:
+    results = translation_data.get("results", [])
+    if isinstance(results, list):
+        for block in results:
             if isinstance(block, dict) and "items" in block:
                 return block["items"]
-    elif isinstance(results_container, dict):
-        return results_container.get("items", [])
+    if isinstance(results, dict):
+        return results.get("items", [])
     return translation_data.get("items", [])
 
-def get_accented_words(hebrew_text_segment):
-    """Scans a Hebrew text string and returns a list of words holding the zaqef-qatan."""
-    words = hebrew_text_segment.split()
-    # Strip common trailing prose formatting or newline noise from the words if present
-    return [w.strip() for w in words if ZAQEF_QATAN in w]
+
+def verse_key(book, chapter, verse):
+    return f"{book}_{str(chapter).zfill(3)}_{str(verse).zfill(3)}"
+
+
+def split_atnah_words(hebrew_text):
+    """Split by words, retaining the atnah word as the end of the first half."""
+    words = hebrew_text.split()
+    for index, word in enumerate(words):
+        if ATNAH in word:
+            return words[: index + 1], words[index + 1 :], index + 1
+    return words, [], -1
+
+
+def accented_words(words):
+    return [word for word in words if ZAQEF_QATAN in word]
+
 
 def build_split_zaqef_map(ornament_data):
-    """
-    Maps each verse to its exact Hebrew word metrics and split zaqef counts
-    to enable precise proportional alignment calculations.
-    """
     zaqef_map = {}
-    zq_section = ornament_data.get("zaqef-qatan", {})
-    
-    for category, verses in zq_section.items():
+    for verses in ornament_data.get("zaqef-qatan", {}).values():
         for item in verses:
-            raw_book = item.get("b", "")
-            book_clean = raw_book.upper().replace(" ", "_")
-                
-            if book_clean not in SCROLLS:
+            book = str(item.get("b", "")).strip().upper().replace(" ", "_")
+            if book not in SCROLLS:
                 continue
-
-            chapter_clean = str(item.get("c", "")).zfill(3)
-            verse_clean = str(item.get("v", "")).zfill(3)
-            key = f"{book_clean}_{chapter_clean}_{verse_clean}"
-            
-            hebrew_text = item.get("t", "").strip()
-            heb_words = hebrew_text.split()
-            heb_total_words = len(heb_words)
-            
-            # Locate position of the Atnah
-            atnah_word_idx = -1
-            for idx, word in enumerate(heb_words):
-                if ATNAH in word:
-                    atnah_word_idx = idx + 1
-                    break
-            
-            # Split Hebrew on Atnah to accurately isolate the targeted words per half
-            if ATNAH in hebrew_text:
-                parts = hebrew_text.split(ATNAH, 1)
-                first_half_heb = parts[0]
-                second_half_heb = parts[1]
-                count_first = first_half_heb.count(ZAQEF_QATAN)
-                count_second = second_half_heb.count(ZAQEF_QATAN)
-            else:
-                first_half_heb = hebrew_text
-                second_half_heb = ""
-                count_first = hebrew_text.count(ZAQEF_QATAN)
-                count_second = 0
-            
-            # Isolate the exact words carrying the accent for easier error reporting
-            words_first = get_accented_words(first_half_heb)
-            words_second = get_accented_words(second_half_heb)
-            
-            if key not in zaqef_map:
-                zaqef_map[key] = {
-                    "first_half": count_first, 
-                    "second_half": count_second,
-                    "first_half_words": words_first,
-                    "second_half_words": words_second,
-                    "heb_total_words": heb_total_words,
-                    "atnah_word_idx": atnah_word_idx
-                }
-            else:
-                # Merge logic favoring maximum count discovery
-                if count_first > zaqef_map[key]["first_half"]:
-                    zaqef_map[key]["first_half"] = count_first
-                    zaqef_map[key]["first_half_words"] = words_first
-                if count_second > zaqef_map[key]["second_half"]:
-                    zaqef_map[key]["second_half"] = count_second
-                    zaqef_map[key]["second_half_words"] = words_second
-                if atnah_word_idx != -1:
-                    zaqef_map[key]["atnah_word_idx"] = atnah_word_idx
-                    zaqef_map[key]["heb_total_words"] = heb_total_words
-            
-            
+            key = verse_key(book, item.get("c", ""), item.get("v", ""))
+            first_words, second_words, atnah_word_idx = split_atnah_words(
+                item.get("t", "").strip()
+            )
+            candidate = {
+                "first_half": sum(ZAQEF_QATAN in word for word in first_words),
+                "second_half": sum(ZAQEF_QATAN in word for word in second_words),
+                "first_half_words": accented_words(first_words),
+                "second_half_words": accented_words(second_words),
+                "heb_total_words": len(first_words) + len(second_words),
+                "atnah_word_idx": atnah_word_idx,
+            }
+            # A verse can occur in several ornament categories. Keep the richest
+            # complete record, rather than merging halves from different records.
+            previous = zaqef_map.get(key)
+            if previous is None or (
+                candidate["first_half"] + candidate["second_half"]
+                > previous["first_half"] + previous["second_half"]
+            ):
+                zaqef_map[key] = candidate
     return zaqef_map
 
-def clean_tail_noise(text_segment):
-    """Cleanly strips trailing Parashat markers and standard sentence boundaries."""
-    text_segment = re.sub(r'[\.\;\:\?]\s*[PSRW]\s*$', '', text_segment.strip())
-    text_segment = re.sub(r'[\.\;\:\?\"\'\!]+$', '', text_segment.strip())
-    
-    if len(text_segment) > 4:
-        tail = text_segment[-4:]
-        if any(mark in tail for mark in ['.', ';', ':', '?']):
-            for i in range(len(text_segment) - 1, len(text_segment) - 5, -1):
-                if text_segment[i] in ['.', ';', ':', '?']:
-                    text_segment = text_segment[:i] + text_segment[i+1:]
-                    break
-    return text_segment
 
-def run_diagnostic():
+def clean_tail_noise(text):
+    text = re.sub(r"[.;:?]\s*[PSRW]\s*$", "", text.strip())
+    return re.sub(r"[.;:?\"'!]+$", "", text.strip())
+
+
+def break_count(text):
+    commas = text.count(",")
+    strong_marks = len(re.findall(r"[.;:?](?!\s*𝄓)", text))
+    return commas + strong_marks
+
+
+def inspect_half(label, english, expected, target_words):
+    found = break_count(clean_tail_noise(english))
+    return {
+        "label": label,
+        "expected": expected,
+        "found": found,
+        "shortfall": max(expected - found, 0),
+        "target_words": target_words,
+    }
+
+
+def priority_for(issues, first_half, second_half):
+    shortfall = max(first_half["shortfall"], second_half["shortfall"])
+    if "MISSING_CAESURA_MARKER" in issues:
+        return 1
+    if shortfall >= 3:
+        return 2
+    if shortfall == 2:
+        return 3
+    if shortfall == 1:
+        return 4
+    return 5  # caesura alignment only
+
+
+def build_review_queue():
     translation_data, ornament_data = load_data()
     zaqef_map = build_split_zaqef_map(ornament_data)
-    items = extract_items(translation_data)
-    
-    errors = []
-    matches_found = 0
-    scrolls_items_count = 0
-    
-    for item in items:
+    queue = []
+    evaluated = matched = 0
+
+    for item in extract_items(translation_data):
         book = str(item.get("book_cd", "")).strip().upper().replace(" ", "_")
-            
         if book not in SCROLLS or item.get("poetry") == "1":
             continue
-            
-        scrolls_items_count += 1
+        evaluated += 1
         chapter = str(item.get("chapter_cd", "")).strip()
         verse = str(item.get("verse_cd", "")).strip()
-        eng_text = item.get("eng_text", "").strip()
+        profile = zaqef_map.get(verse_key(book, chapter, verse))
+        if profile is None:
+            continue
+        matched += 1
+
+        english = item.get("eng_text", "").strip()
         has_atnah = item.get("has_atnah") == "1"
-        
-        lookup_key = f"{book}_{chapter}_{verse}"
-        verse_display = f"{book.replace('_', ' ')} {int(chapter)}:{int(verse)}"
-
-        z_data = zaqef_map.get(lookup_key, {
-            "first_half": 0, "second_half": 0, 
-            "first_half_words": [], "second_half_words": [],
-            "heb_total_words": 0, "atnah_word_idx": -1
-        })
-        if lookup_key in zaqef_map:
-            matches_found += 1
-
-        # --- ALIGNMENT TEST: DETECT MISPLACED CAESURA BOUNDARIES ---
-        if has_atnah and z_data["atnah_word_idx"] != -1 and z_data["heb_total_words"] > 0:
-            eng_words = eng_text.split()
-            eng_total_words = len(eng_words)
-            caesura_word_idx = -1
-            for idx, word in enumerate(eng_words):
-                if CAESURA_ENTITY in word:
-                    caesura_word_idx = idx + 1
-                    break
-            
-            if caesura_word_idx != -1:
-                heb_atnah_ratio = z_data["atnah_word_idx"] / z_data["heb_total_words"]
-                eng_caesura_ratio = caesura_word_idx / eng_total_words
-                variance = abs(heb_atnah_ratio - eng_caesura_ratio)
-                
-                if variance > 0.20:
-                    errors.append({
-                        "type": "MISPLACED_CAESURA_BOUNDARY",
-                        "verse": verse_display,
-                        "text": eng_text,
-                        "reason": f"Caesura boundary shift! Hebrew Atnah is at {int(heb_atnah_ratio*100)}%, but English entity is at {int(eng_caesura_ratio*100)}%."
-                    })
-
-        # --- CAESURA-BASED SPLITTING LOGIC ---
-        if has_atnah:
-            if CAESURA_ENTITY in eng_text:
-                parts = eng_text.split(CAESURA_ENTITY, 1)
-                first_half_eng = parts[0]
-                second_half_eng = parts[1]
-                first_half_eng = re.sub(r',\s*$', '', first_half_eng.strip())
-            else:
-                first_half_eng = eng_text
-                second_half_eng = ""
-                errors.append({
-                    "type": "MISSING_CAESURA_MARKER",
-                    "verse": verse_display,
-                    "text": eng_text,
-                    "reason": f"Verse profile sets 'has_atnah: 1', but no explicit HTML entity ({CAESURA_ENTITY}) was found."
-                })
+        issues = []
+        caesura_variance = None
+        if has_atnah and CAESURA_ENTITY not in english:
+            issues.append("MISSING_CAESURA_MARKER")
+            first_english, second_english = english, ""
+        elif has_atnah:
+            first_english, second_english = english.split(CAESURA_ENTITY, 1)
+            first_english = re.sub(r",\s*$", "", first_english.strip())
+            english_words = english.split()
+            caesura_index = next(
+                (index + 1 for index, word in enumerate(english_words)
+                 if CAESURA_ENTITY in word),
+                -1,
+            )
+            if profile["atnah_word_idx"] != -1 and profile["heb_total_words"]:
+                hebrew_ratio = profile["atnah_word_idx"] / profile["heb_total_words"]
+                english_ratio = caesura_index / len(english_words)
+                caesura_variance = abs(hebrew_ratio - english_ratio)
+                if caesura_variance > 0.20:
+                    issues.append("MISPLACED_CAESURA_BOUNDARY")
         else:
-            first_half_eng = eng_text
-            second_half_eng = ""
+            first_english, second_english = english, ""
 
-        first_half_clean = clean_tail_noise(first_half_eng)
-        second_half_clean = clean_tail_noise(second_half_eng)
+        first_half = inspect_half(
+            "first", first_english, profile["first_half"], profile["first_half_words"]
+        )
+        second_half = inspect_half(
+            "second", second_english, profile["second_half"], profile["second_half_words"]
+        )
+        if first_half["shortfall"]:
+            issues.append("INSUFFICIENT_ZAQEF_FIRST_HALF")
+        if has_atnah and second_half["shortfall"]:
+            issues.append("INSUFFICIENT_ZAQEF_SECOND_HALF")
+        if not issues:
+            continue
 
-        # --- VALIDATION: FIRST HALF (Strict Quantity Check) ---
-        expected_z1 = z_data["first_half"]
-        if expected_z1 > 0:
-            commas_z1 = first_half_clean.count(",")
-            strong_marks_z1 = len(re.findall(r'[\.\;\:\?](?!\s*𝄓)', first_half_clean))
-            breaks_z1 = commas_z1 + strong_marks_z1
-            
-            if breaks_z1 < expected_z1:
-                # Format the specific words for display in the output terminal
-                target_words_str = " | ".join(z_data["first_half_words"])
-                errors.append({
-                    "type": "INSUFFICIENT_ZAQEF_FIRST_HALF",
-                    "verse": verse_display,
-                    "text": f"[First Half Segment]: {first_half_eng.strip()}",
-                    "reason": f"First half requires {expected_z1} zaqef-qatan pause(s), but only found {breaks_z1}. Hebrew Target Word(s): {target_words_str}"
-                })
+        display_book = book.replace("_", " ")
+        queue.append({
+            "priority": priority_for(issues, first_half, second_half),
+            "verse": f"{display_book} {int(chapter)}:{int(verse)}",
+            "book": display_book,
+            "chapter": int(chapter),
+            "verse_number": int(verse),
+            "issues": issues,
+            "max_shortfall": max(first_half["shortfall"], second_half["shortfall"]),
+            "caesura_variance": caesura_variance,
+            "first_half": first_half,
+            "second_half": second_half,
+            "english_text": english,
+        })
+    queue.sort(key=lambda row: (
+        row["priority"], -row["max_shortfall"], row["book"],
+        row["chapter"], row["verse_number"],
+    ))
+    return queue, evaluated, matched
 
-        # --- VALIDATION: SECOND HALF (Strict Quantity Check) ---
-        if has_atnah and second_half_clean:
-            expected_z2 = z_data["second_half"]
-            if expected_z2 > 0:
-                # Count internal commas and strong sentence marks in the second half
-                commas_z2 = second_half_clean.count(",")
-                strong_marks_z2 = len(re.findall(r'[\.\;\:\?](?!\s*𝄓)', second_half_clean))
-                breaks_z2 = commas_z2 + strong_marks_z2
-                
-                # Quantitative verification: flags partial omissions
-                if breaks_z2 < expected_z2:
-                    # Isolate and format the specific Hebrew words for the report message
-                    target_words_str = " | ".join(z_data["second_half_words"])
-                    errors.append({
-                        "type": "INSUFFICIENT_ZAQEF_SECOND_HALF",
-                        "verse": verse_display,
-                        "text": f"[Second Half Segment]: {second_half_eng.strip()}",
-                        "reason": f"Second half requires {expected_z2} zaqef-qatan pause(s), but only found {breaks_z2} phrasing mark(s). Hebrew Target Word(s): {target_words_str}"
-                    })
 
-    print(f"--- FILTER REPORT ---")
-    print(f"Total Torah prose items evaluated: {scrolls_items_count}")
-    print(f"Successfully matched {matches_found} verses within targeted scope.\n")
-    return errors
+def choose_output_paths():
+    """Avoid replacing a queue currently open in a spreadsheet application."""
+    try:
+        with OUTPUT_CSV.open("a", encoding="utf-8"):
+            pass
+        return OUTPUT_CSV, OUTPUT_JSONL, OUTPUT_REPORT
+    except PermissionError:
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        return (
+            Path(f"zaqef_review_queue_{stamp}.csv"),
+            Path(f"zaqef_review_queue_{stamp}.jsonl"),
+            Path(f"zaqef_review_report_{stamp}.txt"),
+        )
+
+
+def write_outputs(queue, evaluated, matched, output_csv, output_jsonl, output_report):
+    fields = [
+        "priority", "verse", "issues", "max_shortfall", "first_expected",
+        "first_found", "first_shortfall", "first_target_words", "second_expected",
+        "second_found", "second_shortfall", "second_target_words",
+        "caesura_variance", "english_text",
+    ]
+    with output_csv.open("w", newline="", encoding="utf-8-sig") as output:
+        writer = csv.DictWriter(output, fieldnames=fields)
+        writer.writeheader()
+        for row in queue:
+            writer.writerow({
+                "priority": row["priority"], "verse": row["verse"],
+                "issues": "; ".join(row["issues"]), "max_shortfall": row["max_shortfall"],
+                "first_expected": row["first_half"]["expected"],
+                "first_found": row["first_half"]["found"],
+                "first_shortfall": row["first_half"]["shortfall"],
+                "first_target_words": " | ".join(row["first_half"]["target_words"]),
+                "second_expected": row["second_half"]["expected"],
+                "second_found": row["second_half"]["found"],
+                "second_shortfall": row["second_half"]["shortfall"],
+                "second_target_words": " | ".join(row["second_half"]["target_words"]),
+                "caesura_variance": "" if row["caesura_variance"] is None else f"{row['caesura_variance']:.3f}",
+                "english_text": row["english_text"],
+            })
+    with output_jsonl.open("w", encoding="utf-8") as output:
+        for row in queue:
+            output.write(json.dumps(row, ensure_ascii=False) + "\n")
+    with output_report.open("w", encoding="utf-8") as output:
+        output.write("--- ZAQEF-QATAN REVIEW QUEUE ---\n")
+        output.write(f"Non-poetry verses evaluated: {evaluated}\n")
+        output.write(f"Verses matched to zaqef index: {matched}\n")
+        output.write(f"Unique verses requiring review: {len(queue)}\n\n")
+        for row in queue:
+            output.write(f"[P{row['priority']}] {row['verse']} — {', '.join(row['issues'])}\n")
+            for half in (row["first_half"], row["second_half"]):
+                if half["expected"]:
+                    output.write(
+                        f"  {half['label'].title()} half: expected {half['expected']}; "
+                        f"found {half['found']}; shortfall {half['shortfall']}. "
+                        f"Targets: {' | '.join(half['target_words'])}\n"
+                    )
+            if row["caesura_variance"] is not None:
+                output.write(f"  Caesura proportional variance: {row['caesura_variance']:.3f}\n")
+            output.write(f"  Translation: {row['english_text']}\n\n")
+
 
 if __name__ == "__main__":
     try:
-        detected_errors = run_diagnostic()
-        print(f"Analysis complete. Found {len(detected_errors)} structural violations:\n")
-        
-        for err in detected_errors:
-            print(f"[{err['type']}] {err['verse']}")
-            print(f"Reason: {err['reason']}")
-            print(f"Text Segment: \"{err['text']}\"")
-            print("-" * 60)
-            
-    except Exception as e:
-        print(f"Execution failed: {e}")
+        review_queue, evaluated_count, matched_count = build_review_queue()
+        output_csv, output_jsonl, output_report = choose_output_paths()
+        write_outputs(
+            review_queue, evaluated_count, matched_count,
+            output_csv, output_jsonl, output_report,
+        )
+        print(f"Created {len(review_queue)} unique review entries.")
+        print(f"  {output_csv}")
+        print(f"  {output_jsonl}")
+        print(f"  {output_report}")
+    except Exception as error:
+        print(f"Execution failed: {error}")
+        raise

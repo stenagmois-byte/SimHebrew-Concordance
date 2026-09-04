@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="qstyles.css">
+  <title>Chapter Ornament Explorer</title>
+  <style>
+    body { font-family: Georgia, serif; margin: 40px auto; max-width: 1050px; color: #222; background: #fffcf4; padding: 0 20px; line-height: 1.6; }
+    a { color: #800000; }
+    .nav, .controls, .summary { font-family: sans-serif; }
+    .nav { margin-bottom: 25px; font-size: .9rem; font-weight: bold; }
+    h1 { color: #800000; font: normal 2.1rem sans-serif; margin-bottom: .25rem; }
+    .controls, .summary { margin: 20px 0; padding: 14px 18px; background: #f3f0e8; border-left: 4px solid #800000; }
+    label { cursor: pointer; }
+    .verse { margin: 26px 0; padding: 18px 20px; background: white; border-top: 2px solid #800000; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+    .verse-heading { display: flex; justify-content: space-between; gap: 1rem; font: bold 1rem sans-serif; color: #800000; }
+    .hebrew { direction: rtl; text-align: right; font: 1.75rem/2.1 'SBL Hebrew', 'Ezra SIL', 'Times New Roman', serif; margin: .6rem 0 1rem; }
+    .occurrences { font-family: sans-serif; display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+    .chip { display: inline-block; border: 1px solid #800000; border-radius: 14px; padding: 3px 9px; background: #fff9e8; text-decoration: none; font-size: .9rem; }
+    .quiet { color: #666; font-style: italic; }
+    .error { color: #800000; font-family: sans-serif; padding: 18px; background: #fff0f0; }
+  </style>
+</head>
+<body>
+  <nav class="nav"><a href="ornament_usage_by_pitch.html">← Ornament usage by recitation pitch</a></nav>
+  <h1 id="title">Chapter Ornament Explorer</h1>
+  <p id="subtitle">Loading the chapter’s musical profile…</p>
+  <div class="controls">
+    <label><input id="vowel-toggle" type="checkbox" checked> Show vowel points (niqqud)</label>
+    <span style="margin-left: 12px;">Cantillation marks remain visible in either view.</span>
+  </div>
+  <div id="summary" class="summary" hidden></div>
+  <main id="chapter"></main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const requestedBook = (params.get('book') || '').trim().toLowerCase();
+    const requestedChapter = String(parseInt(params.get('chapter'), 10));
+    const chapterRoot = document.getElementById('chapter');
+    const vowelToggle = document.getElementById('vowel-toggle');
+    let activeChapter = null;
+
+    function consonantsAndTeamim(text) {
+      // Remove vowels and dot points, but preserve the cantillation range 0591–05AF.
+      return text.replace(/[\u05B0-\u05BD\u05BF\u05C1-\u05C2\u05C4-\u05C5\u05C7]/g, '');
+    }
+
+    function chapterSummary(chapter) {
+      const counts = new Map();
+      chapter.verses.forEach(verse => verse.ornaments.forEach(item => {
+        const key = `${item.n} (${item.p})`;
+        counts.set(key, (counts.get(key) || 0) + 1);
+      }));
+      return [...counts.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+    }
+
+    function render() {
+      if (!activeChapter) return;
+      const showVowels = vowelToggle.checked;
+      chapterRoot.replaceChildren();
+      activeChapter.verses.forEach(verse => {
+        const section = document.createElement('section');
+        section.className = 'verse';
+        const heading = document.createElement('div');
+        heading.className = 'verse-heading';
+        heading.textContent = `${activeChapter.b} ${activeChapter.c}:${verse.v}`;
+        const text = document.createElement('div');
+        text.className = 'hebrew';
+        text.textContent = showVowels ? verse.t : consonantsAndTeamim(verse.t);
+        const occurrences = document.createElement('div');
+        occurrences.className = 'occurrences';
+        if (verse.ornaments.length === 0) {
+          occurrences.innerHTML = '<span class="quiet">No ornament occurrence recorded for this verse.</span>';
+        } else {
+          const unique = new Map();
+          verse.ornaments.forEach(item => {
+            const key = `${item.n}|${item.p}`;
+            unique.set(key, { ...item, count: (unique.get(key)?.count || 0) + 1 });
+          });
+          unique.forEach(item => {
+            const link = document.createElement('a');
+            link.className = 'chip';
+            link.href = `ornament_records.html?ornament=${encodeURIComponent(item.n)}&pitch=${encodeURIComponent(item.p)}`;
+            link.textContent = `${item.n} · ${item.p}${item.count > 1 ? ` ×${item.count}` : ''}`;
+            link.title = 'Open every occurrence in the ornament concordance';
+            occurrences.append(link);
+          });
+        }
+        section.append(heading, text, occurrences);
+        chapterRoot.append(section);
+      });
+    }
+
+    if (!requestedBook || !Number.isInteger(Number(requestedChapter))) {
+      chapterRoot.innerHTML = '<p class="error">Choose a book and chapter from the ornament usage page.</p>';
+    } else {
+      fetch('ornament_chapters.json')
+        .then(response => response.ok ? response.json() : Promise.reject(new Error('chapter index unavailable')))
+        .then(data => {
+          activeChapter = data.chapters.find(item =>
+            item.b.toLowerCase() === requestedBook && String(item.c) === requestedChapter
+          );
+          if (!activeChapter) throw new Error('chapter not found');
+          document.title = `${activeChapter.b} ${activeChapter.c} — Chapter Ornament Explorer`;
+          document.getElementById('title').textContent = `${activeChapter.b} ${activeChapter.c}: Ornament Profile`;
+          const total = activeChapter.verses.reduce((sum, verse) => sum + verse.ornaments.length, 0);
+          document.getElementById('subtitle').textContent = `${activeChapter.verses.length} verses; ${total} ornament/pitch occurrences.`;
+          const summary = document.getElementById('summary');
+          summary.textContent = chapterSummary(activeChapter).map(([key, count]) => `${key}${count > 1 ? ` ×${count}` : ''}`).join(' · ');
+          summary.hidden = false;
+          render();
+        })
+        .catch(() => {
+          chapterRoot.innerHTML = '<p class="error">This chapter is not available in the ornament index yet.</p>';
+          document.getElementById('subtitle').textContent = 'Check the book and chapter, then try again.';
+        });
+    }
+    vowelToggle.addEventListener('change', render);
+  </script>
+</body>
+</html>

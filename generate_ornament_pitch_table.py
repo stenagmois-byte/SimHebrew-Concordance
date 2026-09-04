@@ -1,8 +1,9 @@
 import os
 import json
 import html
+import sys
 from collections import defaultdict
-def run_distribution_analysis():
+def run_distribution_analysis(chapter_index_only=False):
     PITCH_KEYS = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
     PITCH_LABELS = ['c', 'd', 'e', 'f', 'g', 'A', 'B', 'C']
     # 🏛️ TRADITIONAL HEBREW PITCH NAMES MAPPING
@@ -20,6 +21,7 @@ def run_distribution_analysis():
     matrix = defaultdict(lambda: defaultdict(int))
     target_dirs = ["./musicscores"]
     search_index = defaultdict(lambda: defaultdict(list))
+    chapter_index = {}
     
     found_any_files = False
     for t_dir in target_dirs:
@@ -59,6 +61,25 @@ def run_distribution_analysis():
                                     
                                     if text_val and (c_cd, v_cd) not in chapter_verse_text_map:
                                         chapter_verse_text_map[(c_cd, v_cd)] = text_val
+
+                                    # Maintain a verse-first index as well as the existing
+                                    # ornament-first concordance. This preserves verses that
+                                    # have no ornament record at all.
+                                    raw_book_for_chapter = str(row.get('book_cd', row.get('BOOK_CD', ''))).strip()
+                                    if text_val and raw_book_for_chapter and c_cd and v_cd:
+                                        display_book = raw_book_for_chapter.replace('_', ' ').title()
+                                        chapter_key = f"{display_book}|{c_cd}"
+                                        chapter_entry = chapter_index.setdefault(chapter_key, {
+                                            "s": int(row.get('book_seq_no', 99)),
+                                            "b": display_book,
+                                            "c": c_cd,
+                                            "verses": {}
+                                        })
+                                        chapter_entry["verses"].setdefault(v_cd, {
+                                            "v": v_cd,
+                                            "t": text_val,
+                                            "ornaments": []
+                                        })
 
                                 # 2. RUN NATIVE LOWERCASE ORNAMENT PROCESSING LOOP
                                 for row in rows:
@@ -115,6 +136,21 @@ def run_distribution_analysis():
                                         }
                                         
                                         search_index[orn][target_label].append(record)
+
+                                        chapter_key = f"{book_name}|{chapter_num}"
+                                        chapter_entry = chapter_index.setdefault(chapter_key, {
+                                            "s": int(book_seq), "b": book_name,
+                                            "c": chapter_num, "verses": {}
+                                        })
+                                        verse_entry = chapter_entry["verses"].setdefault(verse_num, {
+                                            "v": verse_num, "t": hebrew_text,
+                                            "ornaments": []
+                                        })
+                                        if not verse_entry["t"] and hebrew_text:
+                                            verse_entry["t"] = hebrew_text
+                                        verse_entry["ornaments"].append({
+                                            "n": orn, "p": target_label
+                                        })
 
                         except Exception as e:
                             # Useful for debugging structural errors during setup
@@ -198,6 +234,17 @@ def run_distribution_analysis():
     <h1>Ornament Usage by Recitation Pitch</h1>
     <p>This concordance matrix outlines the distribution frequency of accents above the text aligned against the accent below the text that immediately precedes them defining the recitation pitch that governs the ornaments.</p>
 
+    <form id="chapter-explorer-form" style="margin: 25px 0; padding: 18px; background: #f3f0e8; border-left: 4px solid #800000; font-family: sans-serif;">
+        <strong style="color: #800000;">Explore a chapter</strong>
+        <label style="margin-left: 18px;">Book
+            <select id="chapter-book" required style="margin-left: 6px; padding: 5px;"></select>
+        </label>
+        <label style="margin-left: 12px;">Chapter
+            <input id="chapter-number" type="number" min="1" required style="width: 4.5rem; margin-left: 6px; padding: 5px;">
+        </label>
+        <button type="submit" style="margin-left: 12px; padding: 6px 12px; color: white; background: #800000; border: 0; border-radius: 3px; cursor: pointer;">Show chapter</button>
+    </form>
+
     <table>
         <thead>
             <tr>
@@ -248,15 +295,37 @@ def run_distribution_analysis():
     </p>
     </div>
 
+<script>
+const chapterBooks = ["Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua", "Judges", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings", "Isaiah", "Jeremiah", "Ezekiel", "Hosea", "Joel", "Amos", "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi", "Psalms", "Proverbs", "Job", "Song", "Ruth", "Lamentations", "Qohelet", "Esther", "Daniel", "Ezra", "Nehemiah", "1 Chronicles", "2 Chronicles"];
+const chapterBookSelect = document.getElementById("chapter-book");
+chapterBooks.forEach(book => chapterBookSelect.add(new Option(book, book)));
+document.getElementById("chapter-explorer-form").addEventListener("submit", event => {
+    event.preventDefault();
+    const book = chapterBookSelect.value;
+    const chapter = document.getElementById("chapter-number").value;
+    window.location.href = `ornament_chapter.html?book=${{encodeURIComponent(book)}}&chapter=${{encodeURIComponent(chapter)}}`;
+});
+</script>
 </body>
 </html>"""
 
-    with open("ornament_usage_by_pitch.html", "w", encoding="utf-8") as out_f:
-        out_f.write(html_output)
-    print("📈 Success! 'ornament_usage_by_pitch.html' compiled via direct file list extraction.")
-    with open("./ornament_index.json", "w", encoding="utf-8") as index_f:
-        json.dump(search_index, index_f, ensure_ascii=False)
-        
-    print("📁 Master database file 'ornament_index.json' compiled successfully!")
+    chapter_output = {"chapters": []}
+    for chapter in sorted(chapter_index.values(), key=lambda item: (item["s"], int(item["c"]))):
+        chapter["verses"] = [
+            chapter["verses"][key]
+            for key in sorted(chapter["verses"], key=lambda value: int(value))
+        ]
+        chapter_output["chapters"].append(chapter)
+    with open("ornament_chapters.json", "w", encoding="utf-8") as chapter_f:
+        json.dump(chapter_output, chapter_f, ensure_ascii=False, separators=(",", ":"))
+    print("Chapter-first index 'ornament_chapters.json' compiled successfully!")
+
+    if not chapter_index_only:
+        with open("ornament_usage_by_pitch.html", "w", encoding="utf-8") as out_f:
+            out_f.write(html_output)
+        print("📈 Success! 'ornament_usage_by_pitch.html' compiled via direct file list extraction.")
+        with open("./ornament_index.json", "w", encoding="utf-8") as index_f:
+            json.dump(search_index, index_f, ensure_ascii=False)
+        print("📁 Master database file 'ornament_index.json' compiled successfully!")
 if __name__ == "__main__":
-    run_distribution_analysis()
+    run_distribution_analysis(chapter_index_only="--chapter-index-only" in sys.argv)
