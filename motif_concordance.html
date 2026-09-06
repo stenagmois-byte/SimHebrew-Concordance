@@ -268,7 +268,7 @@
       }
 
       // 1. Draw the Horizontal Book Badge Pills sorted in strict canonical 1-39 sequence
-      Object.entries(dataMatch.book_breakdown)
+      Object.entries(dataMatch.b)
         .sort((a, b) => {
             let keyA = a[0].toUpperCase().replace(/\s+/g, '_').trim();
             let keyB = b[0].toUpperCase().replace(/\s+/g, '_').trim();
@@ -295,7 +295,7 @@
       const warningBanner = document.getElementById('slowSearchWarning');
       
       // Calculate the master total across the entire Bible footprint
-      const globalTotal = dataMatch.occurrences.length;
+      const globalTotal = dataMatch.o.length;
 
       if (allBadge) {
           allBadge.innerText = globalTotal;
@@ -325,20 +325,20 @@
   let displayCount = 0;
 
   // Create a copy of the occurrences array and sort it safely
-  const sortedOccurrences = [...dataMatch.occurrences].sort((a, b) => {
+  const sortedOccurrences = [...dataMatch.o].sort((a, b) => {
     // Unpack reference A
-    let partsA = a.reference.split('_');
+    let partsA = a.r.split('_');
     let vsA = parseInt(partsA.pop()) || 0;
     let chA = parseInt(partsA.pop()) || 0;
     let bookKeyA = partsA.join('_').toUpperCase().trim();
 
     // Unpack reference B
-    let partsB = b.reference.split('_');
+    let partsB = b.r.split('_');
     let vsB = parseInt(partsB.pop()) || 0;
     let chB = parseInt(partsB.pop()) || 0;
     let bookKeyA_clean = bookKeyA.replace(/\s+/g, '_');
     
-    let partsB_clean = b.reference.split('_');
+    let partsB_clean = b.r.split('_');
     let vsB_clean = parseInt(partsB_clean.pop()) || 0;
     let chB_clean = parseInt(partsB_clean.pop()) || 0;
     let bookKeyB = partsB_clean.join('_').toUpperCase().trim();
@@ -364,7 +364,7 @@
   // Now loop through the beautifully sorted array
   for (let i = 0; i < sortedOccurrences.length; i++) {
     let occ = sortedOccurrences[i];
-    let parts = occ.reference.split('_');
+    let parts = occ.r.split('_');
     let vsNum = parseInt(parts.pop()); 
     let chNum = parseInt(parts.pop()); 
     
@@ -375,7 +375,7 @@
 
     displayCount++;
     
-    let textLine = window.translationLookup[occ.reference] || "[Translation text entry missing in dictionary]";
+    let textLine = window.translationLookup[occ.r] || "[Translation text entry missing in dictionary]";
     
     // REFIXED DISPLAY FORMATTER: Correctly handles leading numbers (e.g., "1_kings" -> "1 Kings")
     let bookDisplay = rawBookCode.toLowerCase()
@@ -393,7 +393,7 @@
         targetFolder = cleanFallback.charAt(0).toUpperCase() + cleanFallback.slice(1).toLowerCase();
     }
     
-    let targetChapterUrl = `./musicscores/${targetFolder}/${chapterFileName}#${occ.reference}`;
+    let targetChapterUrl = `./musicscores/${targetFolder}/${chapterFileName}#${occ.r}`;
 
         // =====================================================================
         // 🗣️ LITURGICAL ACCENT & CANTILLATION TERMINOLOGY TRANSLATOR
@@ -426,7 +426,7 @@ const toProperCase = (str) => {
             <td style="font-weight:bold; font-family:sans-serif; color:#444;">
               ${bookDisplay}
               <div style="font-size:0.75rem; color:#888; font-weight:normal; margin-top:4px; line-height: 1.3;">
-                ${occ.poetry_flag === '1' ? 'Poetry:' : 'Prose:'}
+                ${occ.p === '1' ? 'Poetry:' : 'Prose:'}
                 ${liturgicalTier}
               </div>
             </td>
@@ -495,10 +495,10 @@ const toProperCase = (str) => {
           
           related.forEach(motifKey => {
             // Calculate both the global total and the localized book total
-            const totalCount = motifMatrix[motifKey].occurrences ? motifMatrix[motifKey].occurrences.length : 0;
+            const totalCount = motifMatrix[motifKey].o ? motifMatrix[motifKey].o.length : 0;
             
             // Check if it exists in the currently active book filter
-            const bookBreakdown = motifMatrix[motifKey].book_breakdown || {};
+            const bookBreakdown = motifMatrix[motifKey].b || {};
             const localCount = bookBreakdown[currentSelectedBook] || 0;
             
             const rowItem = document.createElement('div');

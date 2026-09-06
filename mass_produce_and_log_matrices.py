@@ -713,13 +713,11 @@ def check_verse_poetry_status(book_name, chapter_val, verse_val):
         pass
         
     return is_poetic    
-# =====================================================================
-# ADD THIS DEFINITION TO THE BOTTOM OF mass_produce_and_log_matrices.py
-# =====================================================================
 def extract_motif_concordance(accumulated_verse_phrases, translation_lookup):
     """
     Takes your verified, compacted musical phrases directly from your main loop,
     maps them to translation.json, and counts rolling sub-motifs over the Tanakh.
+    Minified JSON keys used to reduce file size for mobile performance.
     """
     import json
     from collections import defaultdict
@@ -732,12 +730,10 @@ def extract_motif_concordance(accumulated_verse_phrases, translation_lookup):
     
     # 1. Loop through your verified, compacted verse phrases from the main run
     for verse_key, compacted_notes in accumulated_verse_phrases.items():
-        # Expecting verse_key format like "GENESIS_001_001"
         book_name = verse_key.split('_')[0]
         
         # Cross-reference with your translation data engine
         text_meta = translation_lookup.get(verse_key, {})
-        # eng_text = text_meta.get("eng_text", "[Translation missing]")
         is_poetry = text_meta.get("poetry", "0")
         
         # 2. Extract rolling window sub-motifs of length 3 to 5 from your verified shapes
@@ -749,25 +745,28 @@ def extract_motif_concordance(accumulated_verse_phrases, translation_lookup):
                 motif_counts[motif_str] += 1
                 motif_distribution[motif_str][book_name] += 1
                 
+                # Minified item keys: r=reference, p=poetry_flag, s=start_index
+                # (Note: note_sequence 'motif_slice' removed since 'motif' key already holds it)
                 motif_occurrences[motif_str].append({
-                    "reference": verse_key,
-                    "poetry_flag": is_poetry,
-                    "note_sequence": motif_slice,
-                    "start_index": i
+                    "r": verse_key,
+                    "p": is_poetry,
+                    "s": i
                 })
                 
     # 3. Format and save the global sidecar file completely in isolation
     compiled_matrix = {}
     for motif, total in motif_counts.items():
+        # Minified matrix keys: m=motif, t=total_occurrences, b=book_breakdown, o=occurrences
         compiled_matrix[motif] = {
-            "motif": motif,
-            "total_occurrences": total,
-            "book_breakdown": dict(motif_distribution[motif]),
-            "occurrences": motif_occurrences[motif]
+            "m": motif,
+            "t": total,
+            "b": dict(motif_distribution[motif]),
+            "o": motif_occurrences[motif]
         }
         
     with open("motif_relationship_matrix.json", "w", encoding="utf-8") as f:
-        json.dump(compiled_matrix, f, ensure_ascii=False)
+        # Added separators strictly to remove whitespace and compress further
+        json.dump(compiled_matrix, f, ensure_ascii=False, separators=(',', ':'))
         
     print(f"[Motif Subsystem] Done! Extracted {len(compiled_matrix)} searchable motifs.")
 
@@ -1032,20 +1031,20 @@ if __name__ == "__main__":
                     motif_distribution[motif_str][book] += 1
                     
                     motif_occurrences[motif_str].append({
-                        "reference": verse_key,
-                        "poetry_flag": is_poetry,
-                        "type": entry.get("type", "General"),
-                        "start_index": i
+                        "r": verse_key,
+                        "p": is_poetry,
+                        "t": entry.get("type", "General"),
+                        "s": i
                     })
                     
         # Format the final output matrix
         compiled_matrix = {}
         for motif, total in motif_counts.items():
             compiled_matrix[motif] = {
-                "motif": motif,
-                "total_occurrences": total,
-                "book_breakdown": dict(motif_distribution[motif]),
-                "occurrences": motif_occurrences[motif]
+                "m": motif,
+                "t": total,
+                "b": dict(motif_distribution[motif]),
+                "o": motif_occurrences[motif]
             }
             
         with open("motif_relationship_matrix.json", "w", encoding="utf-8") as out_f:
