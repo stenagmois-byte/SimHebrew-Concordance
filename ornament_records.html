@@ -362,6 +362,29 @@ const ornamentGlyphMap = {
                 const zaqefGlyph  = "\u0594"; // ֔ (Zaqef-Qatan)
                 const atnahGlyph  = "\u0591"; // ֑ (Atnah)
 
+                // =====================================================================
+                // ⚡ HOISTED SETUP: Compile ONCE before ANY loops start running
+                // =====================================================================
+                const rawParam = urlParams.get('ornament'); 
+                const target = rawParam ? ornamentGlyphMap[rawParam.toLowerCase().trim()] : null;
+
+                const whitespaceRegex = /^\s*$/;
+                const breakTagRegex = /<br[^>]*>/i;
+
+             // [HOISTED STEP 3] Pre-determine your word matching strategy logic
+                let isTargetMatch = () => false; 
+                if (target) {
+                    if (target.isCompound) {
+                        const uniPattern = target.unicodePattern;
+                        const htmlPattern = target.htmlEntityPattern;
+                        isTargetMatch = (word) => uniPattern.test(word) || htmlPattern.test(word);
+                    } else {
+                        const rawTarget = target.raw;
+                        const entityTarget = target.entity;
+                        isTargetMatch = (word) => word.includes(rawTarget) || word.includes(entityTarget);
+                    }
+                }
+
                 allMatches.forEach(item => {
                     // Extract the text that already contains the vowels from your main database file
                     const rawText = item.t && item.t.trim() ? item.t : "";
@@ -412,37 +435,17 @@ const ornamentGlyphMap = {
                         cleanBaseText = cleanBaseText.replace(atnahRegex, '$1<br>');
                     }
 
-
-// 2. ULTRA-LEAN EXTRACTOR
-// Directly reads the incoming URL param (decoded natively by the browser)
-const rawParam = urlParams.get('ornament'); 
-const target = rawParam ? ornamentGlyphMap[rawParam.toLowerCase().trim()] : null;
-
-// 3. WORD PARSING ENGINE
-const structuralWordsArray = cleanBaseText.split(/(\s+|<br[^>]*>)/i);
-const processedWordsArray = structuralWordsArray.map(word => {
-    if (/^\s*$/g.test(word) || /<br[^>]*>/i.test(word)) {
-        return word;
-    }
-
-    let isMatch = false;
-
-    if (target) {
-        if (target.isCompound) {
-            // Test if BOTH targets exist inside the string layout
-            isMatch = target.unicodePattern.test(word) || target.htmlEntityPattern.test(word);
-        } else {
-            // Standard single-accent match
-            isMatch = word.includes(target.raw) || word.includes(target.entity);
-        }
-    }
-
-    if (isMatch) {
-        return `<span class="highlight-accent-word">${word}</span>`;
-    }
-    return `<span>${word}</span>`;
-});
-
+                    // 3. WORD PARSING ENGINE
+                    const structuralWordsArray = cleanBaseText.split(/(\s+|<br[^>]*>)/i);
+                    const processedWordsArray = structuralWordsArray.map(word => {
+                        if (whitespaceRegex.test(word) || breakTagRegex.test(word)) {
+                            return word;
+                        }
+                        if (isTargetMatch(word)) {
+                            return `<span class="highlight-accent-word">${word}</span>`;
+                        }
+                        return `<span>${word}</span>`;
+                    });
 
                     // Re-stitch our clean structural textual layout foundation
                     let compiledBaseString = processedWordsArray.join(' ');
