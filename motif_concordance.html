@@ -325,50 +325,59 @@
   let displayCount = 0;
 
   // Create a copy of the occurrences array and sort it safely
+  // Now loop through the beautifully sorted array
+  // Create a copy of the occurrences array and sort it safely
   const sortedOccurrences = [...dataMatch.o].sort((a, b) => {
-    // Unpack reference A
-    let partsA = a.r.split('_');
-    let vsA = parseInt(partsA.pop()) || 0;
-    let chA = parseInt(partsA.pop()) || 0;
-    let bookKeyA = partsA.join('_').toUpperCase().trim();
+    // 1. Unpack completely and safely reference A
+    const partsA = a.r.split('_');
+    const vsA = parseInt(partsA.pop()) || 0;
+    const chA = parseInt(partsA.pop()) || 0;
+    const bookKeyA = partsA.join('_').toUpperCase().trim();
+    const bookKeyA_clean = bookKeyA.replace(/\s+/g, '_');
 
-    // Unpack reference B
-    let partsB = b.r.split('_');
-    let vsB = parseInt(partsB.pop()) || 0;
-    let chB = parseInt(partsB.pop()) || 0;
-    let bookKeyA_clean = bookKeyA.replace(/\s+/g, '_');
-    
-    let partsB_clean = b.r.split('_');
-    let vsB_clean = parseInt(partsB_clean.pop()) || 0;
-    let chB_clean = parseInt(partsB_clean.pop()) || 0;
-    let bookKeyB = partsB_clean.join('_').toUpperCase().trim();
-    let bookKeyB_clean = bookKeyB.replace(/\s+/g, '_');
+    // 2. Unpack completely and safely reference B
+    const partsB = b.r.split('_');
+    const vsB = parseInt(partsB.pop()) || 0;
+    const chB = parseInt(partsB.pop()) || 0;
+    const bookKeyB = partsB.join('_').toUpperCase().trim();
+    const bookKeyB_clean = bookKeyB.replace(/\s+/g, '_');
 
-    // 1. Compare by Canonical Book Index
-    let rankA = canonicalOrder[bookKeyA_clean] || canonicalOrderMap[bookKeyA_clean] || 999;
-    let rankB = canonicalOrder[bookKeyB_clean] || canonicalOrderMap[bookKeyB_clean] || 999;
+    // 3. Compare by Canonical Book Index
+    const rankA = canonicalOrder[bookKeyA_clean] || canonicalOrderMap[bookKeyA_clean] || 999;
+    const rankB = canonicalOrder[bookKeyB_clean] || canonicalOrderMap[bookKeyB_clean] || 999;
     
     if (rankA !== rankB) {
         return rankA - rankB;
     }
     
-    // 2. If same book, compare by Chapter Number
-    if (chA !== chB_clean) {
-        return chA - chB_clean;
+    // 4. If same book, compare by Chapter Number
+    if (chA !== chB) {
+        return chA - chB;
     }
     
-    // 3. If same chapter, compare by Verse Number
-    return vsA - vsB_clean;
+    // 5. If same chapter, compare by Verse Number
+    return vsA - vsB;
   });
 
-  // Now loop through the beautifully sorted array
+   // 1. Define the helper utility ONCE outside and above the loop
+  const toProperCase = (str) => {
+    return str
+      .toLowerCase()
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join('_');
+  };
+
+  // 2. Accumulate rows in a fast string buffer to prevent layout thrashing
+  let tableHTMLBuffer = '';
+
+  // 3. Run the loop safely
   for (let i = 0; i < sortedOccurrences.length; i++) {
     let occ = sortedOccurrences[i];
     let parts = occ.r.split('_');
     let vsNum = parseInt(parts.pop()); 
     let chNum = parseInt(parts.pop()); 
     
-    // REFIXED STITCHING LOGIC: Protects leading numbers and underscores
     let rawBookCode = parts.join('_').toUpperCase().trim(); 
 
     if (currentSelectedBook !== 'ALL' && currentSelectedBook !== rawBookCode) continue;
@@ -377,7 +386,6 @@
     
     let textLine = window.translationLookup[occ.r] || "[Translation text entry missing in dictionary]";
     
-    // REFIXED DISPLAY FORMATTER: Correctly handles leading numbers (e.g., "1_kings" -> "1 Kings")
     let bookDisplay = rawBookCode.toLowerCase()
                         .replace(/_/g, ' ')
                         .replace(/(^\w|\b\w)/g, c => c.toUpperCase());
@@ -395,67 +403,58 @@
     
     let targetChapterUrl = `./musicscores/${targetFolder}/${chapterFileName}#${occ.r}`;
 
-        // =====================================================================
-        // 🗣️ LITURGICAL ACCENT & CANTILLATION TERMINOLOGY TRANSLATOR
-        // =====================================================================
-        let liturgicalTier = occ.type || "Unknown Tier";
-        
-        if (liturgicalTier === "Left Approach") {
-            liturgicalTier = "Approach to the Subdominant (Atnah)";
-        } else if (liturgicalTier === "Right Resolution") {
-            liturgicalTier = "Return to the Tonic (Silluq)";
-        } else if (liturgicalTier === "No Atnah") {
-            liturgicalTier = "Verse Without Subdominant (Atnah) Cadence";
-        }
-        // =====================================================================
+    let liturgicalTier = occ.type || "Unknown Tier";
+    
+    if (liturgicalTier === "Left Approach") {
+        liturgicalTier = "Approach to the Subdominant (Atnah)";
+    } else if (liturgicalTier === "Right Resolution") {
+        liturgicalTier = "Return to the Tonic (Silluq)";
+    } else if (liturgicalTier === "No Atnah") {
+        liturgicalTier = "Verse Without Subdominant (Atnah) Cadence";
+    }
 
-// Helper function to turn "1_CHRONICLES" into "1_Chronicles" or "AMOS" into "Amos"
-const toProperCase = (str) => {
-  return str
-    .toLowerCase()
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join('_');
-};
-        const properBookName = toProperCase(rawBookCode);
-        const audioFileName = `${properBookName}_${chNum}_${vsNum}`;
-        const audioUrl = `musicscores/audio/${rawBookCode}/${audioFileName}.mp3`;
-        const formattedTextLine = textLine.replace(/&#119059;/g, '<br />');
-        tableBody.innerHTML += `
-          <tr>
-            <td style="font-weight:bold; font-family:sans-serif; color:#444;">
-              ${bookDisplay}
-              <div style="font-size:0.75rem; color:#888; font-weight:normal; margin-top:4px; line-height: 1.3;">
-                ${occ.p === '1' ? 'Poetry:' : 'Prose:'}
-                ${liturgicalTier}
-              </div>
-            </td>
-            <td>
-              <a href="${targetChapterUrl}" style="color:#800000; text-decoration:underline; font-weight:bold; font-family: sans-serif;" title="Open complete chapter color matrix">
-                ${chNum}:${vsNum} ↗
-              </a>
-            </td>
-            <td class="text-cell">
-              <div style="font-size: 1.1rem;">${textLine}</div>
-            </td>
-<!-- The <th> controls the column width (e.g., width: 15%) -->
-<td style="text-align: center; vertical-align: middle;">
-    <!-- max-width stops it from becoming too wide on large screens -->
-    <audio controls preload="none" style="width: 100%; max-width: 250px; display: block; margin: 0 auto;">
-        <source src="${audioUrl || ''}" type="audio/mpeg">
-    </audio>
-</td>
-          </tr>
-        `;
+    // Call the outside function safely
+    const properBookName = toProperCase(rawBookCode);
+    const audioFileName = `${properBookName}_${chNum}_${vsNum}`;
+    const audioUrl = `musicscores/audio/${rawBookCode}/${audioFileName}.mp3`;
+    const formattedTextLine = textLine.replace(/𝄓/g, '<br />');
+
+    // Append to string buffer instead of touching the live web DOM
+    tableHTMLBuffer += `
+      <tr>
+        <td style="font-weight:bold; font-family:sans-serif; color:#444;">
+          ${bookDisplay}
+          <div style="font-size:0.75rem; color:#888; font-weight:normal; margin-top:4px; line-height: 1.3;">
+            ${occ.p === '1' ? 'Poetry:' : 'Prose:'}
+            ${liturgicalTier}
+          </div>
+        </td>
+        <td>
+          <a href="${targetChapterUrl}" style="color:#800000; text-decoration:underline; font-weight:bold; font-family: sans-serif;" title="Open complete chapter color matrix">
+            ${chNum}:${vsNum} ↗
+          </a>
+        </td>
+        <td class="text-cell">
+          <div style="font-size: 1.1rem;">${formattedTextLine}</div>
+        </td>
+        <td style="text-align: center; vertical-align: middle;">
+          <audio controls preload="none" style="width: 100%; max-width: 250px; display: block; margin: 0 auto;">
+              <source src="${audioUrl || ''}" type="audio/mpeg">
+          </audio>
+        </td>
+      </tr>
+    `;
   }
 
-      
-      document.getElementById('totalOccurrencesCounter').innerText = displayCount;
-      
-      if (displayCount === 0) {
+  // 4. Commit everything to the screen exactly ONCE at the finish line
+  tableBody.innerHTML = tableHTMLBuffer;
+  document.getElementById('totalOccurrencesCounter').innerText = displayCount;
+}
+     
+    if (displayCount === 0) {
         tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#aaa; font-style:italic; padding: 20px;">No matching entries found inside this specific book filter block.</td></tr>';
       }
-    }
+
 
     function filterByBook(bookKey) {
       currentSelectedBook = bookKey.toUpperCase().trim();
