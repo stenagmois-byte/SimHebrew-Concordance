@@ -18,6 +18,13 @@
         .explorer-nav a { color: #800000; text-decoration: none; font-weight: bold; }
         .explorer-nav a:hover { text-decoration: underline; }
         
+        /* Custom display visibility rules for the new layout engine */
+        #records-table-body .vowel-text { display: inline; }
+        #records-table-body .consonant-text { display: none; }
+
+        #records-table-body.hide-vowels .vowel-text { display: none; }
+        #records-table-body.hide-vowels .consonant-text { display: inline; }
+
         h1 { font-family: sans-serif; color: #800000; font-weight: normal; margin-bottom: 5px; }
         .explorer-subtitle { font-family: sans-serif; font-size: 1.1rem; color: #555; margin-bottom: 30px; }
         
@@ -168,6 +175,21 @@
             const statusContainer = document.getElementById('explorer-status');
             const bookFilter = document.getElementById('book-filter');
             const vowelToggle = document.getElementById('vowel-toggle'); // 🎯 Re-bound UI element
+
+// =====================================================================
+// ⚡ HIGH-PERFORMANCE STATIC RENDERING & CSS TOGGLE ENGINE
+// =====================================================================
+
+// 1. Establish a single event listener on the layout wrapper to control visibility
+if (vowelToggle) {
+    vowelToggle.addEventListener('change', () => {
+        if (vowelToggle.checked) {
+            recordsTable.classList.remove('hide-vowels');
+        } else {
+            recordsTable.classList.add('hide-vowels');
+        }
+    });
+}
 
 // 1. FULLY EXPANDED MAP WITH YOUR EXACT JSON/URL PARAMETER STRINGS
 // Maps both single accents and your exact lower-case double-accent strings
@@ -522,64 +544,67 @@ function getVolumeLink(bookCd, chapterCd) {
     return `./musicscores/${volumeDir}/${fileBook}_${chPad}_matrix.html`;
 }
 
-                // ⚙️ LIVE RENDERING & FILTERING ENGINE
-                function drawTableRows() {
-                    const selectedBook = bookFilter.value;
-                    
-                    // 🎯 INITIAL DISPLAY FIX: Default to false (unchecked layout format) if element properties miss definition values
-                    const showVowels = vowelToggle ? vowelToggle.checked : false; 
-                    
-                    const filteredRecords = recordsCache.filter(item => {
-                        return selectedBook === 'all' || item.book === selectedBook;
-                    });
+function drawTableRows() {
+    const selectedBook = bookFilter.value;
+    
+    // Filter rows down based on selected drop-down category
+    const filteredRecords = recordsCache.filter(item => {
+        return selectedBook === 'all' || item.book === selectedBook;
+    });
 
-                    const displayLimit = 9999;
-                    statusContainer.innerHTML = `<div class="explorer-badge">Showing ${Math.min(filteredRecords.length, displayLimit)} of ${filteredRecords.length} filtered rows.</div>`;
+    const displayLimit = 9999;
+    statusContainer.innerHTML = `<div class="explorer-badge">Showing ${Math.min(filteredRecords.length, displayLimit)} of ${filteredRecords.length} filtered rows.</div>`;
 
-                    const htmlBuffer = [];
-                    filteredRecords.slice(0, displayLimit).forEach(item => {
-                        const activeText = showVowels ? item.withVowels : item.withoutVowels;
-                        const gematriaValue = calculateGematria(item.withoutVowels);
+    // Force table class layout container state based on the current checkbox setting
+    if (vowelToggle && vowelToggle.checked) {
+        recordsTable.classList.remove('hide-vowels');
+    } else {
+        recordsTable.classList.add('hide-vowels');
+    }
 
-                        const bookDir = item.book.trim().toUpperCase(); 
-                        const audioUrl = `musicscores/audio/${bookDir}/${item.location.replace(/[\s:]/g, '_')}.mp3`;
-console.log(`DEBUG: [Local Item: ${item.location}] Looking for mp3: "${audioUrl}" | file: "${item.location.replace(/[\s:]/g, '_')}.mp3"`);
+    const htmlBuffer = [];
+    filteredRecords.slice(0, displayLimit).forEach(item => {
+        const bookDir = item.book.trim().toUpperCase(); 
+        const audioUrl = `musicscores/audio/${bookDir}/${item.location.replace(/[\s:]/g, '_')}.mp3`;
 
-                        htmlBuffer.push(`
-                            <tr>
-                         <!-- 🎯 LIVE MATRIX LINK INJECTION -->
-                                <td class="location-cell">
-                                    <a href="${item.musicLink}" target="_blank" title="Open Music Score Matrix" style="text-decoration: none; color: #1a73e8; font-weight: bold;">
-                                        ${item.location}
-                                    </a>
-                                </td>
-                                <td class="hebrew-cell" style="direction: rtl; text-align: right;">${activeText}</td>
-    <!--           //<th>Gematria</th> -->
-    <!--                            //<td class="gematria-cell">${gematriaValue}</td> -->
-        <td style="width: 120px; text-align: center;">
-            <audio controls preload="none" style="width: 100%; max-width: 120px; height: 30px;">
-                <source src="${audioUrl}" type="audio/mpeg">
-            </audio>
-        </td>
-                             </tr>
-                        `);
-                    });
-                    recordsTable.innerHTML = htmlBuffer.join('');
-                }
+        // 🎯 RENDER BOTH OPTIONS ONCE: Wrap with unique hiding CSS markers
+        htmlBuffer.push(`
+            <tr>
+                <td class="location-cell">
+                    <a href="${item.musicLink}" target="_blank" title="Open Music Score Matrix" style="text-decoration: none; color: #1a73e8; font-weight: bold;">
+                        ${item.location}
+                    </a>
+                </td>
+                <td class="hebrew-cell" style="direction: rtl; text-align: right;">
+                    <span class="vowel-text">${item.withVowels}</span>
+                    <span class="consonant-text">${item.withoutVowels}</span>
+                </td>
+                <td style="width: 120px; text-align: center;">
+                    <audio controls preload="none" style="width: 100%; max-width: 120px; height: 30px;">
+                        <source src="${audioUrl}" type="audio/mpeg">
+                    </audio>
+                </td>
+             </tr>
+        `);
+    }); // <--- FIX 1: Closes the .forEach loop safely
+    
+    recordsTable.innerHTML = htmlBuffer.join('');
+} // <--- FIX 2: Closes the drawTableRows function cleanly
 
-                bookFilter.addEventListener('change', drawTableRows);
-                if (vowelToggle) {
-                    vowelToggle.addEventListener('change', drawTableRows);
-                }
-                
-                // Initial execution call draws the layout smoothly right away
-                drawTableRows();
-            })
-            .catch(err => {
-                console.error("Fetch Data Loop Crash:", err);
-                statusContainer.innerHTML = '<div class="explorer-badge" style="color:red;">Error loading resource data libraries.</div>';
-            });
-        });
+// Only redraw the entire layout structure if the user actually switches the BOOK filter dropdown!
+bookFilter.addEventListener('change', drawTableRows);
+
+// Initial paint execution
+drawTableRows();
+
+// === FIX 3: Closes out your script's background data fetch engine ===
+    })
+    .catch(err => {
+        console.error("Fetch Data Loop Crash:", err);
+        statusContainer.innerHTML = '<div class="explorer-badge" style="color:red;">Error loading resource data libraries.</div>';
+    });
+});
+// ===================================================================
 
 // Helper mapping for Standard Hebrew Gematria
 function calculateGematria(text) {
