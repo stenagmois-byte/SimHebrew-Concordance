@@ -16,7 +16,8 @@
     .verse { margin: 26px 0; padding: 18px 20px; background: white; border-top: 2px solid #800000; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
     .verse-heading { display: flex; justify-content: space-between; gap: 1rem; font: bold 1rem sans-serif; color: #800000; }
     .hebrew { direction: rtl; text-align: right; font: 1.75rem/2.1 'SBL Hebrew', 'Ezra SIL', 'Times New Roman', serif; margin: .6rem 0 1rem; }
-    .occurrences { font-family: sans-serif; display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+    .occurrences { font-family: sans-serif; display: flex; flex-wrap: wrap; gap: 7px; align-items: center; direction: rtl; }
+
     .chip { display: inline-block; border: 1px solid #800000; border-radius: 14px; padding: 3px 9px; background: #fff9e8; text-decoration: none; font-size: .9rem; }
     .quiet { color: #666; font-style: italic; }
     .error { color: #800000; font-family: sans-serif; padding: 18px; background: #fff0f0; }
@@ -55,6 +56,13 @@
       return [...counts.entries()].sort((a, b) => a[0].localeCompare(b[0]));
     }
 
+    function toProperCaseFilename(str) {
+      return str
+        .toLowerCase()
+        .split(/[\s_]+/) // Splits on both spaces and underscores
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join('_');     // Rejoins with underscores for the filename
+    }    
     function render() {
       if (!activeChapter) return;
       const showVowels = vowelToggle.checked;
@@ -87,7 +95,25 @@
             occurrences.append(link);
           });
         }
-        section.append(heading, text, occurrences);
+        // 1. Keep raw spaces for the parent directory (e.g., "1 CHRONICLES")
+        const rawBookCode = activeChapter.b.toUpperCase().trim(); 
+        
+        // 2. Generate the underscore filename (e.g., "1_Chronicles_1_1.mp3")
+        const properBookName = toProperCaseFilename(rawBookCode);
+        const audioFileName = `${properBookName}_${activeChapter.c}_${verse.v}`;
+        const audioUrl = `musicscores/audio/${rawBookCode}/${audioFileName}.mp3`;
+
+        const audioContainer = document.createElement('div');
+        audioContainer.style.marginTop = '12px';
+        audioContainer.style.direction = 'ltr'; // Keeps the audio player controls left-to-right
+        
+        audioContainer.innerHTML = `
+          <audio controls preload="none" style="width: 100%; max-width: 250px; height: 32px; display: block;">
+            <source src="${audioUrl}" type="audio/mpeg">
+          </audio>
+        `;
+
+        section.append(heading, text, occurrences, audioContainer);
         chapterRoot.append(section);
       });
     }
