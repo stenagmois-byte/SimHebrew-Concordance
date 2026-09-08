@@ -27,7 +27,7 @@
   <h1 id="title">Chapter Ornament Explorer</h1>
   <p id="subtitle">Loading the chapter’s musical profile…</p>
   <div class="controls">
-    <label><input id="vowel-toggle" type="checkbox" checked> Show vowel points (niqqud)</label>
+    <label><input id="vowel-toggle" type="checkbox"> Show vowel points (niqqud)</label>
     <span style="margin-left: 12px;">Cantillation marks remain visible in either view.</span>
   </div>
   <div id="summary" class="summary" hidden></div>
@@ -40,7 +40,7 @@
     const chapterRoot = document.getElementById('chapter');
     const vowelToggle = document.getElementById('vowel-toggle');
     let activeChapter = null;
-
+    vowelToggle.checked = false; 
     function consonantsAndTeamim(text) {
       // Remove vowels and dot points, but preserve cantillation marks.
       return text.replace(/[\u05B0-\u05BB\u05BC\u05C1\u05C2\u05C7]/g, '');
@@ -98,10 +98,13 @@
       fetch('ornament_chapters.json')
         .then(response => response.ok ? response.json() : Promise.reject(new Error('chapter index unavailable')))
         .then(data => {
-          activeChapter = data.chapters.find(item =>
-            item.b.toLowerCase() === requestedBook && String(item.c) === requestedChapter
-          );
-          if (!activeChapter) throw new Error('chapter not found');
+          // Replace the agent's .find loop with an optimized find step
+          activeChapter = data.chapters.find(item => {
+              if (item.b.toLowerCase() === requestedBook && String(item.c) === requestedChapter) {
+                  return true; // Match found, break execution stack instantly!
+              }
+              return false;
+          });          if (!activeChapter) throw new Error('chapter not found');
           document.title = `${activeChapter.b} ${activeChapter.c} — Chapter Ornament Explorer`;
           document.getElementById('title').textContent = `${activeChapter.b} ${activeChapter.c}: Ornament Profile`;
           const total = activeChapter.verses.reduce((sum, verse) => sum + verse.ornaments.length, 0);
