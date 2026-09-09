@@ -160,6 +160,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const targetOrnament = (urlParams.get('ornament') || '').trim().toLowerCase();
             const targetPitch = (urlParams.get('pitch') || '').trim();
+            let requestedBook = (urlParams.get('book-filter') || '').trim();
 
             const pitchToHebrewName = {
                 "c": "Darga", "d": "Tevir / Galgal", "e": "Silluq", "f": "Mercha",
@@ -168,12 +169,73 @@
 
             const traditionalName = pitchToHebrewName[targetPitch] || "Unknown Accent";
 
+            // 1. Parse incoming parameters natively from the URL
+            const rawOrnament = (urlParams.get('ornament') || '').trim();
+
+            // 2. Define your 5 poetry-exclusive structural accents
+            const poetryAccents = ['revia-mugrash', 'geresh', 'zarqa', 'illuy', 'ole'];
+
+            // 3. Comprehensive Exception Lookup Table (Your 30 exact mappings)
+            // Format: "ornament_name|pitch" : "Target Book"
+            const routingExceptions = {
+                "azla|d": "2 Chronicles",
+                "azla|g": "Deuteronomy",
+                "azla pashta|e": "Exodus",
+                "azla t-qetana|B": "Deuteronomy",
+                "azla z-qatan|e": "Deuteronomy",
+                "pashta pashta|C": "Isaiah",
+                "pazer azla|B": "Exodus",
+                "pazer z-qatan|B": "Exodus",
+                "qadma|g": "Deuteronomy",
+                "qarne-farah|d": "1 Chronicles",
+                "revia z-qatan|C": "Deuteronomy",
+                "segol|A": "Deuteronomy",
+                "segol|f": "1 Chronicles",
+                "tarsin|c": "2 Chronicles",
+                "tarsin|C": "1 Chronicles",
+                "tarsin|d": "2 Chronicles",
+                "tarsin|f": "2 Chronicles",
+                "tarsin revia|e": "Deuteronomy",
+                "telisha-gedola|C": "1 Chronicles",
+                "telisha-gedola|d": "Nehemiah",
+                "telisha-gedola|f": "2 Chronicles",
+                "telisha-gedola azla|B": "2 Kings",
+                "telisha-qetana|d": "2 Chronicles",
+                "telisha-qetana|f": "Deuteronomy",
+                "tsinnor|g": "Deuteronomy",
+                "tsinnor|C": "Psalms",
+                "z-qatan azla|e": "Exodus",
+                "z-qatan pazer|B": "Deuteronomy",
+                "z-qatan tsinnor|B": "Exodus",
+                "z-qatan tsinnor|e": "Deuteronomy",
+                "zaqef-gadol|f": "1 Samuel"
+            };
+
+            // 4. Apply the Smart Genre + Exception Fallback Rule
+            if (!requestedBook) {
+                // Build a composite lookup key (lowercase ornament name + pitch)
+                const lookupKey = `${targetOrnament.trim()}|${targetPitch.trim()}`;
+                
+                // First, check if this combination exists in your 30 exceptions
+                if (routingExceptions[lookupKey]) {
+                    requestedBook = routingExceptions[lookupKey];
+                } 
+                // Second, if not an exception, check if it's one of the 5 poetry accents
+                else if (poetryAccents.includes(targetOrnament)) {
+                    requestedBook = 'Psalms';  // Default to Psalms for poetry
+                } 
+                // Third, default to Genesis for standard prose combinations
+                else {
+                    requestedBook = 'Genesis'; // Default to Genesis for prose
+                }
+            }
+
+            const bookFilter = document.getElementById('book-filter');
             document.getElementById('page-title').innerText = `Occurrences of ${targetOrnament.toUpperCase()}`;
             document.getElementById('page-subtitle').innerText = `Recitation Pitch: ${targetPitch} (${traditionalName})`;
 
             const recordsTable = document.getElementById('records-table-body');
             const statusContainer = document.getElementById('explorer-status');
-            const bookFilter = document.getElementById('book-filter');
             const vowelToggle = document.getElementById('vowel-toggle'); // 🎯 Re-bound UI element
 
 // =====================================================================
@@ -356,6 +418,9 @@ const ornamentGlyphMap = {
                     bookFilter.appendChild(opt);
                 });
 
+                if (bookFilter && requestedBook) {
+                    bookFilter.value = requestedBook;
+                }
 
                 // MAP 1: Map Oracle translation items strictly by nested query index
                 const englishLookupMap = {};
