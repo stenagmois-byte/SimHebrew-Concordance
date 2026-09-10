@@ -29,7 +29,10 @@
   <p id="subtitle">Loading the chapter’s musical profile…</p>
   <div class="controls">
     <label><input id="vowel-toggle" type="checkbox"> Show vowel points (niqqud)</label>
-    <span style="margin-left: 12px;">Cantillation marks remain visible in either view.</span>
+<label style="margin-left: 20px; font-weight: normal; cursor: pointer; color: #800000;">
+    <input type="checkbox" id="gematria-toggle"> Show Gematria Profiles
+</label>
+
   </div>
   <div id="summary" class="summary" hidden></div>
   <main id="chapter"></main>
@@ -40,8 +43,10 @@
     const requestedChapter = String(parseInt(params.get('chapter'), 10));
     const chapterRoot = document.getElementById('chapter');
     const vowelToggle = document.getElementById('vowel-toggle');
+    const gematriaToggle = document.getElementById('gematria-toggle');
     let activeChapter = null;
     vowelToggle.checked = false; 
+    gematriaToggle.checked = false; 
     function consonantsAndTeamim(text) {
       // Remove vowels and dot points, but preserve cantillation marks.
       return text.replace(/[\u05B0-\u05BB\u05BC\u05C1\u05C2\u05C7]/g, '');
@@ -66,6 +71,10 @@
     function render() {
       if (!activeChapter) return;
       const showVowels = vowelToggle.checked;
+      
+      // Fetch the state of our new toggle safely
+      const showGematria = gematriaToggle ? gematriaToggle.checked : false;
+      
       chapterRoot.replaceChildren();
       activeChapter.verses.forEach(verse => {
         const section = document.createElement('section');
@@ -95,6 +104,8 @@
             occurrences.append(link);
           });
         }
+        
+        // --- RESTORED AUDIO PIPELINE VARIABLES ---
         // 1. Keep raw spaces for the parent directory (e.g., "1 CHRONICLES")
         const rawBookCode = activeChapter.b.toUpperCase().trim(); 
         
@@ -113,39 +124,170 @@
           </audio>
         `;
 
+        // Append your primary music components to the section first
         section.append(heading, text, occurrences, audioContainer);
+
+        // ===================================================================
+        // OPTIMIZED TOGGLE CONDITIONAL: Only build and append if checked
+        // ===================================================================
+        if (showGematria) {
+            const gematriaMap = {
+                1488:1, 1489:2, 1490:3, 1491:4, 1492:5, 1493:6, 1494:7, 1495:8, 1496:9,
+                1497:10, 1499:20, 1498:20, 1500:30, 1502:40, 1501:40, 1504:50, 1503:50,
+                1505:60, 1506:70, 1508:80, 1507:80, 1510:90, 1509:90, 1511:100, 1512:200,
+                1513:300, 1514:400
+            };
+
+            let verseSum = 0;
+            let wordValues = []; 
+            const rawText = verse.t || "";
+            const wordsArray = rawText.split(" ");
+
+            wordsArray.forEach(word => {
+                let wordSum = 0;
+                for (let i = 0; i < word.length; i++) {
+                    let code = word.charCodeAt(i);
+                    if (gematriaMap[code]) {
+                        wordSum += gematriaMap[code];
+                    }
+                }
+                if (wordSum > 0) {
+                    verseSum += wordSum;
+                    wordValues.push(wordSum);
+                }
+            });
+
+            // Reverses the array so the numbers sequence Right-to-Left
+            const rtlWordArithmeticTrace = wordValues.reverse().join(" + ");
+
+            let tempNum = verseSum;
+            let factorSet = new Set();
+            let divisor = 2;
+            while (divisor * divisor <= tempNum) {
+                while (tempNum % divisor === 0) {
+                    factorSet.add(divisor);
+                    tempNum = Math.floor(tempNum / divisor);
+                }
+                divisor++;
+            }
+            if (tempNum > 1) factorSet.add(tempNum);
+            const formattedFactors = Array.from(factorSet).sort((a,b) => a - b).join(", ");
+
+            const gematriaContainer = document.createElement('div');
+            gematriaContainer.style.marginTop = '12px';
+            gematriaContainer.style.paddingTop = '8px';
+            gematriaContainer.style.borderTop = '1px dashed #eee'; // Subtle separator line
+            gematriaContainer.style.fontSize = '12px';
+            gematriaContainer.style.color = '#555';
+            gematriaContainer.style.direction = 'ltr'; 
+            
+            let colorClass = "gem-low";
+            if (verseSum >= 600) colorClass = "gem-high";
+            else if (verseSum >= 400) colorClass = "gem-mid-high";
+            else if (verseSum >= 200) colorClass = "gem-mid";
+            else if (verseSum >= 50) colorClass = "gem-mid-low";
+
+            gematriaContainer.innerHTML = `
+              <div style="margin-bottom: 4px;">
+                <span style="font-weight: bold; margin-right: 15px;">
+                  Gematria: <span class="${colorClass}" style="padding: 2px 6px; border-radius: 4px; font-weight: bold;">${verseSum}</span>
+                </span>
+                <span style="font-family: monospace; color: #800000;">
+                  Factors: ( ${formattedFactors || 'None'} )
+                </span>
+              </div>
+              <div style="font-family: monospace; font-size: 11px; color: #666; word-break: break-all; margin-top: 4px;">
+                Word weights (Right to Left): ${rtlWordArithmeticTrace || '0'}
+              </div>
+            `;
+            
+            section.append(gematriaContainer);
+        }
+        // ===================================================================
+
         chapterRoot.append(section);
       });
     }
-
     if (!requestedBook || !Number.isInteger(Number(requestedChapter))) {
       chapterRoot.innerHTML = '<p class="error">Choose a book and chapter from the ornament usage page.</p>';
     } else {
       fetch('ornament_chapters.json')
         .then(response => response.ok ? response.json() : Promise.reject(new Error('chapter index unavailable')))
         .then(data => {
-          // Replace the agent's .find loop with an optimized find step
+          
+          // Cleanly separate the search loop out so it runs flawlessly
           activeChapter = data.chapters.find(item => {
               if (item.b.toLowerCase() === requestedBook && String(item.c) === requestedChapter) {
-                  return true; // Match found, break execution stack instantly!
+                  return true; 
               }
               return false;
-          });          if (!activeChapter) throw new Error('chapter not found');
+          });          
+          
+          // Fixed formatting gap prevents the script from crashing here:
+          if (!activeChapter) {
+              throw new Error('chapter not found');
+          }
+          
           document.title = `${activeChapter.b} ${activeChapter.c} — Chapter Ornament Explorer`;
           document.getElementById('title').textContent = `${activeChapter.b} ${activeChapter.c}: Ornament Profile`;
+          
           const total = activeChapter.verses.reduce((sum, verse) => sum + verse.ornaments.length, 0);
           document.getElementById('subtitle').textContent = `${activeChapter.verses.length} verses; ${total} ornament/pitch occurrences.`;
+          
           const summary = document.getElementById('summary');
           summary.textContent = chapterSummary(activeChapter).map(([key, count]) => `${key}${count > 1 ? ` ×${count}` : ''}`).join(' · ');
           summary.hidden = false;
+          
           render();
         })
-        .catch(() => {
+        .catch((err) => {
+          console.error("Gematria Fetch Error Trace:", err); // Prints error to console log for easier debugging
           chapterRoot.innerHTML = '<p class="error">This chapter is not available in the ornament index yet.</p>';
           document.getElementById('subtitle').textContent = 'Check the book and chapter, then try again.';
         });
     }
     vowelToggle.addEventListener('change', render);
+    gematriaToggle.addEventListener('change', render);
+// Lightweight Experiment Module for ornament_chapter.html
+function experimentGematriaAndFactors(rawText) {
+    // Standard Hebrew decimal mappings (consonants only)
+    const gematriaMap = {
+        1488:1, 1489:2, 1490:3, 1491:4, 1492:5, 1493:6, 1494:7, 1495:8, 1496:9,
+        1497:10, 1499:20, 1498:20, 1500:30, 1502:40, 1501:40, 1504:50, 1503:50,
+        1505:60, 1506:70, 1508:80, 1507:80, 1510:90, 1509:90, 1511:100, 1512:200,
+        1513:300, 1514:400
+    };
+
+    let totalSum = 0;
+    // Walk character by character through the unescaped verse text
+    for (let i = 0; i < rawText.length; i++) {
+        let code = rawText.charCodeAt(i);
+        if (gematriaMap[code]) {
+            totalSum += gematriaMap[code];
+        }
+    }
+
+    // Lowest Common Factors (LCFs) Calculation Engine
+    let n = totalSum;
+    let factors = new Set();
+    let d = 2;
+    while (d * d <= n) {
+        while (n % d === 0) {
+            factors.add(d);
+            n = Math.floor(n / d);
+        }
+        d++;
+    }
+    if (n > 1) factors.add(n);
+
+    return {
+        sum: totalSum,
+        lcf: Array.from(factors).sort((a,b) => a - b).join(", ")
+    };
+}
+
+// Example usage: testing on a raw string element from Psalms 150
+// console.log(experimentGematriaAndFactors("הַלְלוּ־קֵ֥ל בְּקָדְשׁ֑וֹ")); 
   </script>
 </body>
 </html>
