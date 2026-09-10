@@ -149,31 +149,25 @@ a:hover {
     display: grid; 
     padding: 8px; 
     width: 98%;
-    grid-template-columns: 20% 20% 15% 20% 25%;
+    grid-template-columns: 20% 20% 15% 35% 10%;
     grid-gap: 4px; 
 }
 
 /* ==========================================================================
    CONCORDANCE TABLES (A & B Engine Matrices)
    ========================================================================== */
-.atable { 
-    margin-left: 10px; 
-    margin-right: 10px; 
-    width: 95%;  
+.atable, .btable { 
+    width: calc(100% - 20px);  /* Forces total width to be exactly the screen size minus 20px total margins */
+    margin: 0 auto;           /* Perfectly centers the table on the screen */
     border: 1px solid lightgrey; 
     border-style: none none none none; 
 }
 
-.btable { 
-    margin-left: 10px; 
-    margin-right: 10px; 
-    width: 95%;  
-    border: 1px solid black; 
-    border-style: none none none none; 
+.btable {
+    border-color: black;      /* Keeps the black border distinction for btable */
 }
-
 /* Header Cells (Deep Red Tones instead of plain grey) */
-.tdch1, .tdch2, .tdch3, .tdch4, .tdch5, .tdch6, .tdch7, .tdch8, .tdch9 {
+.tdch1, .tdch2, .tdch3, .tdch4, .tdch5, .tdch6, .tdch7, .tdch8, .tdch9, .tdch10 {
     vertical-align: top; 
     font-weight: bold;
     background-color: #f3f0e8; /* Soft cream instead of aggressive #f1f1f1 */
@@ -190,6 +184,8 @@ a:hover {
 .tdch7 { text-align: left; }
 .tdch8 { text-align: left; }
 .tdch9 { text-align: center; }
+/* New header alignment style for the "Gem" row marker */
+.tdch10 { text-align: right; }
 
 /* Data Line Cells */
 .tdcl1, .tdcl2, .tdcl3, .tdcl4, .tdcl5, .tdcl6, .tdcl7, .tdcl8, .tdcl9, .tdcl11, .tdcl12, .tdcl13 {
@@ -205,7 +201,23 @@ a:hover {
 .tdcl6  { text-align: right; }
 .tdcl7  { text-align: left; padding-left: 6px; }
 .tdcl8  { text-align: left; }
-.tdcl9  { text-align: left; grid-column: 4 / span 2; }
+/* Reduce references grid reach so it doesn't spill over to column 5 */
+.tdcl9 { 
+    text-align: left; 
+    grid-column: 4 / span 1; /* Was span 2, changed to cleanly fill column 4 */
+}
+/* Set Gematria to snap cleanly into column 5 right under the Count column */
+.tdcl_gem { 
+    grid-column: 5; 
+    text-align: right; 
+    padding: 2px 10px;
+    font-weight: bold;
+    border-radius: 4px; /* Gives the background colors a subtle card look */
+    justify-self: end;       /* Prevents the block from stretching wide */
+    min-width: 45px;         /* Ensures a consistent badge size for 2-3 digit numbers */
+    margin-right: 4px;       /* Adds a safety buffer before the page edge */
+}
+
 .tdcl11 { text-align: left; width: 12%; border: 2px solid lightgrey; border-style: solid none none none; }
 .tdcl12 { text-align: left; width: 20%; border: 2px solid lightgrey; border-style: solid none none none; }
 .tdcl13 { text-align: right; width: 20%; border: 2px solid lightgrey; border-style: solid none none none; }
