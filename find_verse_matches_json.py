@@ -174,7 +174,7 @@ def build_output_page(groups, unique_factors, books):
     </style>
 </head>
 <body>
-    <div class="nav" style="margin-left:10px; margin-top:10px;"><a href="matrix.html">Matrix page</a></div>
+    <div class="nav" style="margin-left:10px; margin-top:10px;"><a href="matrix.html">Matrix page</a> | <a href="musicscores/index.html.html">Music Scores page</a></div>
     <h2 style="margin-left:10px;">Co-Inherent Verse Weights Index (JSON Engine)</h2>
     <p style="margin-left:10px; color:#555;">Sorted by <strong>Maximum Prime Factor (Largest First)</strong>. Click references to inspect their dynamic musical profiles.</p>
     
