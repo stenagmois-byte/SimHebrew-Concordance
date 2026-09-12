@@ -141,7 +141,7 @@ def build_output_page(groups, unique_factors, books):
 <head>
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="qstyles.css"/>
-    <title>Inverted JSON Verse Concordance</title>
+    <title>Gematria Concordance</title>
     <style>
         .filter-panel { 
             position: sticky; 
@@ -174,9 +174,9 @@ def build_output_page(groups, unique_factors, books):
     </style>
 </head>
 <body>
-    <div class="nav" style="margin-left:10px; margin-top:10px;"><a href="matrix.html">Matrix page</a> | <a href="musicscores/index.html">Music Scores page</a></div>
+    <div class="nav" style="margin-left:10px; margin-top:10px;"><a href="matrix.html">Back to Matrix page</a> | <a href="musicscores/index.html">Back to Volume Index</a></div>
     <h2 style="margin-left:10px;">Co-Inherent Verse Weights Index (JSON Engine)</h2>
-    <p style="margin-left:10px; color:#555;">Sorted by <strong>Maximum Prime Factor (Largest First)</strong>. Click references to inspect their dynamic musical profiles.</p>
+    <p style="margin-left:10px; color:#555;">Sorted by <strong>Maximum Prime Factor (Largest First)</strong>. Click a reference to read and hear the music for the chapter.</p>
     
     <!-- STICKY FILTER BAR -->
     <div class="filter-panel">
