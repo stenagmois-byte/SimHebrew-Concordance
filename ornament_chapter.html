@@ -132,32 +132,39 @@
         // ===================================================================
         if (showGematria) {
             const gematriaMap = {
-                1488:1, 1489:2, 1490:3, 1491:4, 1492:5, 1493:6, 1494:7, 1495:8, 1496:9,
-                1497:10, 1499:20, 1498:20, 1500:30, 1502:40, 1501:40, 1504:50, 1503:50,
-                1505:60, 1506:70, 1508:80, 1507:80, 1510:90, 1509:90, 1511:100, 1512:200,
-                1513:300, 1514:400
+            'א': 1, 'ב': 2, 'ג': 3, 'ד': 4, 'ה': 5, 'ו': 6, 'ז': 7, 'ח': 8, 'ט': 9,
+            'י': 10, 'כ': 20, 'ך': 20, 'ל': 30, 'מ': 40, 'ם': 40, 'נ': 50, 'ן': 50,
+            'ס': 60, 'ע': 70, 'פ': 80, 'ף': 80, 'צ': 90, 'ץ': 90, 'ק': 100, 'ר': 200,
+            'ש': 300, 'ת': 400
             };
 
             let verseSum = 0;
             let wordValues = []; 
             const rawText = verse.t || "";
-            const wordsArray = rawText.split(" ");
-
+        
+            // Split by standard whitespace (\s, which includes \n) and the Maqaf (־)
+            const wordsArray = rawText.split(/[\s־|]+/);
+    
             wordsArray.forEach(word => {
                 let wordSum = 0;
+            
+                // Look at each character in the word string directly
                 for (let i = 0; i < word.length; i++) {
-                    let code = word.charCodeAt(i);
-                    if (gematriaMap[code]) {
-                        wordSum += gematriaMap[code];
+                    let char = word.charAt(i);
+                
+                    // Directly check if the character is one of our 22 square consonants
+                    if (gematriaMap[char]) {
+                        wordSum += gematriaMap[char];
                     }
                 }
+            
                 if (wordSum > 0) {
                     verseSum += wordSum;
                     wordValues.push(wordSum);
                 }
             });
 
-            // Reverses the array so the numbers sequence Right-to-Left
+            // ALL GLOBAL VERSE TEXT STRUCTURING PIECES SIT SAFELY OUTSIDE HERE:
             const rtlWordArithmeticTrace = wordValues.reverse().join(" + ");
 
             let tempNum = verseSum;
@@ -170,17 +177,19 @@
                 }
                 divisor++;
             }
-            if (tempNum > 1) factorSet.add(tempNum);
+            if (tempNum > 1) {
+                factorSet.add(tempNum);
+            }
             const formattedFactors = Array.from(factorSet).sort((a,b) => a - b).join(", ");
 
             const gematriaContainer = document.createElement('div');
             gematriaContainer.style.marginTop = '12px';
             gematriaContainer.style.paddingTop = '8px';
-            gematriaContainer.style.borderTop = '1px dashed #eee'; // Subtle separator line
+            gematriaContainer.style.borderTop = '1px dashed #eee'; 
             gematriaContainer.style.fontSize = '12px';
             gematriaContainer.style.color = '#555';
             gematriaContainer.style.direction = 'ltr'; 
-            
+        
             let colorClass = "gem-low";
             if (verseSum >= 600) colorClass = "gem-high";
             else if (verseSum >= 400) colorClass = "gem-mid-high";
@@ -200,8 +209,9 @@
                 Word weights (Right to Left): ${rtlWordArithmeticTrace || '0'}
               </div>
             `;
-            
+        
             section.append(gematriaContainer);
+            // ===================================================================
         }
         // ===================================================================
 
@@ -249,45 +259,6 @@
     vowelToggle.addEventListener('change', render);
     gematriaToggle.addEventListener('change', render);
 // Lightweight Experiment Module for ornament_chapter.html
-function experimentGematriaAndFactors(rawText) {
-    // Standard Hebrew decimal mappings (consonants only)
-    const gematriaMap = {
-        1488:1, 1489:2, 1490:3, 1491:4, 1492:5, 1493:6, 1494:7, 1495:8, 1496:9,
-        1497:10, 1499:20, 1498:20, 1500:30, 1502:40, 1501:40, 1504:50, 1503:50,
-        1505:60, 1506:70, 1508:80, 1507:80, 1510:90, 1509:90, 1511:100, 1512:200,
-        1513:300, 1514:400
-    };
-
-    let totalSum = 0;
-    // Walk character by character through the unescaped verse text
-    for (let i = 0; i < rawText.length; i++) {
-        let code = rawText.charCodeAt(i);
-        if (gematriaMap[code]) {
-            totalSum += gematriaMap[code];
-        }
-    }
-
-    // Lowest Common Factors (LCFs) Calculation Engine
-    let n = totalSum;
-    let factors = new Set();
-    let d = 2;
-    while (d * d <= n) {
-        while (n % d === 0) {
-            factors.add(d);
-            n = Math.floor(n / d);
-        }
-        d++;
-    }
-    if (n > 1) factors.add(n);
-
-    return {
-        sum: totalSum,
-        lcf: Array.from(factors).sort((a,b) => a - b).join(", ")
-    };
-}
-
-// Example usage: testing on a raw string element from Psalms 150
-// console.log(experimentGematriaAndFactors("הַלְלוּ־קֵ֥ל בְּקָדְשׁ֑וֹ")); 
   </script>
 </body>
 </html>
