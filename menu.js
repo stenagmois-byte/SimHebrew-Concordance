@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             <div class="menu-group-title">📐 Tropes & Ornaments</div>
             <a href="${baseUrl}/ornament_usage_by_pitch.html" class="menu-item-link">📊 Usage Matrix by Pitch</a>
-            <a href="#" id="contextual-ornament-records" class="menu-item-link">🔍 View Chapter Ornaments</a>
+            <a href="#" id="contextual-ornament-records" class="menu-item-link">🔍 Chapter Ornaments</a>
             
             <div class="menu-divider"></div>
             
@@ -172,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const recordBtn = document.getElementById("contextual-ornament-records");
             if (recordBtn) {
                 recordBtn.href = dynamicOrnamentUrl;
-                recordBtn.innerHTML = " View Chapter Ornaments: " + displayTitle + " " + chapterNum;
+                recordBtn.innerHTML = " Chapter Ornaments: " + displayTitle + " " + chapterNum;
             }
         }
     } catch (e) {
