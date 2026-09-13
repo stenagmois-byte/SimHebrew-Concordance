@@ -172,6 +172,7 @@ def build_output_page(groups, unique_factors, books):
             text-align: left;
         }
     </style>
+<script src="./menu.js" defer></script>
 </head>
 <body>
     <div class="nav" style="margin-left:10px; margin-top:10px;"><a href="matrix.html">Back to Matrix page</a> | <a href="musicscores/index.html">Back to Volume Index</a></div>

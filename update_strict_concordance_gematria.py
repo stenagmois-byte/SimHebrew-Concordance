@@ -37,10 +37,13 @@ def inject_gematria_to_files(directory_path):
     if not os.path.exists(directory_path):
         return
 
+def inject_gematria_to_files(directory_path):
+    if not os.path.exists(directory_path):
+        return
+
     for filename in os.listdir(directory_path):
         if filename.endswith(".html"):
-            # Clean length check using index [0] to extract just the text name
-            base_name = os.path.splitext(filename)[0]
+            base_name = os.path.splitext(filename)[0] # Fixed index parsing extraction
             if len(base_name) == 0 or len(base_name) > 2:
                 continue
                 
@@ -48,10 +51,30 @@ def inject_gematria_to_files(directory_path):
             
             with open(file_path, 'r', encoding='utf-8') as f:
                 raw_content = f.read()
-                
-            soup = BeautifulSoup(raw_content, 'html.parser')
-            modified = False
+
+            # ==========================================================================
+            # STEP 1: RAW TEXT MODERNIZER BLOCK (Bypasses BeautifulSoup Node Breakages)
+            # ==========================================================================
+            # Cleans off the old long XHTML doc headers completely via regular text replacement
+            cleaned_text = re.sub(r'<!DOCTYPE[^>]*>', '', raw_content, flags=re.IGNORECASE)
+            cleaned_text = re.sub(r'<html[^>]*>', '<html>', cleaned_text, flags=re.IGNORECASE)
             
+            # Prepend the pristine modern HTML5 directive safely at the absolute front string index
+            if not cleaned_text.strip().startswith("<!DOCTYPE html>"):
+                cleaned_text = "<!DOCTYPE html>\n" + cleaned_text.strip()
+
+            # Parse our stabilized text framework cleanly 
+            soup = BeautifulSoup(cleaned_text, 'html.parser')
+            modified = True # Set default true to force file standardization rewrite pass
+
+            # Ensure native UTF-8 meta blocks populate the head matrix
+            if soup.head and not soup.find('meta', charset=True):
+                meta_utf8 = soup.new_tag('meta', charset='utf-8')
+                soup.head.insert(0, meta_utf8)
+            
+            # ==========================================================================
+            # STEP 2: YOUR GEMATRIA LOGIC REGIME (UNTOUCHED & STABLE)
+            # ==========================================================================
             # 1. Update Layout Headers
             ref_header = soup.find('td', class_='tdch9')
             if ref_header and ref_header.get('colspan') == '2':
@@ -59,7 +82,6 @@ def inject_gematria_to_files(directory_path):
                 gem_header = soup.new_tag('td', attrs={'class': 'tdch10'})
                 gem_header.string = "Gem"
                 ref_header.insert_after(gem_header)
-                modified = True
             
             # 2. Update All Multi-Line Concordance Rows
             data_blocks = soup.find_all('div', class_='level2')
@@ -81,15 +103,15 @@ def inject_gematria_to_files(directory_path):
                             new_cell = soup.new_tag('div', attrs={'class': f'tdcl_gem {color_class}'})
                             new_cell.string = str(gematria_val)
                             ref_cell.insert_after(new_cell)
-                            modified = True
             
+            # ==========================================================================
+            # STEP 3: SAFE STREAM WRITE BACK OUT TO DISK
+            # ==========================================================================
             if modified:
                 with open(file_path, 'w', encoding='utf-8') as f:
-                    # FIXED LINE: We use standard HTML rules but encode as 'ascii'.
-                    # This forces Python to safely turn Hebrew letters back into codes like &#1492;
                     output_bytes = soup.encode(formatter="html", encoding="ascii")
                     f.write(output_bytes.decode('ascii'))
-                print(f"Processed entity-safe file: {filename}")
+                print(f"Successfully processed full modern file: {filename}")
 
 if __name__ == "__main__":
     inject_gematria_to_files(".")

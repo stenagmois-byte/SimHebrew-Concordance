@@ -304,7 +304,7 @@ document.getElementById("chapter-explorer-form").addEventListener("submit", even
     const book = chapterBookSelect.value;
     const chapter = document.getElementById("chapter-number").value;
     window.location.href = `ornament_chapter.html?book=${{encodeURIComponent(book)}}&chapter=${{encodeURIComponent(chapter)}}`;
-});
+
 </script>
 </body>
 </html>"""

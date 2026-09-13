@@ -167,6 +167,7 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         .tuba-badge {{ background: #000; color: #fff; font-size: 10px; padding: 2px 5px; border-radius: 3px; margin-left: 20px; font-family: monospace; flex-shrink: 0; }}
         .nav-btn.home-btn {{ background: #4A4A4A; }}
         .nav-btn.home-btn:hover {{ background: #333333; }}    </style>
+<script src="./menu.js" defer></script>
 </head>
 <body>
 <!-- Sticky Header Navigation Matching Your Oxford CSS Block Layout -->
