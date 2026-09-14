@@ -137,43 +137,80 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     document.body.appendChild(navWrapper);
 
-    // 5. ADVANCED CONTEXT RESOLVER
+    // 5. ADVANCED CONTEXT RESOLVER (Handles Overlapping Book Names & Query Parameters)
     try {
         const path = window.location.pathname;
-        if (path.includes('_matrix')) {
-            const fileSegment = path.split('/').pop() || "";
-            const chapterMatch = fileSegment.match(/\d+/);
-            const rawChapter = chapterMatch ? chapterMatch[0] : "1";
-            const chapterNum = parseInt(rawChapter, 10).toString();
+        const fullUrl = window.location.href.toUpperCase(); // Scans the absolute complete string parameters
+        const fileSegment = path.split('/').pop() || "";
 
-            const bookLookup = {
-                "HOSEA_": "Hosea", "JOEL_": "Joel", "AMOS_": "Amos", "OBADIAH_": "Obadiah",
-                "JONAH_": "Jonah", "MICAH_": "Micah", "NAHUM_": "Nahum", "HABAKKUK_": "Habakkuk",
-                "ZEPHANIAH_": "Zephaniah", "HAGGAI_": "Haggai", "ZECHARIAH_": "Zechariah", "MALACHI_": "Malachi",
-                "RUTH_": "Ruth", "ESTHER_": "Esther", "ECCLESIASTES_": "Ecclesiastes", "LAMENTATIONS_": "Lamentations",
-                "SONG_": "Song%20of%20Songs", "1_CHRONICLES_": "1%20Chronicles", "2_CHRONICLES_": "2%20Chronicles",
-                "1_KINGS_": "1%20Kings", "2_KINGS_": "2%20Kings", "1_SAMUEL_": "1%20Samuel", "2_SAMUEL_": "2%20Samuel",
-                "DANIEL_": "Daniel", "EZRA_": "Ezra", "NEHEMIAH_": "Nehemiah"
-            };
+        // 1. COMPREHENSIVE DICTIONARY MAP (Expanded to include Major Prophets)
+        const bookLookup = {
+            "EXODUS": "Exodus", "LEVITICUS": "Leviticus", "NUMBERS": "Numbers", "DEUTERONOMY": "Deuteronomy",
+            "JOSHUA": "Joshua", "JUDGES": "Judges", "PSALMS": "Psalms", "PROVERBS": "Proverbs", "JOB": "Job", 
+            "EZEKIEL": "Ezekiel", "ISAIAH": "Isaiah", "JEREMIAH": "Jeremiah",
+            "HOSEA": "Hosea", "JOEL": "Joel", "AMOS": "Amos", "OBADIAH": "Obadiah",
+            "JONAH": "Jonah", "MICAH": "Micah", "NAHUM": "Nahum", "HABAKKUK": "Habakkuk",
+            "ZEPHANIAH": "Zephaniah", "HAGGAI": "Haggai", "ZECHARIAH": "Zechariah", "MALACHI": "Malachi",
+            "RUTH": "Ruth", "ESTHER": "Esther", "ECCLESIASTES": "Ecclesiastes", "LAMENTATIONS": "Lamentations",
+            "SONG": "Song", "QOHELET": "Qohelet",
+            "1_CHRONICLES": "1%20Chronicles", "2_CHRONICLES": "2%20Chronicles", 
+            "1 CHRONICLES": "1%20Chronicles", "2 CHRONICLES": "2%20Chronicles",
+            "1_KINGS": "1%20Kings", "2_KINGS": "2%20Kings", "1 KINGS": "1%20Kings", "2 KINGS": "2%20Kings",
+            "1_SAMUEL": "1%20Samuel", "2_SAMUEL": "2%20Samuel", "1 SAMUEL": "1%20Samuel", "2 SAMUEL": "2%20Samuel",
+            "NEHEMIAH": "Nehemiah", "EZRA": "Ezra", "DANIEL": "Daniel"
+        };
 
-            let bookParam = "Genesis"; 
-            let displayTitle = "Genesis";
-            const upperFile = fileSegment.toUpperCase();
+        // 2. Default fallback variables
+        let bookParam = "Genesis"; 
+        let displayTitle = "Genesis";
 
+        // 3. PRIORITY MATCHING: We check the filename first to avoid multi-book folder conflicts
+        let foundMatch = false;
+        const upperFile = fileSegment.toUpperCase();
+
+        for (const key in bookLookup) {
+            if (upperFile.includes(key)) {
+                bookParam = bookLookup[key];
+                displayTitle = decodeURIComponent(bookLookup[key]);
+                foundMatch = true;
+                break;
+            }
+        }
+
+        // 4. SECONDARY MATCHING: If filename doesn't contain a key, we scan query parameters safely
+        // Checking for strict bounded query formats like "=EZRA" prevents folder names from cross-contaminating keys
+        if (!foundMatch) {
             for (const key in bookLookup) {
-                if (upperFile.startsWith(key)) {
+                if (fullUrl.includes("=" + key) || fullUrl.includes("_" + key) || fullUrl.includes(key + "_")) {
                     bookParam = bookLookup[key];
                     displayTitle = decodeURIComponent(bookLookup[key]);
                     break;
                 }
             }
+        }
 
-            const dynamicOrnamentUrl = `${baseUrl}/ornament_chapter.html?book=${bookParam}&chapter=${chapterNum}`;
-            const recordBtn = document.getElementById("contextual-ornament-records");
-            if (recordBtn) {
-                recordBtn.href = dynamicOrnamentUrl;
-                recordBtn.innerHTML = " Chapter Ornaments: " + displayTitle + " " + chapterNum;
+        // 5. Extract and clean the chapter digits out of the location
+        let chapterNum = "1";
+        if (path.includes('_matrix')) {
+            const chapterMatch = fileSegment.match(/\d+/);
+            const rawChapter = chapterMatch ? chapterMatch[0] : "1";
+            chapterNum = parseInt(rawChapter, 10).toString();
+        } else {
+            const urlParams = new URLSearchParams(window.location.search);
+            const chapterQuery = urlParams.get('chapter') || urlParams.get('book'); // Checks backup selectors
+            if (chapterQuery && chapterQuery.match(/\d+/)) {
+                const chapterMatch = chapterQuery.match(/\d+/);
+                chapterNum = parseInt(chapterMatch[0], 10).toString();
             }
+        }
+
+        // 6. Assemble the pristine final URL target
+        const dynamicOrnamentUrl = `${baseUrl}/ornament_chapter.html?book=${bookParam}&chapter=${chapterNum}`;
+        
+        const recordBtn = document.getElementById("contextual-ornament-records");
+        if (recordBtn) {
+            recordBtn.href = dynamicOrnamentUrl;
+            recordBtn.innerHTML = " View Chapter Ornaments: " + displayTitle + " " + chapterNum;
         }
     } catch (e) {
         console.warn("Context tracking skipped outside contour paths:", e);
