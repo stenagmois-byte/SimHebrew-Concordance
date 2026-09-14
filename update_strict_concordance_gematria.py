@@ -109,8 +109,8 @@ def inject_gematria_to_files(directory_path):
             # ==========================================================================
             if modified:
                 with open(file_path, 'w', encoding='utf-8') as f:
-                    output_bytes = soup.encode(formatter="html", encoding="ascii")
-                    f.write(output_bytes.decode('ascii'))
+                    output_bytes = soup.encode(formatter="html", encoding="utf-8")
+                    f.write(output_bytes.decode('utf-8'))
                 print(f"Successfully processed full modern file: {filename}")
 
 if __name__ == "__main__":

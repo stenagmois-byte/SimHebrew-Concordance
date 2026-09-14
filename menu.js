@@ -58,6 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
             gap: 8px !important;
             line-height: 1 !important;
         }
+
         .menu-trigger-btn:hover {
             background: #400000 !important;
         }
@@ -101,9 +102,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         /* Forces full-width real estate and clears room for the menu bar */
         body {
-            padding-top: 65px !important;
+            padding-top: 60px !important;
             max-width: none !important; 
             margin: 0 auto !important;
+        }
+        :target {
+            scroll-margin-top: 60px !important;
         }
     `;
     document.head.appendChild(style);
@@ -112,6 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const isGitHubPages = window.location.hostname.includes("github.io");
     const repoPath = isGitHubPages ? "/SimHebrew-Concordance" : "";
     const baseUrl = `${window.location.origin}${repoPath}`;
+    const basePath = isGitHubPages ? '/SimHebrew-Concordance/' : '/';
 
     // 4. Build UI Markup (Swapped broken emojis for clean, universal text markers)
     navWrapper.innerHTML = `
@@ -210,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const recordBtn = document.getElementById("contextual-ornament-records");
         if (recordBtn) {
             recordBtn.href = dynamicOrnamentUrl;
-            recordBtn.innerHTML = " View Chapter Ornaments: " + displayTitle + " " + chapterNum;
+            recordBtn.innerHTML = " Chapter Ornaments: " + displayTitle + " " + chapterNum;
         }
     } catch (e) {
         console.warn("Context tracking skipped outside contour paths:", e);
@@ -223,3 +228,147 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("🚀 [DEBUG] Global navigation pipeline script successfully loaded!");
+
+    const contextBox = document.createElement("div");
+    contextBox.id = "oracle-root-linker";
+    contextBox.style.cssText = `
+        display: none;
+        position: absolute;
+        z-index: 100000;
+        background: #800000;
+        border: 2px solid #d4af37;
+        border-radius: 6px;
+        padding: 8px 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    `;
+    document.body.appendChild(contextBox);
+
+    let wordRootMap = null;
+
+    // Fetch the Oracle-generated JSON dictionary file
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    const jsonPath = isGitHubPages ? '/SimHebrew-Concordance/word_to_root.json' : '/word_to_root.json';
+    const wordPath = isGitHubPages ? '/SimHebrew-Concordance/' : '/';
+    fetch(jsonPath)
+        .then(response => response.json())
+        .then(data => {
+            console.log("📥 [DEBUG] word_to_root.json successfully fetched from root directory.");
+            wordRootMap = {};
+            
+            // ORACLE PATH REPAIR:
+            // Drill down into the first element [0] of the results array to reach "items"
+            if (data && data.results && data.results[0] && data.results[0].items) {
+                const itemsList = data.results[0].items;
+                
+                itemsList.forEach(item => {
+                    const decodedHebrew = decodeHtmlEntities(item.h);
+                    wordRootMap[decodedHebrew] = item.r;
+                });
+                console.log(`✅ [DEBUG] Successfully mapped ${Object.keys(wordRootMap).length} dictionary entries into memory cache.`);
+            } else {
+                console.error("❌ [ERROR] JSON structure did not match expected Oracle format (results[0].items missing).");
+            }
+        })
+        .catch(err => {
+            console.error("❌ [ERROR] Failed to load or decode word_to_root.json layout template:", err);
+        });
+    // Main processing routine triggered on right-click or long-press
+    const resolveContextAddress = (e) => {
+        const rawSelection = window.getSelection().toString().trim();
+        
+        if (rawSelection.length > 0 && wordRootMap) {
+            
+            // 1. Strip vowels/accents first (leaving only consonants and Maqaf)
+            const cleanHebrew = rawSelection.replace(/[\u0591-\u05BD\u05BF-\u05C7]/g, "").trim();
+            
+            // 2. Transliterate to Latin SimHebrew script! (e.g., "מזמור" -> "mzmur")
+            const simHebrewKey = translateHebrewToSimHebrew(cleanHebrew);
+            console.log(`🔤 [SIMHEBREW KEY] Converted selection to: "${simHebrewKey}"`);
+
+            // 3. Query your simplified JSON using the pure Latin string key
+            const rootCode = wordRootMap[simHebrewKey];
+
+            if (rootCode) {
+                e.preventDefault();
+                console.log(`🎯 [MATCH FOUND] Found root code: "${rootCode}"`);
+
+                // Structural anchor normalization (f -> T) for hashes
+                const targetHash = rootCode.replace(/f/g, 'T');
+
+                // Preserve 'f' for file prefix to prevent case collisions with 't' (Taf)
+                const rawPrefix = rootCode.substring(0, 2); 
+                const computedUrl = `${wordPath}${rawPrefix}.html#${targetHash}`;
+
+                contextBox.innerHTML = `
+                    <a href="${computedUrl}" style="color: #fff; text-decoration: none; font-size: 13px; font-family: system-ui, sans-serif; display: flex; align-items: center; gap: 6px;" target="_blank">
+                        🔍 Concordance Root View: <strong>${targetHash}</strong>
+                    </a>
+`;
+
+                const pageX = e.pageX || (e.touches ? e.touches.pageX : 0);
+                const pageY = e.pageY || (e.touches ? e.touches.pageY : 0);
+                
+                contextBox.style.left = `${pageX + 10}px`;
+                contextBox.style.top = `${pageY + 10}px`;
+                contextBox.style.display = "block";
+            } else {
+                console.warn(`🔍 [NO MATCH] The SimHebrew key "${simHebrewKey}" does not exist in your JSON database.`);
+            }
+        }
+    };
+
+    // Attach standard context listeners
+    document.body.addEventListener("contextmenu", resolveContextAddress);
+    document.body.addEventListener("touchend", (e) => {
+        setTimeout(() => {
+            if (window.getSelection().toString().trim().length > 0) resolveContextAddress(e);
+        }, 150);
+    });
+    document.addEventListener("mousedown", (e) => {
+        if (!contextBox.contains(e.target)) {
+            contextBox.style.display = "none";
+        }
+    });
+});
+
+function stripHebrewAccents(text) {
+    return text.replace(/[\u0591-\u05BD\u05BF-\u05C7]/g, "").trim();
+}
+
+function decodeHtmlEntities(str) {
+    const txt = document.createElement("textarea");
+    txt.innerHTML = str;
+    return txt.value;
+}
+/**
+ * Transliterates clean consonantal Hebrew text into your Latin SimHebrew equivalent.
+ * Maps both standard and final (Sofit) variants to their correct keys.
+ */
+function translateHebrewToSimHebrew(text) {
+    const translationTable = {
+        // Standard Characters
+        'א': 'a', 'ב': 'b', 'ג': 'g', 'ד': 'd', 'ה': 'h', 
+        'ו': 'v', 'ז': 'z', 'ח': 'k', 'ט': 'T', 'י': 'i', 
+        'כ': 'c', 'ל': 'l', 'מ': 'm', 'נ': 'n', 'ס': 's', 
+        'ע': 'y', 'פ': 'p', 'צ': 'x', 'ק': 'q', 'ר': 'r', 
+        'ש': 'w', 'ת': 't',
+        
+        // Final (Sofit) Characters
+        'ך': 'c', 'ם': 'm', 'ן': 'n', 'ף': 'p', 'ץ': 'x'
+    };
+
+    let latinResult = "";
+    for (let char of text) {
+        // If it's a character in our dictionary table, convert it; 
+        // Otherwise, keep it as-is (like the Maqaf hyphen '־')
+        if (translationTable[char]) {
+            latinResult += translationTable[char];
+        } else {
+            latinResult += char;
+        }
+    }
+    return latinResult;
+}
+
