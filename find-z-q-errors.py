@@ -171,7 +171,7 @@ def build_review_queue():
                 hebrew_ratio = profile["atnah_word_idx"] / profile["heb_total_words"]
                 english_ratio = caesura_index / len(english_words)
                 caesura_variance = abs(hebrew_ratio - english_ratio)
-                if caesura_variance > 0.20:
+                if caesura_variance > 0.25:
                     issues.append("MISPLACED_CAESURA_BOUNDARY")
         else:
             first_english, second_english = english, ""
