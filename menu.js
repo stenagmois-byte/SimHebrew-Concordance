@@ -129,14 +129,14 @@ document.addEventListener("DOMContentLoaded", function() {
             top: 0;
             left: 0;
             width: 100% !important;
-            height: 50px !important;
+            height: 40px !important;
             background: #800000 !important; 
             z-index: 999999 !important;
             font-family: Arial, sans-serif !important;
             display: flex !important;
             align-items: center !important;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
-            padding: 0 15px !important;
+            padding: 0 10px !important;
             box-sizing: border-box !important;
         }
         .menu-trigger-btn {
