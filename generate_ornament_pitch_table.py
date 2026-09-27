@@ -235,7 +235,7 @@ def run_distribution_analysis(chapter_index_only=False):
     <p>This concordance matrix outlines the distribution frequency of accents above the text aligned against the accent below the text that immediately precedes them defining the recitation pitch that governs the ornaments.</p>
 
     <form id="chapter-explorer-form" style="margin: 25px 0; padding: 18px; background: #f3f0e8; border-left: 4px solid #800000; font-family: sans-serif;">
-        <strong style="color: #800000;">Explore a chapter</strong>
+        <strong style="color: #800000;">Trope for a chapter</strong>
         <label style="margin-left: 18px;">Book
             <select id="chapter-book" required style="margin-left: 6px; padding: 5px;"></select>
         </label>

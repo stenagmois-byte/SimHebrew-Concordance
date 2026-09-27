@@ -2,6 +2,7 @@
 // menu.js - Universal Navigation & Interlinear Gloss Pipeline
 // ==========================================
 
+// Global 39-book sequence mapping (book_seq_no padded to 2 digits)
 const bookSequenceMap = {
     "GENESIS": "01", "EXODUS": "02", "LEVITICUS": "03", "NUMBERS": "04", "DEUTERONOMY": "05",
     "JOSHUA": "06", "JUDGES": "07", "1_SAMUEL": "08", "2_SAMUEL": "09", "1_KINGS": "10",
@@ -13,15 +14,22 @@ const bookSequenceMap = {
     "EZRA": "36", "NEHEMIAH": "37", "1_CHRONICLES": "38", "2_CHRONICLES": "39"
 };
 
+/**
+ * Normalizes book names to standard uppercase underscore format.
+ * Examples: "1 Samuel", "1%20Samuel", "1_SAMUEL" -> "1_SAMUEL"
+ */
 function normalizeBookName(raw) {
-    if (!raw) return "";
+    if (!raw) return "GENESIS";
     const decoded = decodeURIComponent(raw).trim().toUpperCase();
     return decoded.replace(/%20/g, ' ').replace(/\s+/g, '_').replace(/_+/g, '_');
 }
 
+/**
+ * Formats directory book keys into clean display titles.
+ * Examples: "1_SAMUEL" -> "1 Samuel", "JOB" -> "Job"
+ */
 function formatDisplayTitle(bookKey) {
     const clean = normalizeBookName(bookKey);
-    if (!clean) return "";
     const parts = clean.split('_');
     return parts.map(p => {
         if (p.match(/^\d+$/)) return p;
@@ -29,6 +37,9 @@ function formatDisplayTitle(bookKey) {
     }).join(' ');
 }
 
+/**
+ * Extracts pure consonantal Hebrew text by stripping HTML entities, niqqud, and cantillation marks.
+ */
 function stripHebrew(str) {
     if (!str) return "";
     const decoded = decodeHtmlEntities(str);
@@ -42,10 +53,13 @@ function decodeHtmlEntities(str) {
     return txt.value;
 }
 
+// 📥 GLOBAL CHAPTER DATA STORE
 let interlinDataList = [];
 
+/**
+ * Fetches individual chapter JSON file (e.g. chapters/ESTHER/ESTHER_001.json)
+ */
 function loadChapterInterlinear(book, chap) {
-    if (!book || !chap) return;
     const isGitHubPages = window.location.hostname.includes('github.io');
     const basePath = isGitHubPages ? '/SimHebrew-Concordance' : '';
     const cleanBook = normalizeBookName(book);
@@ -53,11 +67,11 @@ function loadChapterInterlinear(book, chap) {
     const chapterJsonPath = `${basePath}/chapters/${cleanBook}/${cleanBook}_${padCh}.json`;
     const customBuster = "?cb=" + new Date().getTime();
 
-    console.log(`📥 [CHAPTER FETCH] Fetching interlinear JSON: ${chapterJsonPath}`);
+    console.log(`📥 [CHAPTER FETCH] Fetching chapter interlinear: ${chapterJsonPath}`);
 
     fetch(chapterJsonPath + customBuster)
         .then(response => {
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            if (!response.ok) throw new Error(`HTTP ${response.status} when fetching ${chapterJsonPath}`);
             return response.json();
         })
         .then(data => {
@@ -70,7 +84,7 @@ function loadChapterInterlinear(book, chap) {
             } else {
                 interlinDataList = [];
             }
-            console.log(`✅ [CHAPTER DATA MOUNTED] Loaded ${interlinDataList.length} items for ${cleanBook} Ch ${padCh}.`);
+            console.log(`✅ [CHAPTER DATA MOUNTED] Loaded ${interlinDataList.length} items for ${cleanBook} Chapter ${padCh}.`);
         })
         .catch(err => {
             console.warn(`⚠️ [CHAPTER FETCH FALLBACK] Could not load ${chapterJsonPath}:`, err);
@@ -78,12 +92,32 @@ function loadChapterInterlinear(book, chap) {
         });
 }
 
+// Bind globally for immediate availability
 window.loadChapterInterlinear = loadChapterInterlinear;
 
 document.addEventListener("DOMContentLoaded", function() {
     // ---------------------------------------------------------
-    // PHASE 1: TOP BUTTON MENU BAR
+    // PHASE 1: GLOBAL HAMBURGER MENU (Runs on EVERY screen)
     // ---------------------------------------------------------
+    console.log("Initializing global hamburger menu components...");
+
+    try {
+        if (!document.querySelector('meta[charset]') && !document.querySelector('meta[http-equiv="Content-Type"]')) {
+            const metaCharset = document.createElement('meta');
+            metaCharset.setAttribute('charset', 'utf-8');
+            document.head.insertBefore(metaCharset, document.head.firstChild);
+        }
+
+        if (!document.querySelector('meta[name="viewport"]')) {
+            const metaViewport = document.createElement('meta');
+            metaViewport.name = 'viewport';
+            metaViewport.content = 'width=device-width, initial-scale=1.0';
+            document.head.appendChild(metaViewport);
+        }
+    } catch (e) {
+        console.warn("Header injection skipped:", e);
+    }
+
     const navWrapper = document.createElement("nav");
     navWrapper.id = "canonical-nav-menu";
     navWrapper.setAttribute("aria-label", "Tanach Music Concordance Navigator");
@@ -95,71 +129,74 @@ document.addEventListener("DOMContentLoaded", function() {
             top: 0;
             left: 0;
             width: 100% !important;
-            height: 48px !important;
+            height: 40px !important;
             background: #800000 !important; 
             z-index: 999999 !important;
             font-family: Arial, sans-serif !important;
             display: flex !important;
             align-items: center !important;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
-            padding: 0 8px !important;
+            padding: 0 10px !important;
             box-sizing: border-box !important;
         }
-        .top-nav-bar {
-            display: flex !important;
-            flex-direction: row !important;
-            align-items: center !important;
-            gap: 6px !important;
-            width: 100% !important;
-            overflow-x: auto !important;
-            scrollbar-width: thin !important;
-        }
-        .top-nav-btn {
+        .menu-trigger-btn {
             background: #600000 !important; 
             color: #fcfcf9 !important;     
-            border: 1px solid #a03030 !important;
-            padding: 3px 10px !important;  
+            border: 1px solid #400000 !important;
+            padding: 8px 16px !important;  
             border-radius: 4px !important; 
             cursor: pointer !important;
-            text-decoration: none !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: center !important;
-            align-items: center !important;
-            text-align: center !important;
-            min-width: 110px !important;
-            height: 38px !important;
-            box-sizing: border-box !important;
-            transition: background 0.15s, border-color 0.15s !important;
-            flex-shrink: 0 !important;
-        }
-        .top-nav-btn:hover { 
-            background: #400000 !important; 
-            border-color: #d4af37 !important;
-            color: #ffd700 !important;
-        }
-        .top-nav-btn.is-hidden {
-            display: none !important;
-        }
-        .btn-line1 {
-            font-size: 11px !important;
             font-weight: bold !important;
-            line-height: 1.1 !important;
-            white-space: nowrap !important;
+            font-size: 18px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            line-height: 1 !important;
         }
-        .btn-line2 {
-            font-size: 10px !important;
+        .menu-trigger-btn:hover { background: #400000 !important; }
+        .menu-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 48px !important;
+            left: 15px !important; 
+            background: #ffffff !important;
+            border: 1px solid #ddd !important;
+            border-radius: 6px !important;
+            width: 300px !important;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
+            padding: 12px !important;
+        }
+        .menu-dropdown-content.active { display: block !important; }
+        .menu-group-title {
+            font-size: 13px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
+            color: #566573 !important;     
+            margin: 10px 0 6px 4px !important;
+            font-weight: 700 !important;
+        }
+        .menu-item-link {
+            display: block !important;
+            padding: 8px 10px !important;
+            color: #222 !important;
+            text-decoration: none !important;
+            border-radius: 4px !important;
+            font-size: 16px !important;
             font-weight: normal !important;
-            color: #e0d0c0 !important;
-            line-height: 1.1 !important;
-            white-space: nowrap !important;
+            transition: background 0.15s !important;
         }
+        .menu-item-link:hover { 
+            background: #f3f0e8 !important; 
+            color: #800000 !important;      
+        }
+        .menu-divider { border-top: 1px solid #eee !important; margin: 8px 0 !important; }
+
         body {
-            padding-top: 58px !important;
+            padding-top: 60px !important;
             max-width: none !important; 
             margin: 0 auto !important;
         }
-        :target { scroll-margin-top: 58px !important; }
+        :target { scroll-margin-top: 60px !important; }
     `;
     document.head.appendChild(style);
 
@@ -169,97 +206,92 @@ document.addEventListener("DOMContentLoaded", function() {
     const wordPath = isGitHubPages ? '/SimHebrew-Concordance/' : '/';
 
     navWrapper.innerHTML = `
-        <div class="top-nav-bar">
-            <a href="${baseUrl}/index.html" class="top-nav-btn">
-                <span class="btn-line1">🏠 Home</span>
-                <span class="btn-line2">Introduction</span>
-            </a>
-            <a href="${baseUrl}/musicscores/index.html" class="top-nav-btn">
-                <span class="btn-line1">📁 Volume Index</span>
-                <span class="btn-line2">Scores and Contours</span>
-            </a>
-            <a href="${baseUrl}/ornament_usage_by_pitch.html" class="top-nav-btn">
-                <span class="btn-line1">📊 Ornaments</span>
-                <span class="btn-line2">by Pitch</span>
-            </a>
-            <a href="#" id="contextual-ornament-records" class="top-nav-btn is-hidden">
-                <span class="btn-line1">🔍 Full Trope</span>
-                <span class="btn-line2" id="chapter-btn-label">by Chapter</span>
-            </a>
-            <a href="${baseUrl}/matrix.html" class="top-nav-btn">
-                <span class="btn-line1">⌨️ Word Matrix</span>
-                <span class="btn-line2">SimHebrew</span>
-            </a>
-            <a href="${baseUrl}/gematria_verse_twins.html" class="top-nav-btn">
-                <span class="btn-line1">🔢 Gematria</span>
-                <span class="btn-line2">Verse Twins</span>
-            </a>
+        <button class="menu-trigger-btn" onclick="document.getElementById('menu-dropdown').classList.toggle('active')">
+            <span>☰</span><span class="menu-btn-text"> Menu</span>
+        </button>
+        <div id="menu-dropdown" class="menu-dropdown-content">
+            <div class="menu-group-title">🎼 Scores and Contours</div>
+            <a href="${baseUrl}/musicscores/index.html" class="menu-item-link">📁 Volume Index (929 Contours)</a>
+            
+            <div class="menu-divider"></div>
+            
+            <div class="menu-group-title">📐 Tropes & Ornaments</div>
+            <a href="${baseUrl}/ornament_usage_by_pitch.html" class="menu-item-link">📊 Usage Matrix by Pitch</a>
+            <a href="#" id="contextual-ornament-records" class="menu-item-link">🔍 Chapter Ornaments</a>
+            
+            <div class="menu-divider"></div>
+            
+            <div class="menu-group-title">🔤 Textual Lexicons</div>
+            <a href="${baseUrl}/matrix.html" class="menu-item-link">⌨️ SimHebrew Word Matrix</a>
+            <a href="${baseUrl}/gematria_verse_twins.html" class="menu-item-link">🔢 Gematria Verse Weights</a>
         </div>
     `;
     document.body.appendChild(navWrapper);
 
     // ---------------------------------------------------------
-    // PHASE 2: CONTEXT RESOLUTION (929 CONTOUR PAGES & CANTILLATION SCREEN)
+    // PHASE 2: CONDITIONAL GUARD (Determines screen type)
     // ---------------------------------------------------------
-    const recordBtn = document.getElementById("contextual-ornament-records");
-    const labelSpan = document.getElementById("chapter-btn-label");
+    const currentUrl = window.location.href;
+    const isChapterScreen = currentUrl.includes('ornament_chapter.html');
+    const isMatrixScreen = currentUrl.includes('_matrix.html');
 
-    let cleanBook = null;
-    let chapterNum = null;
+    if (!isChapterScreen && !isMatrixScreen) {
+        console.log("Standard screen verified. Exiting gloss initialization.");
+        return;
+    }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const rawBookParam = urlParams.get('book');
-    const rawChapterParam = urlParams.get('chapter');
+    // ---------------------------------------------------------
+    // PHASE 3: INTERLINEAR GLOSS POPUPS (Only Matrix / Chapter)
+    // ---------------------------------------------------------
+    console.log("Matrix or Chapter screen detected. Resolving book & chapter context...");
 
-    const pathSegments = window.location.pathname.split('/');
-    const filename = pathSegments[pathSegments.length - 1] || "";
+    let cleanBook = "GENESIS";
+    let chapterNum = "1";
 
-    // Case 1: URL Query Parameters (e.g. ornament_chapter.html?book=Isaiah&chapter=5)
-    if (rawBookParam) {
-        const candidateBook = normalizeBookName(rawBookParam);
-        if (bookSequenceMap[candidateBook]) {
-            cleanBook = candidateBook;
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const rawBookParam = urlParams.get('book');
+        const rawChapterParam = urlParams.get('chapter');
+
+        if (rawBookParam) {
+            cleanBook = normalizeBookName(rawBookParam);
             if (rawChapterParam && rawChapterParam.match(/\d+/)) {
                 chapterNum = parseInt(rawChapterParam.match(/\d+/), 10).toString();
             }
-        }
-    }
-    // Case 2: Filename pattern matching (e.g. ISAIAH_005_matrix.html)
-    else {
-        const contourMatch = filename.match(/^([A-Z0-9_]+)_(\d{1,3})_matrix\.html$/i);
-        if (contourMatch) {
-            const candidateBook = normalizeBookName(contourMatch[1]);
-            if (bookSequenceMap[candidateBook]) {
-                cleanBook = candidateBook;
-                chapterNum = parseInt(contourMatch[2], 10).toString();
+        } else {
+            const path = window.location.pathname;
+            const fileSegment = path.split('/').pop() || "";
+            const matrixMatch = fileSegment.match(/^([A-Z0-9_]+)_(\d{3})_/i);
+
+            if (matrixMatch) {
+                cleanBook = normalizeBookName(matrixMatch[1]);
+                chapterNum = parseInt(matrixMatch[2], 10).toString();
+            } else {
+                const parts = fileSegment.split('_');
+                if (parts.length > 0 && parts[0]) {
+                    cleanBook = normalizeBookName(parts[0]);
+                }
             }
         }
-    }
 
-    // Mount chapter data & update top menu button state
-    if (cleanBook && chapterNum && bookSequenceMap[cleanBook]) {
         const displayTitle = formatDisplayTitle(cleanBook);
-        const dynamicOrnamentUrl = `${baseUrl}/ornament_chapter.html?book=${encodeURIComponent(displayTitle)}&chapter=${chapterNum}`;
+        console.log(`📍 [CONTEXT RESOLVED] Active Book: "${cleanBook}" (${displayTitle}), Chapter: ${chapterNum}`);
 
-        // Load chapter JSON for concordance popups on both matrix & cantillation screens
+        const dynamicOrnamentUrl = `${baseUrl}/ornament_chapter.html?book=${encodeURIComponent(displayTitle)}&chapter=${chapterNum}`;
+        const recordBtn = document.getElementById("contextual-ornament-records");
+        if (recordBtn) {
+            recordBtn.href = dynamicOrnamentUrl;
+            recordBtn.innerHTML = " Chapter Ornaments: " + displayTitle + " " + chapterNum;
+        }
+
         loadChapterInterlinear(cleanBook, chapterNum);
 
-        // Show "Cantillation [Book] [Ch]" button ONLY when on a 929 contour page (_matrix.html)
-        if (filename.includes('_matrix.html')) {
-            if (recordBtn && labelSpan) {
-                recordBtn.href = dynamicOrnamentUrl;
-                labelSpan.textContent = `${displayTitle} ${chapterNum}`;
-                recordBtn.classList.remove("is-hidden");
-            }
-        } else {
-            if (recordBtn) recordBtn.classList.add("is-hidden");
-        }
-    } else {
-        if (recordBtn) recordBtn.classList.add("is-hidden");
+    } catch (e) {
+        console.warn("Context tracking skipped outside contour paths:", e);
     }
 
     // ---------------------------------------------------------
-    // PHASE 3: INTERLINEAR GLOSS POPUP & CONCORDANCE LINKER
+    // CONTEXTUAL POPUP BOX SETUP
     // ---------------------------------------------------------
     const contextBox = document.createElement("div");
     contextBox.id = "oracle-root-linker";
@@ -275,6 +307,9 @@ document.addEventListener("DOMContentLoaded", function() {
     `;
     document.body.appendChild(contextBox);
 
+    /**
+     * Contextual lookup resolver triggered on word selection / right-click
+     */
     const resolveContextAddress = (e) => {
         const rawSelection = window.getSelection().toString().trim();
         if (rawSelection.length === 0) return;
@@ -284,9 +319,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
         e.preventDefault();
 
-        let padBook = cleanBook ? (bookSequenceMap[cleanBook] || "01") : "01";
+        let padBook = bookSequenceMap[cleanBook] || "01";
         let padCh = String(chapterNum || 1).padStart(3, '0');
 
+        // Locate closest verse container element
         const verseWrapper = e.target.closest('[id]') || e.target.closest('.verse') || e.target.closest('[data-verse]') || e.target.closest('p');
         let parsedVerseNum = "001";
         if (verseWrapper) {
@@ -299,7 +335,13 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         const currentVersePrefix = `${padBook}_${padCh}_${parsedVerseNum}_`;
+        console.log(`🎯 [VERSE SCOPE BOUND] Scanning matrix for verse key prefix: "${currentVersePrefix}" with selection: "${cleanHebrew}"`);
 
+        // 🍇 TIERED WORD RESOLVER LOGIC
+        // Tier 1: Exact consonantal text match in current verse
+        // Tier 2: Prefix-tolerant consonantal match in current verse
+        // Tier 3: Exact consonantal text match in entire chapter
+        // Tier 4: Prefix-tolerant match in entire chapter
         const databaseRowMatch = interlinDataList.find(item => {
             if (!item.h || !item.k) return false;
             if (!item.k.startsWith(currentVersePrefix)) return false;
@@ -336,6 +378,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const rawPrefix = targetRoot.substring(0, 2);
         const computedUrl = `${wordPath}${rawPrefix}.html#${targetHash}`;
 
+        // Render popup inside Oxford Maroon container
         contextBox.innerHTML = `
             <div style="color: #f0f0f0; font-size: 11px; font-family: system-ui, sans-serif; font-style: italic; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 6px; margin-bottom: 6px; width: 100%;">
                 Gloss: <strong style="color: #ffd700; font-style: normal; font-size: 12px;">"${localGloss}"</strong> 
@@ -354,6 +397,7 @@ document.addEventListener("DOMContentLoaded", function() {
         contextBox.style.display = "block";
     };
 
+    // Attach listeners
     document.body.addEventListener("contextmenu", resolveContextAddress);
     document.body.addEventListener("touchend", (e) => {
         setTimeout(() => {
@@ -363,6 +407,13 @@ document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener("mousedown", (e) => {
         if (!contextBox.contains(e.target)) {
             contextBox.style.display = "none";
+        }
+    });
+
+    window.addEventListener("click", (e) => {
+        if (!navWrapper.contains(e.target)) {
+            const drop = document.getElementById('menu-dropdown');
+            if (drop) drop.classList.remove('active');
         }
     });
 });
