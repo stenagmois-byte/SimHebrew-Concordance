@@ -172,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function() {
         <div class="top-nav-bar">
             <a href="${baseUrl}/index.html" class="top-nav-btn">
                 <span class="btn-line1">🏠 Home</span>
-                <span class="btn-line2">The Print Edition</span>
+                <span class="btn-line2">Project History</span>
             </a>
             <a href="${baseUrl}/musicscores/index.html" class="top-nav-btn">
                 <span class="btn-line1">📁 Hebrew Bible</span>
