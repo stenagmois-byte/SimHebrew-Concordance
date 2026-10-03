@@ -414,10 +414,20 @@
         liturgicalTier = "Verse Without Subdominant (Atnah) Cadence";
     }
 
+// 1. Convert "1_CHRONICLES" -> "1 CHRONICLES" for the folder name
+const folderName = rawBookCode.replace(/_/g, " ");
+
+// 2. Ensure proper casing for file name: "1_Chronicles"
+const properBookName = toProperCase(rawBookCode).replace(/ /g, "_");
+const audioFileName = `${properBookName}_${chNum}_${vsNum}`;
+
+// 3. Encode spaces cleanly for web URLs (%20)
+const audioUrl = `musicscores/audio/${encodeURIComponent(folderName)}/${audioFileName}.mp3`;
+
     // Call the outside function safely
-    const properBookName = toProperCase(rawBookCode);
-    const audioFileName = `${properBookName}_${chNum}_${vsNum}`;
-    const audioUrl = `musicscores/audio/${rawBookCode}/${audioFileName}.mp3`;
+//    const properBookName = toProperCase(rawBookCode);
+//    const audioFileName = `${properBookName}_${chNum}_${vsNum}`;
+//    const audioUrl = `musicscores/audio/${rawBookCode}/${audioFileName}.mp3`;
     const formattedTextLine = textLine.replace(/𝄓/g, '<br />');
 
     // Append to string buffer instead of touching the live web DOM
@@ -438,11 +448,10 @@
         <td class="text-cell">
           <div style="font-size: 1.1rem;">${formattedTextLine}</div>
         </td>
-        <td style="text-align: center; vertical-align: middle;">
-          <audio controls preload="none" style="width: 100%; max-width: 250px; display: block; margin: 0 auto;">
-              <source src="${audioUrl || ''}" type="audio/mpeg">
-          </audio>
-        </td>
+<td style="text-align: center; vertical-align: middle;">
+  <audio src="${audioUrl || ''}" controls preload="none" style="width: 100%; max-width: 250px; display: block; margin: 0 auto;">
+  </audio>
+</td>
       </tr>
     `;
   }
@@ -551,6 +560,16 @@
       });
     }
 
+// Automatically pause any playing audio track when a new one starts
+document.addEventListener('play', function(e) {
+    const allAudios = document.querySelectorAll('audio');
+    allAudios.forEach(audio => {
+        if (audio !== e.target) {
+            audio.pause();
+            audio.currentTime = 0; // Resets previous track back to start
+        }
+    });
+}, true); // 'true' captures the play event as it bubbles up
   </script>
   <!-- ===================================================================== -->
   <!-- 🎛️ DYNAMIC RIGHT-CLICK EXTENSIONS CONTROLLER LAYER                     -->
