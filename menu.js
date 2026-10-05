@@ -257,7 +257,20 @@ document.addEventListener("DOMContentLoaded", function() {
     } else {
         if (recordBtn) recordBtn.classList.add("is-hidden");
     }
+const currentUrl = window.location.href;
 
+// Explicitly suppress on ornament_records.html
+if (currentUrl.includes('ornament_records.html')) {
+    console.log("Records overview screen detected. Suppressing context popup.");
+    return; // Exits before registering contextmenu event listeners
+}
+
+const isChapterScreen = currentUrl.includes('ornament_chapter.html');
+const isMatrixScreen = currentUrl.includes('_matrix.html');
+
+if (!isChapterScreen && !isMatrixScreen) {
+    return;
+}
     // ---------------------------------------------------------
     // PHASE 3: INTERLINEAR GLOSS POPUP & CONCORDANCE LINKER
     // ---------------------------------------------------------
