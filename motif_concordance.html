@@ -29,7 +29,7 @@
     /* 📊 3-Column Structural Text Matrix Table Styles */
     .concordance-matrix-table { width: 100%; border-collapse: collapse; font-family: 'Georgia', serif; margin-top: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     .concordance-matrix-table td { padding: 10px 12px; border: 1px solid #ddd; vertical-align: top; font-size: 1.05rem; }
-    .matrix-hdr { background-color: #f3f0e8; color: #800000; font-weight: bold; font-family: sans-serif; font-size: 0.85rem; text-transform: uppercase; }
+    .matrix-hdr { background-color: #f3f0e8; color: #800000; font-weight: bold; font-family: sans-serif; font-size: 0.85rem;  }
     
     .text-cell { line-height: 1.5; color: #222; }
   </style>
@@ -84,8 +84,9 @@
       <thead>
         <tr>
           <td class="matrix-hdr">Book</td>
-          <td class="matrix-hdr">Location</td>
+          <td class="matrix-hdr">Contour</td>
           <td class="matrix-hdr">English Text</td>
+          <td class="matrix-hdr">Trope</td>
           <td class="matrix-hdr" style="width: 18%;">Audio</td>
         </tr>
       </thead>
@@ -404,6 +405,7 @@
     
     let targetChapterUrl = `./musicscores/${targetFolder}/${chapterFileName}#${occ.r}`;
 
+    let targetTropeUrl = `ornament_chapter.html?book=${encodeURIComponent(bookDisplay)}&chapter=${chNum}#${occ.r}`;
     let liturgicalTier = occ.t || "Unknown Tier";
     
     if (liturgicalTier === "Left Approach") {
@@ -425,9 +427,6 @@ const audioFileName = `${properBookName}_${chNum}_${vsNum}`;
 const audioUrl = `musicscores/audio/${encodeURIComponent(folderName)}/${audioFileName}.mp3`;
 
     // Call the outside function safely
-//    const properBookName = toProperCase(rawBookCode);
-//    const audioFileName = `${properBookName}_${chNum}_${vsNum}`;
-//    const audioUrl = `musicscores/audio/${rawBookCode}/${audioFileName}.mp3`;
     const formattedTextLine = textLine.replace(/𝄓/g, '<br />');
 
     // Append to string buffer instead of touching the live web DOM
@@ -441,17 +440,22 @@ const audioUrl = `musicscores/audio/${encodeURIComponent(folderName)}/${audioFil
           </div>
         </td>
         <td>
-          <a href="${targetChapterUrl}" style="color:#800000; text-decoration:underline; font-weight:bold; font-family: sans-serif;" title="Open complete chapter color matrix">
+          <a href="${targetChapterUrl}" style="color:#800000; text-decoration:underline; font-weight:bold; font-family: sans-serif;" title="Open chapter contour page">
             ${chNum}:${vsNum} ↗
           </a>
         </td>
         <td class="text-cell">
           <div style="font-size: 1.1rem;">${formattedTextLine}</div>
         </td>
-<td style="text-align: center; vertical-align: middle;">
-  <audio src="${audioUrl || ''}" controls preload="none" style="width: 100%; max-width: 250px; display: block; margin: 0 auto;">
-  </audio>
-</td>
+        <td>
+          <a href="${targetTropeUrl}" style="color:#800000; text-decoration:underline; font-weight:bold; font-family: sans-serif;" title="Open chapter trope page" target ="_blank">
+            ${chNum}:${vsNum} ↗
+          </a>
+        </td>
+        <td style="text-align: center; vertical-align: middle;">
+            <audio src="${audioUrl || ''}" controls preload="none" style="width: 100%; max-width: 250px; display: block; margin: 0 auto;">
+            </audio>
+         </td>
       </tr>
     `;
   }
