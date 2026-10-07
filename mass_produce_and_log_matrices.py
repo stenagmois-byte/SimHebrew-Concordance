@@ -188,7 +188,6 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
     <!-- Right Hand Action Controls Alignment Cluster -->
     <div class="nav-cluster" style="display: flex; gap: 8px; align-items: center;">
         {prev_button}
-        {home_button}
         
         <!-- Search Subsystem Portal Link Hook -->
         <a id="globalSearchBtn" href="../../motif_concordance.html?book={book_id.upper()}" class="nav-btn" style="background-color: #800000; color: white; border: 1px solid #800000; text-decoration: none; padding: 6px 12px; border-radius: 4px; font-variant: all-small-caps; font-weight: bold; font-family: sans-serif; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">

@@ -12,7 +12,23 @@ const bookSequenceMap = {
     "RUTH": "31", "LAMENTATIONS": "32", "QOHELET": "33", "ESTHER": "34", "DANIEL": "35",
     "EZRA": "36", "NEHEMIAH": "37", "1_CHRONICLES": "38", "2_CHRONICLES": "39"
 };
-
+const bookVolumeMap = {
+    "GENESIS": "Genesis", "EXODUS": "Exodus", "LEVITICUS": "Leviticus",
+    "NUMBERS": "Numbers", "DEUTERONOMY": "Deuteronomy", "JOSHUA": "Joshua-Judges",
+    "JUDGES": "Joshua-Judges", "1_SAMUEL": "Samuel", "2_SAMUEL": "Samuel",
+    "1_KINGS": "Kings", "2_KINGS": "Kings", "ISAIAH": "Isaiah",
+    "JEREMIAH": "Jeremiah", "EZEKIEL": "Ezekiel", "HOSEA": "The Twelve",
+    "JOEL": "The Twelve", "AMOS": "The Twelve", "OBADIAH": "The Twelve",
+    "JONAH": "The Twelve", "MICAH": "The Twelve", "NAHUM": "The Twelve",
+    "HABAKKUK": "The Twelve", "ZEPHANIAH": "The Twelve", "HAGGAI": "The Twelve",
+    "ZECHARIAH": "The Twelve", "MALACHI": "The Twelve", "PSALMS": "The Psalms",
+    "PROVERBS": "Proverbs", "JOB": "Job", "SONG": "The Five Scrolls",
+    "RUTH": "The Five Scrolls", "LAMENTATIONS": "The Five Scrolls",
+    "QOHELET": "The Five Scrolls", "ESTHER": "The Five Scrolls",
+    "DANIEL": "Daniel-Ezra-Nehemiah", "EZRA": "Daniel-Ezra-Nehemiah",
+    "NEHEMIAH": "Daniel-Ezra-Nehemiah", "1_CHRONICLES": "Chronicles",
+    "2_CHRONICLES": "Chronicles"
+};
 function normalizeBookName(raw) {
     if (!raw) return "";
     const decoded = decodeURIComponent(raw).trim().toUpperCase();
@@ -182,9 +198,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 <span class="btn-line1">📊 Ornaments</span>
                 <span class="btn-line2">by Pitch</span>
             </a>
+            <!-- 🔍 Full Trope (shows when on a contour page) -->
             <a href="#" id="contextual-ornament-records" class="top-nav-btn is-hidden">
                 <span class="btn-line1">🔍 Full Trope</span>
                 <span class="btn-line2" id="chapter-btn-label">by Chapter</span>
+            </a>
+            <!-- 🎯 🎼 Contour Score (shows when on a trope/ornament page) -->
+            <a href="#" id="contextual-contour-records" class="top-nav-btn is-hidden">
+                <span class="btn-line1">🎼 Contour</span>
+                <span class="btn-line2" id="contour-btn-label">by Chapter</span>
             </a>
             <a href="${baseUrl}/matrix.html" class="top-nav-btn">
                 <span class="btn-line1">⌨️ Word Matrix</span>
@@ -203,6 +225,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // ---------------------------------------------------------
     const recordBtn = document.getElementById("contextual-ornament-records");
     const labelSpan = document.getElementById("chapter-btn-label");
+    const contourBtn = document.getElementById("contextual-contour-records");
+    const contourLabelSpan = document.getElementById("contour-btn-label");
 
     let cleanBook = null;
     let chapterNum = null;
@@ -211,24 +235,28 @@ document.addEventListener("DOMContentLoaded", function() {
     const rawBookParam = urlParams.get('book');
     const rawChapterParam = urlParams.get('chapter');
 
-    const pathSegments = window.location.pathname.split('/');
-    const filename = pathSegments[pathSegments.length - 1] || "";
+    // Extract filename safely across web and Windows local file URLs
+    const pathSegments = window.location.pathname.split(/[\/\\]/);
+    const filename = pathSegments.pop() || "";
+    const lowerFilename = filename.toLowerCase();
 
-    // Case 1: URL Query Parameters (e.g. ornament_chapter.html?book=Isaiah&chapter=5)
+    // CASE 1: Read from URL query params (e.g. ornament_chapter.html?book=Genesis&chapter=1)
     if (rawBookParam) {
-        const candidateBook = normalizeBookName(rawBookParam);
+        const candidateBook = normalizeBookName(rawBookParam.replace(/-/g, '_'));
         if (bookSequenceMap[candidateBook]) {
             cleanBook = candidateBook;
             if (rawChapterParam && rawChapterParam.match(/\d+/)) {
                 chapterNum = parseInt(rawChapterParam.match(/\d+/), 10).toString();
             }
         }
-    }
-    // Case 2: Filename pattern matching (e.g. ISAIAH_005_matrix.html)
+    } 
+    // CASE 2: Parse from filename (e.g. GENESIS_001_matrix.html, 1-SAMUEL_008_matrix.html)
     else {
-        const contourMatch = filename.match(/^([A-Z0-9_]+)_(\d{1,3})_matrix\.html$/i);
+        // Tolerates hyphens, underscores, 1-3 digit chapters, and case variations
+        const contourMatch = filename.match(/^([0-9a-zA-Z_-]+)[_-](\d{1,3})_matrix/i);
         if (contourMatch) {
-            const candidateBook = normalizeBookName(contourMatch[1]);
+            const rawBook = contourMatch[1].replace(/-/g, '_');
+            const candidateBook = normalizeBookName(rawBook);
             if (bookSequenceMap[candidateBook]) {
                 cleanBook = candidateBook;
                 chapterNum = parseInt(contourMatch[2], 10).toString();
@@ -236,26 +264,56 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // Mount chapter data & update top menu button state
+    console.log(`📍 [MENU CONTEXT] File: "${filename}", Book: "${cleanBook}", Ch: "${chapterNum}"`);
+
+    // If context is resolved, set URLs and toggle button visibility
     if (cleanBook && chapterNum && bookSequenceMap[cleanBook]) {
         const displayTitle = formatDisplayTitle(cleanBook);
-        const dynamicOrnamentUrl = `${baseUrl}/ornament_chapter.html?book=${encodeURIComponent(displayTitle)}&chapter=${chapterNum}`;
+        const padCh = String(chapterNum || 1).padStart(3, '0');
 
-        // Load chapter JSON for concordance popups on both matrix & cantillation screens
+        // Dynamic targets
+        const dynamicOrnamentUrl = `${baseUrl}/ornament_chapter.html?book=${encodeURIComponent(displayTitle)}&chapter=${chapterNum}`;
+        const volumeFolder = (typeof bookVolumeMap !== 'undefined' && bookVolumeMap[cleanBook]) ? bookVolumeMap[cleanBook] : cleanBook;
+        const dynamicContourUrl = `${baseUrl}/musicscores/${encodeURIComponent(volumeFolder)}/${cleanBook}_${padCh}_matrix.html`;
+
         loadChapterInterlinear(cleanBook, chapterNum);
 
-        // Show "Cantillation [Book] [Ch]" button ONLY when on a 929 contour page (_matrix.html)
-        if (filename.includes('_matrix.html')) {
-            if (recordBtn && labelSpan) {
+        // 🎯 1. On a 929 contour page (_matrix.html): SHOW Trope button, HIDE Contour button
+        if (lowerFilename.includes('_matrix')) {
+            if (recordBtn) {
                 recordBtn.href = dynamicOrnamentUrl;
-                labelSpan.textContent = `${displayTitle} ${chapterNum}`;
-                recordBtn.classList.remove("is-hidden");
+                recordBtn.classList.remove("is-hidden"); // 🚀 Reveals the Trope button!
             }
-        } else {
+            if (labelSpan) {
+                labelSpan.textContent = `${displayTitle} ${chapterNum}`;
+            }
+            if (contourBtn) {
+                contourBtn.classList.add("is-hidden");
+            }
+        } 
+        // 🎯 2. On the Trope / Cantillation page (ornament_chapter.html): SHOW Contour button, HIDE Trope button
+        else if (lowerFilename.includes('ornament_chapter')) {
+            if (contourBtn) {
+                contourBtn.href = dynamicContourUrl;
+                contourBtn.classList.remove("is-hidden"); // 🚀 Reveals the Contour button!
+            }
+            if (contourLabelSpan) {
+                contourLabelSpan.textContent = `${displayTitle} ${chapterNum}`;
+            }
+            if (recordBtn) {
+                recordBtn.classList.add("is-hidden");
+            }
+        } 
+        // 3. Any other page with resolved context
+        else {
             if (recordBtn) recordBtn.classList.add("is-hidden");
+            if (contourBtn) contourBtn.classList.add("is-hidden");
         }
     } else {
+        // No chapter context: ensure both stay hidden
+        console.warn(`⚠️ [MENU CONTEXT] Could not resolve book/chapter for: "${filename}"`);
         if (recordBtn) recordBtn.classList.add("is-hidden");
+        if (contourBtn) contourBtn.classList.add("is-hidden");
     }
 const currentUrl = window.location.href;
 
