@@ -21,17 +21,33 @@
         .zero-count { color: #ccc; font-weight: 300; }
         .footnote { margin-top: 40px; font-family: 'Georgia', serif; font-size: 1.05rem; border-top: 1px solid #800000; padding-top: 20px; color: #444; }
         .footnote p { text-align: justify; line-height: 1.6; }
+.glyph-cell {
+    font-family: "SBL Hebrew", "Ezra SIL", "Times New Roman", serif;
+    font-size: 1.75rem;
+    line-height: 1;
+    text-align: center;
+    color: #800000;
+    width: 48px;
+}
+.heb-carrier {
+    font-family: "SBL Hebrew", "Ezra SIL", "Times New Roman", serif;
+    font-size: 1.6rem;
+    line-height: normal;         /* Prevents clipping sublinear accents */
+    font-weight: normal !important; /* CRITICAL: Kills <th> faux-bold smudging */
+    color: #800000;
+    display: inline;             /* Natural font engine rendering */
+    margin: 0 3px;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
     </style>
 <script src="./menu.js" defer></script>
 </head>
 <body>
 
-    <!--div class="nav">
-        <a href="./musicscores/index.html">← Back to Volume Index</a>
-    </div> </!-->
-
     <h1>Ornament Usage by Recitation Pitch</h1>
-    <p>Understandng the relationship of the accents above the text (ornaments) with the accent below the text that immediately precedes them, and which defines the recitation pitch that governs them.</p>
+    <p>The deciphering key reveals relationships that have been hidden since antiquity, specifically, the relationship of the accents above the text (ornaments) with the accent below the text that immediately precedes them, and which defines the recitation pitch that governs them. The music of these pages and scores is the demonstration.
+    </p>
 
     <form id="chapter-explorer-form" style="margin: 25px 0; padding: 18px; background: #f3f0e8; border-left: 4px solid #800000; font-family: sans-serif;">
         <strong style="color: #800000;">Trope for a chapter</strong>
@@ -45,51 +61,120 @@
     </form>
 
     <table>
-        <thead>
-            <tr>
-                <th class='left-align'>Ornament Name</th>
-                <th class='total-cell'>Total</th>
-                <th>c<br><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Darga</span></th><th>d<br><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Tevir/Galgal</span></th><th>e<br><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Silluq</span></th><th>f<br><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Mercha</span></th><th>g<br><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Tifha/D'khi</span></th><th>A<br><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Atnah</span></th><th>B<br><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Munach</span></th><th>C<br><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Mahpach/Yetiv</span></th>
-            </tr>
-        </thead>
+    <thead>
+        <!-- ROW 1: Super Header + Musical Pitches -->
+        <tr>
+            <th colspan="2" rowspan="2" class="left-align" style="vertical-align: middle;">Ornament &amp; Name</th>
+            <th rowspan="3" class="total-cell" style="vertical-align: middle;">Total</th>
+            <th>c</th>
+            <th>d</th>
+            <th>e</th>
+            <th>f</th>
+            <th>g</th>
+            <th>A</th>
+            <th>B</th>
+            <th>C</th>
+        </tr>
+
+        <!-- ROW 2: Sublinear Accent Names -->
+        <tr>
+            <th><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Darga</span></th>
+            <th><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Tevir/Galgal</span></th>
+            <th><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Silluq</span></th>
+            <th><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Mercha</span></th>
+            <th><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Tifha/D'khi</span></th>
+            <th><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Atnah</span></th>
+            <th><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Munach</span></th>
+            <th><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Mahpach/Yetiv</span></th>
+        </tr>
+
+        <!-- ROW 3: Divided Columns + Sublinear Carrier Alephs -->
+        <tr>
+            <th style="font-size: 0.75rem; font-weight: normal; text-transform: none; width: 48px;">Ornament</th>
+            <th class="left-align" style="font-size: 0.75rem; font-weight: normal; text-transform: none;">Name</th>
+            
+            <!-- c: Darga -->
+            <th><span class="heb-carrier" title="Darga">א֧</span></th>
+            
+            <!-- d: Tevir / Galgal (TWO LETTERS) -->
+            <th>
+                <span class="heb-carrier" title="Tevir (prose)">א֛</span>
+                <span class="heb-carrier" title="Galgal / Yerah (poetry)">א֪</span>
+            </th>
+            
+            <!-- e: Silluq -->
+            <th><span class="heb-carrier" title="Silluq">אֽ</span></th>
+            
+            <!-- f: Mercha -->
+            <th><span class="heb-carrier" title="Mercha">א֥</span></th>
+            
+            <!-- g: Tifha / D'khi -->
+            <th>
+                <span class="heb-carrier" title="Tifha">א֖</span>
+                <span class="heb-carrier" title="D'khi">א֭</span>
+            </th>
+            
+            <!-- A: Atnah -->
+            <th><span class="heb-carrier" title="Atnah">א֑</span></th>
+            
+            <!-- B: Munach -->
+            <th><span class="heb-carrier" title="Munach">א֣</span></th>
+            
+            <!-- C: Mahpach / Yetiv -->
+            <th>
+                <span class="heb-carrier" title="Mahpach">א֤</span>
+                <span class="heb-carrier" title="Yetiv">א֚</span>
+            </th>
+        </tr>
+    </thead>
         <tbody>
         <tr>
-                <td class="left-align">ZAQEF-QATAN</td>
-                <td class="total-cell">25542</td>
-                <td class="zero-count">0</td><td class="zero-count">0</td><td>
-                        <div>3128</div>
-                        <div style='margin-top: 4px; font-size: 0.72rem;'>
-                            <a href='ornament_records.html?ornament=zaqef-qatan&pitch=e' 
-                               style='color: #800000; text-decoration: none;' title='Explore records'>🔍 explore</a>
-                        </div>
-                    </td><td>
-                        <div>267</div>
-                        <div style='margin-top: 4px; font-size: 0.72rem;'>
-                            <a href='ornament_records.html?ornament=zaqef-qatan&pitch=f' 
-                               style='color: #800000; text-decoration: none;' title='Explore records'>🔍 explore</a>
-                        </div>
-                    </td><td class="zero-count">0</td><td>
-                        <div>643</div>
-                        <div style='margin-top: 4px; font-size: 0.72rem;'>
-                            <a href='ornament_records.html?ornament=zaqef-qatan&pitch=A' 
-                               style='color: #800000; text-decoration: none;' title='Explore records'>🔍 explore</a>
-                        </div>
-                    </td><td>
-                        <div>16307</div>
-                        <div style='margin-top: 4px; font-size: 0.72rem;'>
-                            <a href='ornament_records.html?ornament=zaqef-qatan&pitch=B' 
-                               style='color: #800000; text-decoration: none;' title='Explore records'>🔍 explore</a>
-                        </div>
-                    </td><td>
-                        <div>5197</div>
-                        <div style='margin-top: 4px; font-size: 0.72rem;'>
-                            <a href='ornament_records.html?ornament=zaqef-qatan&pitch=C' 
-                               style='color: #800000; text-decoration: none;' title='Explore records'>🔍 explore</a>
-                        </div>
-                    </td>
-            </tr>
+            <td class="glyph-cell">א֔</td>
+            <td class="left-align">Zaqef-Qatan</td>
+            <td class="total-cell">25542</td>
+            <td class="zero-count">0</td>
+            <td class="zero-count">0</td>
+            <td>
+                <div>3128</div>
+                <div style='margin-top: 4px; font-size: 0.72rem;'>
+                    <a href='ornament_records.html?ornament=zaqef-qatan&pitch=e' 
+                       style='color: #800000; text-decoration: none;' title='Explore records'>🔍 explore</a>
+                </div>
+            </td>
+            <td>
+                <div>267</div>
+                <div style='margin-top: 4px; font-size: 0.72rem;'>
+                    <a href='ornament_records.html?ornament=zaqef-qatan&pitch=f' 
+                       style='color: #800000; text-decoration: none;' title='Explore records'>🔍 explore</a>
+                </div>
+            </td>
+            <td class="zero-count">0</td>
+            <td>
+                <div>643</div>
+                <div style='margin-top: 4px; font-size: 0.72rem;'>
+                    <a href='ornament_records.html?ornament=zaqef-qatan&pitch=A' 
+                       style='color: #800000; text-decoration: none;' title='Explore records'>🔍 explore</a>
+                </div>
+            </td>
+            <td>
+                <div>16307</div>
+                <div style='margin-top: 4px; font-size: 0.72rem;'>
+                    <a href='ornament_records.html?ornament=zaqef-qatan&pitch=B' 
+                       style='color: #800000; text-decoration: none;' title='Explore records'>🔍 explore</a>
+                </div>
+            </td>
+            <td>
+                <div>5197</div>
+                <div style='margin-top: 4px; font-size: 0.72rem;'>
+                    <a href='ornament_records.html?ornament=zaqef-qatan&pitch=C' 
+                       style='color: #800000; text-decoration: none;' title='Explore records'>🔍 explore</a>
+                </div>
+            </td>
+        </tr>
+
         <tr>
-                <td class="left-align">PASHTA</td>
+                <td class="glyph-cell">א֙</td>
+                <td class="left-align">Pashta</td>
                 <td class="total-cell">24433</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>5864</div>
@@ -130,7 +215,8 @@
                     </td>
             </tr>
         <tr>
-                <td class="left-align">REVIA</td>
+                <td class="glyph-cell">א֗</td>
+                <td class="left-align">Revia</td>
                 <td class="total-cell">12570</td>
                 <td class="zero-count">0</td><td>
                         <div>7</div>
@@ -177,7 +263,8 @@
                     </td>
             </tr>
         <tr>
-                <td class="left-align">QADMA</td>
+                <td class="glyph-cell">א֨</td>
+                <td class="left-align">Qadma</td>
                 <td class="total-cell">7544</td>
                 <td class="zero-count">0</td><td>
                         <div>9</div>
@@ -224,7 +311,8 @@
                     </td>
             </tr>
         <tr>
-                <td class="left-align">AZLA</td>
+                <td class="glyph-cell">א֜</td>
+                <td class="left-align">Azla</td>
                 <td class="total-cell">4164</td>
                 <td class="zero-count">0</td><td>
                         <div>6</div>
@@ -271,7 +359,8 @@
                     </td>
             </tr>
         <tr>
-                <td class="left-align">GERESH</td>
+                <td class="glyph-cell">א֝</td>
+                <td class="left-align">Geresh</td>
                 <td class="total-cell">2723</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>94</div>
@@ -306,7 +395,8 @@
                     </td>
             </tr>
         <tr>
-                <td class="left-align">TELISHA-QETANA</td>
+                <td class="glyph-cell">א֩</td>
+                <td class="left-align">Telisha Qetana</td>
                 <td class="total-cell">1868</td>
                 <td class="zero-count">0</td><td>
                         <div>8</div>
@@ -346,8 +436,9 @@
                         </div>
                     </td>
             </tr>
-        <tr>
-                <td class="left-align">TARSIN</td>
+        <tr>                
+                <td class="glyph-cell">א֞</td>
+                <td class="left-align">Tarsin / Gershaim</td>
                 <td class="total-cell">1728</td>
                 <td>
                         <div>1</div>
@@ -393,8 +484,9 @@
                         </div>
                     </td>
             </tr>
-        <tr>
-                <td class="left-align">ZAQEF-GADOL</td>
+        <tr>                
+                <td class="glyph-cell">א֕</td>
+                <td class="left-align">Zaqef-Gadol</td>
                 <td class="total-cell">1654</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>512</div>
@@ -429,7 +521,8 @@
                     </td>
             </tr>
         <tr>
-                <td class="left-align">TSINNOR</td>
+                <td class="glyph-cell">א֮</td>
+                <td class="left-align">Tsinnor</td>
                 <td class="total-cell">1237</td>
                 <td class="zero-count">0</td><td>
                         <div>5</div>
@@ -470,7 +563,8 @@
                     </td>
             </tr>
         <tr>
-                <td class="left-align">TELISHA-GEDOLA</td>
+                <td class="glyph-cell">א֠</td>
+                <td class="left-align">Telisha-Gedola</td>
                 <td class="total-cell">1198</td>
                 <td class="zero-count">0</td><td>
                         <div>1</div>
@@ -511,7 +605,8 @@
                     </td>
             </tr>
         <tr>
-                <td class="left-align">SEGOL</td>
+                <td class="glyph-cell">א֒</td>
+                <td class="left-align">Segol</td>
                 <td class="total-cell">958</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>120</div>
@@ -540,7 +635,8 @@
                     </td><td class="zero-count">0</td>
             </tr>
         <tr>
-                <td class="left-align">PAZER</td>
+                <td class="glyph-cell">א֡</td>
+                <td class="left-align">Pazer</td>
                 <td class="total-cell">950</td>
                 <td class="zero-count">0</td><td>
                         <div>36</div>
@@ -581,7 +677,8 @@
                     </td>
             </tr>
         <tr>
-                <td class="left-align">OLE</td>
+                <td class="glyph-cell">&#x05D0;&#x05AB;</td>
+                <td class="left-align">Ole</td>
                 <td class="total-cell">406</td>
                 <td class="zero-count">0</td><td>
                         <div>166</div>
@@ -616,7 +713,8 @@
                     </td>
             </tr>
         <tr>
-                <td class="left-align">REVIA-MUGRASH</td>
+                <td class="glyph-cell">&#x05D0;&#x059D;&#x0597;</td>
+                <td class="left-align">Revia-Mugrash</td>
                 <td class="total-cell">240</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>10</div>
@@ -639,7 +737,8 @@
                     </td><td class="zero-count">0</td><td class="zero-count">0</td>
             </tr>
         <tr>
-                <td class="left-align">ZARQA</td>
+                <td class="glyph-cell">&#x05D0;&#x0598;</td>
+                <td class="left-align">Tsinnorit (poetic Zarqa)</td>
                 <td class="total-cell">199</td>
                 <td class="zero-count">0</td><td>
                         <div>6</div>
@@ -680,7 +779,8 @@
                     </td>
             </tr>
         <tr>
-                <td class="left-align">ILLUY</td>
+                <td class="glyph-cell">&#x05D0;&#x05AC;</td>
+                <td class="left-align">Illuy</td>
                 <td class="total-cell">184</td>
                 <td class="zero-count">0</td><td>
                         <div>3</div>
@@ -721,7 +821,8 @@
                     </td>
             </tr>
         <tr>
-                <td class="left-align">SHALSHELET</td>
+                <td class="glyph-cell">א֓</td>
+                <td class="left-align">Shalshalet</td>
                 <td class="total-cell">46</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>11</div>
@@ -750,7 +851,8 @@
                     </td>
             </tr>
         <tr>
-                <td class="left-align">QARNE-FARAH</td>
+                <td class="glyph-cell">א֟</td>
+                <td class="left-align">Qarne-Farah</td>
                 <td class="total-cell">16</td>
                 <td class="zero-count">0</td><td>
                         <div>16</div>
@@ -761,7 +863,8 @@
                     </td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td>
             </tr>
         <tr>
-                <td class="left-align">PASHTA PASHTA</td>
+                <td class="glyph-cell">&#x05D0;&#x0599;&#x0599;</td>
+                <td class="left-align">Pashta Pashta</td>
                 <td class="total-cell">4</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>3</div>
@@ -778,7 +881,8 @@
                     </td>
             </tr>
         <tr>
-                <td class="left-align">Z-QATAN PAZER</td>
+                <td class="glyph-cell">&#x05D0;&#x0594;&#x05A1;</td>
+                <td class="left-align">Z-Qatan Pazer</td>
                 <td class="total-cell">2</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>2</div>
@@ -789,7 +893,8 @@
                     </td><td class="zero-count">0</td>
             </tr>
         <tr>
-                <td class="left-align">Z-QATAN TSINNOR</td>
+                <td class="glyph-cell">&#x05D0;&#x0594;&#x05AE;</td>
+                <td class="left-align">Z-Qatan Tsinnor</td>
                 <td class="total-cell">2</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>1</div>
@@ -806,7 +911,8 @@
                     </td><td class="zero-count">0</td>
             </tr>
         <tr>
-                <td class="left-align">PAZER Z-QATAN</td>
+                <td class="glyph-cell">&#x05D0;&#x05A1;&#x0594;</td>
+                <td class="left-align">Pazer Z-Qatan</td>
                 <td class="total-cell">2</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>2</div>
@@ -817,7 +923,8 @@
                     </td><td class="zero-count">0</td>
             </tr>
         <tr>
-                <td class="left-align">AZLA Z-QATAN</td>
+                <td class="glyph-cell">&#x05D0;&#x059C;&#x0594;</td>
+                <td class="left-align">Azla Z-Qatan</td>
                 <td class="total-cell">1</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>1</div>
@@ -828,7 +935,8 @@
                     </td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td>
             </tr>
         <tr>
-                <td class="left-align">TARSIN REVIA</td>
+                <td class="glyph-cell">&#x05D0;&#x059E;&#x0597;</td>
+                <td class="left-align">Tarsin Revia</td>
                 <td class="total-cell">1</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>1</div>
@@ -839,7 +947,8 @@
                     </td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td>
             </tr>
         <tr>
-                <td class="left-align">AZLA T-QETANA</td>
+                <td class="glyph-cell">&#x05D0;&#x059C;&#x05A9;</td>
+                <td class="left-align">Azla T-Qetana</td>
                 <td class="total-cell">1</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>1</div>
@@ -850,7 +959,8 @@
                     </td><td class="zero-count">0</td>
             </tr>
         <tr>
-                <td class="left-align">REVIA Z-QATAN</td>
+                <td class="glyph-cell">&#x05D0;&#x0597;&#x0594;</td>
+                <td class="left-align">Revia Z-Qatan</td>
                 <td class="total-cell">1</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>1</div>
@@ -861,7 +971,8 @@
                     </td>
             </tr>
         <tr>
-                <td class="left-align">Z-QATAN AZLA</td>
+                <td class="glyph-cell">&#x05D0;&#x0594;&#x059C;</td>
+                <td class="left-align">Z-Qatan Azla</td>
                 <td class="total-cell">1</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>1</div>
@@ -872,7 +983,8 @@
                     </td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td>
             </tr>
         <tr>
-                <td class="left-align">PAZER AZLA</td>
+                <td class="glyph-cell">&#x05D0;&#x05A1;&#x059C;</td>
+                <td class="left-align">Pazer Azla</td>
                 <td class="total-cell">1</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>1</div>
@@ -883,7 +995,8 @@
                     </td><td class="zero-count">0</td>
             </tr>
         <tr>
-                <td class="left-align">AZLA PASHTA</td>
+                <td class="glyph-cell">&#x05D0;&#x059C;&#x0599;</td>
+                <td class="left-align">Azla Pashta</td>
                 <td class="total-cell">1</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>1</div>
@@ -894,7 +1007,8 @@
                     </td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td>
             </tr>
         <tr>
-                <td class="left-align">Z-GADOL PASHTA</td>
+                <td class="glyph-cell">&#x05D0;&#x0595;&#x0599;</td>
+                <td class="left-align">Z-Gadol Pashta</td>
                 <td class="total-cell">1</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>1</div>
@@ -905,7 +1019,8 @@
                     </td><td class="zero-count">0</td>
             </tr>
         <tr>
-                <td class="left-align">TELISHA-GEDOLA AZLA</td>
+                <td class="glyph-cell">&#x05D0;&#x05A0;&#x059C;</td>
+                <td class="left-align">T-Gedola Azla</td>
                 <td class="total-cell">1</td>
                 <td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td class="zero-count">0</td><td>
                         <div>1</div>
@@ -919,8 +1034,9 @@
     </table>
 
     <div class="footnote">
-    <p>We can see immediately which ornaments are rarely or frequently used and on which pitches. The last 13 rows are double accents on a single syllable. They are noted in the publications. They are all rare. Several are in the decalogues. Notice the sole tarsin on the low c in the table above. It is from 2 Chronicles 24:27 in the Leningrad Codex. It is not in the Aleppo codex online at mgketer.org. So in the terms of the deciphering key, no ornament ever occurs on a low c. In terms of traditional Hebrew names, no accent above the text ever occurs following a darga and before another accent under the text is encountered. The largest contributor to the musical corpus of the accents above the text is the zaqef-qatan. This is a significant division of the text into phrases, sometimes in surprising contexts where one would not expect to breathe. Each has to be looked at individually.
-    </p>
+    <p>We can see immediately which ornaments are rarely or frequently used and on which pitches. The last 13 rows are the rare double accents on a single syllable. Notice the sole tarsin on the low c in the table above. It is from 2 Chronicles 24:27 in the Leningrad Codex. It is not in the Aleppo codex online at mgketer.org. So using the terms of the deciphering key, no <i>ornament</i> ever occurs on a low c. In the language of traditional Hebrew names, no accent <i>above the text</i> ever occurs following a darga and before another accent under the text is encountered.</p>
+<p>The largest contributor to the musical corpus of the accents above the text is the zaqef-qatan. This is a significant division of the text into phrases, sometimes in surprising contexts where one would not expect a pause in the recitation.</p>
+
     </div>
 
 <script>
