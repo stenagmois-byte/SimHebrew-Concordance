@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 
 # --- Configuration Paths ---
 MUSESCORE_PATH = r"C:\Program Files\MuseScore 4\bin\musescore4.exe"
-REPO_ROOT = Path(r"C:\Users\Bob\OneDrive\Documents\GitHub\SimHebrew-Concordance")
+REPO_ROOT = Path(r"C:\Users\Bob\GitHub\SimHebrew-Concordance")
 SCORE_DIR = REPO_ROOT / "musicscores"
 AUDIO_DIR = SCORE_DIR / "audio"
 
