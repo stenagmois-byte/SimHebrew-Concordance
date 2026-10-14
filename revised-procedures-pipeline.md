@@ -26,6 +26,7 @@ The project comprises two parallel, interrelated production tracks governed by a
 * **Master Copy of Record:** The SVG-based ePub in the Calibre Library is the authoritative master.
 * **Print PDFs:** Always generated directly from the SVG copy of the ePub.
   - *Single Volume:* Export directly from Calibre.
+  - *Large volumes will require the python adjustment of the spine:C:\Users\Bob\Calibre Library\D. Robert MacDonald\The Psalms (117)\fix-margins.py 
   - *Batch All Volumes:* Run the automated Python generation script against the ePub SVG files in `C:\Users\Bob\KindleProject\Input\`.
 * **Kindle ePubs:** Amazon KDP requires PNG images rather than raw SVGs for fixed-layout fidelity.
   - Run `C:\Users\Bob\KindleProject\svgtopng.py` to convert vector music to PNG.
@@ -214,7 +215,7 @@ Both `chapter_mp3s.py` and `verse_mp3s.py` include skip-guards (`if mp3_out.exis
 * **Surgical Fixes (1–2 Verses):** Uncompressed MP3 exports from MuseScore add minimal footprint (~1–2 MB combined). Commit them directly to GitHub without extra compression.
 * **Bulk Re-renders:** When regenerating whole chapters or books, run:
   ```cmd
-  python reduce_bitrate.py
+  python reduce_bitrate.py and for chapters reduce_bitrate_chapters.py
   ```
   *(Compresses audio to 64–96 kbps joint-stereo for lightweight streaming).*
 
@@ -284,5 +285,5 @@ python mass_produce_and_log_matrices.py
 
 ### 2. Liturgical Punctuation & Performance Notes
 * **Punctuation Governs Song:** English translation punctuation reflects liturgical and musical breath pauses dictated by the Hebrew accents.
-* **Ezekiel 16:49:** The mid-phrase comma in *"Behold this was, the iniquity of Sodom..."* reflects the critical Zaqef-Qatan pause on `הִנֵּה־זֶ֣ה הָיָ֔ה`, demanding an intentional vocal caesura to summon listener attention.
-* **Lamentations 1:1:** Punctuation preserves verse half-divisions dictated by Atnah cadences.
+* **Ezekiel 16:49:** The mid-phrase comma in *"Behold this was, the iniquity of Sodom..."* reflects the critical Zaqef-Qatan pause on `הִנֵּה־זֶ֣ה הָיָ֔ה`, demanding an intentional vocal breath to summon listener attention.
+* **Lamentations 1:1:** Punctuation preserves verse half-divisions dictated by Atnah cadences.The punctuation frequently is required to prevent misreading the text.
