@@ -24,6 +24,7 @@ The project comprises two parallel, interrelated production tracks governed by a
 
 ### 1. Master Source Formats & Hierarchy
 * **Master Copy of Record:** The SVG-based ePub in the Calibre Library is the authoritative master.
+  - *The htmml for these files comes from the database via script5 of the concord form -- html goes to download directory and 1 epub at a time goes in the input directory -- then run replacehtml.py -- beautify all files -- check epub -- and save.
 * **Print PDFs:** Always generated directly from the SVG copy of the ePub.
   - *Single Volume:* Export directly from Calibre.
   - *Large volumes will require the python adjustment of the spine:C:\Users\Bob\Calibre Library\D. Robert MacDonald\The Psalms (117)\fix-margins.py 
@@ -129,7 +130,6 @@ When an English translation string or liturgical punctuation is revised (e.g., E
 5. Recalculate gematria concordances by running:
    ```cmd
    python C:\Users\Bob\Downloads\update_strict_concordance_gematria.py
-   python find_verse_matches_json.py
    ```
    *(Note: Translation edits do not alter the musical notation files, as scores contain phonetic Hebrew lyrics only).*
 
