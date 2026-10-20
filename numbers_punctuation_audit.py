@@ -54,6 +54,15 @@ def gloss_span(text: str, gloss: str, start: int = 0) -> tuple[int, int] | None:
     return None
 
 
+def construct_trimmed_span(text: str, gloss: str) -> tuple[int, int] | None:
+    """Match a construct gloss after trimming a terminal `of` only."""
+    gloss = decode_gloss(gloss)
+    if not gloss.casefold().endswith(" of"):
+        return None
+    trimmed = gloss[:-3].rstrip()
+    return gloss_span(text, trimmed) if trimmed else None
+
+
 def punctuation_after(text: str, end: int) -> str:
     tail = text[end:]
     match = re.match(r"\s*([,;:.!?—–])", tail)
@@ -149,7 +158,11 @@ def analyze_boundary(
 ) -> str:
     gloss = decode_gloss(item.get("e", ""))
     span = gloss_span(text, gloss)
+    trimmed_of = False
     inferred = False
+    if not span:
+        span = construct_trimmed_span(text, gloss)
+        trimmed_of = span is not None
     if not span:
         if kind == "ATNAH" and final_gloss_word_before_newline(text, gloss):
             return f"PASS: final gloss word occurs immediately before the English line break ({gloss})"
@@ -193,11 +206,15 @@ def analyze_boundary(
             return f"PASS: final gloss word inferred after preceding 'not'; line break present, punctuation optional ({gloss})"
         return f"PASS: aligned gloss has nearby line break; punctuation is optional here ({gloss})"
     if mark:
+        if trimmed_of:
+            return f"PASS: gloss matched after trimming terminal 'of'; punctuation follows the matched phrase ({mark}; {gloss})"
         if inferred:
             return f"PASS: final gloss word inferred after preceding 'not'; punctuation present ({mark}; {gloss})"
         return f"PASS: aligned gloss has punctuation nearby ({mark}; {gloss})"
     if inferred:
         return f"CHECK punctuation at inferred final gloss word after preceding 'not' ({gloss})"
+    if trimmed_of:
+        return f"CHECK punctuation: matched after trimming terminal 'of', none follows ({gloss})"
     return f"CHECK punctuation: gloss located, none immediately after ({gloss})"
 
 

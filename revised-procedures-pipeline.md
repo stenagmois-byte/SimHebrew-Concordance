@@ -286,4 +286,9 @@ python mass_produce_and_log_matrices.py
 ### 2. Liturgical Punctuation & Performance Notes
 * **Punctuation Governs Song:** English translation punctuation reflects liturgical and musical breath pauses dictated by the Hebrew accents.
 * **Ezekiel 16:49:** The mid-phrase comma in *"Behold this was, the iniquity of Sodom..."* reflects the critical Zaqef-Qatan pause on `הִנֵּה־זֶ֣ה הָיָ֔ה`, demanding an intentional vocal breath to summon listener attention.
+Run from any command-line shell with Python 3.10 or later installed (PowerShell example):
+```powershell
+python numbers_punctuation_audit.py "input.json" "output.txt" --checks-only
+```
+On systems where the Python command is `python3`, use `python3` instead of `python`. This checks English breath marks in books not yet reviewed.
 * **Lamentations 1:1:** Punctuation preserves verse half-divisions dictated by Atnah cadences.The punctuation frequently is required to prevent misreading the text.
