@@ -15,7 +15,8 @@ from collections import defaultdict
 from pathlib import Path
 
 
-PUNCT_RE = re.compile(r"[,;:.!?—–]$", re.UNICODE)
+WORD_RE = re.compile(r"[^\W\d_]+(?:['’][^\W\d_]+)*", re.UNICODE)
+MAX_GLOSS_GAP_WORDS = 5
 
 
 def read_items(path: Path) -> list[dict[str, str]]:
@@ -39,19 +40,66 @@ def decode_gloss(text: str) -> str:
     return html.unescape(text or "").strip()
 
 
-def gloss_span(text: str, gloss: str, start: int = 0) -> tuple[int, int] | None:
-    """Find an exact, case-insensitive gloss phrase in English verse text."""
+def gloss_spans(text: str, gloss: str, start: int = 0) -> list[tuple[int, int]]:
+    """Find all exact, case-insensitive gloss phrase occurrences."""
     gloss = decode_gloss(gloss)
     if not gloss:
-        return None
+        return []
     # Normalize whitespace but preserve the original span for context checks.
     words = [re.escape(w) for w in gloss.split()]
     if not words:
+        return []
+    return [
+        (start + match.start(), start + match.end())
+        for match in re.finditer(r"(?<!\w)" + r"\s+".join(words) + r"(?!\w)", text[start:], re.I)
+    ]
+
+
+def gloss_span(text: str, gloss: str, start: int = 0) -> tuple[int, int] | None:
+    matches = gloss_spans(text, gloss, start)
+    return matches[0] if matches else None
+
+
+def aligned_gloss_span(
+    text: str, gloss: str, prefix_rows: list[dict[str, str]]
+) -> tuple[int, int] | None:
+    """Choose a repeated gloss occurrence following the prior Hebrew prefix."""
+    matches = gloss_spans(text, gloss)
+    if len(matches) <= 1:
+        return matches[0] if matches else None
+    prior_positions = [
+        span
+        for row in prefix_rows[:-1]
+        for span in record_word_positions(text, row)
+    ]
+    if not prior_positions:
         return None
-    match = re.search(r"(?<!\w)" + r"\s+".join(words) + r"(?!\w)", text[start:], re.I)
-    if match:
-        return start + match.start(), start + match.end()
-    return None
+    anchor = max(prior_positions, key=lambda span: span[1])[1]
+    following = [span for span in matches if span[0] >= anchor]
+    return following[0] if len(following) == 1 else None
+
+
+def noun_this_boundary_span(
+    text: str, item: dict[str, str], previous_item: dict[str, str] | None
+) -> tuple[int, int] | None:
+    """Align Hebrew noun + demonstrative `this` to English `this` + noun."""
+    if decode_gloss(item.get("e", "")).casefold() != "this" or not previous_item:
+        return None
+    noun_gloss = decode_gloss(previous_item.get("lemma", "")) or decode_gloss(previous_item.get("e", ""))
+    noun_words = WORD_RE.findall(noun_gloss)
+    if len(noun_words) != 1:
+        return None
+    noun_spans = gloss_spans(text, noun_words[0])
+    this_spans = gloss_spans(text, "this")
+    pairs = []
+    for this_span in this_spans:
+        for noun_span in noun_spans:
+            if noun_span[0] < this_span[1]:
+                continue
+            gap = len(WORD_RE.findall(text[this_span[1]:noun_span[0]]))
+            if gap <= 2:
+                pairs.append((this_span, noun_span))
+    return pairs[0][1] if len(pairs) == 1 else None
 
 
 def construct_trimmed_span(text: str, gloss: str) -> tuple[int, int] | None:
@@ -61,6 +109,89 @@ def construct_trimmed_span(text: str, gloss: str) -> tuple[int, int] | None:
         return None
     trimmed = gloss[:-3].rstrip()
     return gloss_span(text, trimmed) if trimmed else None
+
+
+def ordered_term_positions(text: str, term: str) -> list[tuple[int, int]]:
+    """Align phrase tokens in order, allowing a small number of inserted words.
+
+    A result is returned only when there is one uniquely tight alignment.
+    """
+    words = [word.casefold() for word in WORD_RE.findall(decode_gloss(term))]
+    english = list(WORD_RE.finditer(text))
+    if not words or not english:
+        return []
+    candidates = [
+        [index for index, token in enumerate(english) if token.group().casefold() == word]
+        for word in words
+    ]
+    if any(not found for found in candidates):
+        return []
+
+    paths: list[tuple[int, ...]] = []
+
+    def extend(path: tuple[int, ...], depth: int) -> None:
+        if len(paths) > 512:
+            return
+        if depth == len(words):
+            paths.append(path)
+            return
+        for index in candidates[depth]:
+            if path:
+                gap = index - path[-1] - 1
+                if gap < 0 or gap > MAX_GLOSS_GAP_WORDS:
+                    continue
+            extend(path + (index,), depth + 1)
+
+    extend((), 0)
+    if not paths:
+        return []
+    best_gap = min(path[-1] - path[0] - len(path) + 1 for path in paths)
+    best = [path for path in paths if path[-1] - path[0] - len(path) + 1 == best_gap]
+    if len(best) != 1:
+        return []
+    return [english[index].span() for index in best[0]]
+
+
+def record_word_positions(text: str, item: dict[str, str]) -> list[tuple[int, int]]:
+    """Align gloss tokens, then lemma tokens, to English positions."""
+    gloss = decode_gloss(item.get("e", ""))
+    if gloss and gloss != "--":
+        aligned = ordered_term_positions(text, gloss)
+        if aligned:
+            return aligned
+    lemma = decode_gloss(item.get("lemma", ""))
+    if lemma and lemma.casefold() != gloss.casefold():
+        return ordered_term_positions(text, lemma)
+    return []
+
+
+def line_break_after(text: str, end: int) -> bool:
+    return re.match(r"(?:[,;:.!?—–][ \t]*)?\r?\n", text[end:]) is not None
+
+
+def reordered_prefix_boundary(
+    text: str, prefix_rows: list[dict[str, str]], kind: str
+) -> tuple[tuple[int, int], bool] | None:
+    """Find a boundary after the rightmost English token aligned to the Hebrew prefix.
+
+    This fallback applies only when the marked Hebrew word's English position
+    is earlier than an aligned token from a preceding Hebrew word.
+    """
+    scope = text.split("\n", 1)[0] if kind == "ATNAH" else text
+    previous_positions: list[tuple[int, int]] = []
+    for row in prefix_rows[:-1]:
+        previous_positions.extend(record_word_positions(scope, row))
+    current_positions = record_word_positions(scope, prefix_rows[-1])
+    if not previous_positions or not current_positions:
+        return None
+    previous_rightmost = max(previous_positions, key=lambda span: span[1])
+    current_rightmost = max(current_positions, key=lambda span: span[1])
+    if current_rightmost[1] >= previous_rightmost[1]:
+        return None
+    boundary = max(previous_positions + current_positions, key=lambda span: span[1])
+    if kind == "ATNAH":
+        return boundary, line_break_after(text, boundary[1])
+    return boundary, bool(punctuation_after(text, boundary[1]))
 
 
 def punctuation_after(text: str, end: int) -> str:
@@ -152,12 +283,37 @@ def prior_initial_gloss_comma(
 def analyze_boundary(
     text: str,
     item: dict[str, str],
+    prefix_rows: list[dict[str, str]],
     previous_item: dict[str, str] | None,
     next_item: dict[str, str] | None,
     kind: str,
 ) -> str:
     gloss = decode_gloss(item.get("e", ""))
-    span = gloss_span(text, gloss)
+    noun_this_span = noun_this_boundary_span(text, item, previous_item)
+    if noun_this_span:
+        noun = text[noun_this_span[0]:noun_this_span[1]]
+        if kind == "ATNAH":
+            if line_break_after(text, noun_this_span[1]):
+                return f"PASS: Hebrew noun + 'this' aligns to English 'this {noun}' before the atnah line break"
+            return f"CHECK LINE BREAK after English noun following Hebrew 'this' ({noun})"
+        if punctuation_after(text, noun_this_span[1]):
+            return f"PASS: Hebrew noun + 'this' aligns through English noun '{noun}' and punctuation follows"
+        return f"CHECK punctuation after English noun following Hebrew 'this' ({noun})"
+    reordered = reordered_prefix_boundary(text, prefix_rows, kind)
+    if reordered:
+        boundary, represented = reordered
+        aligned_word = text[boundary[0]:boundary[1]]
+        if represented:
+            return (
+                f"PASS: reordered Hebrew prefix aligns through '{aligned_word}' and "
+                f"the punctuation boundary is present"
+            )
+        if kind == "ATNAH":
+            return f"CHECK LINE BREAK at reordered Hebrew-prefix end ('{aligned_word}')"
+        return f"CHECK punctuation at reordered Hebrew-prefix end ('{aligned_word}')"
+
+    span = aligned_gloss_span(text, gloss, prefix_rows)
+    ambiguous_gloss = len(gloss_spans(text, gloss)) > 1 and span is None
     trimmed_of = False
     inferred = False
     if not span:
@@ -169,6 +325,8 @@ def analyze_boundary(
         span = inferred_negated_span(text, item, previous_item)
         inferred = span is not None
     if not span:
+        if ambiguous_gloss:
+            return f"REVIEW: repeated gloss has no unique occurrence after prior Hebrew alignment ({gloss})"
         return f"REVIEW: gloss not located ({gloss or 'empty gloss'})"
     mark = punctuation_after(text, span[1])
     # English may reorder words inside the Hebrew-to-English alignment span.
@@ -242,17 +400,36 @@ def build_report(items: list[dict[str, str]], checks_only: bool = False) -> str:
             previous_item = rows[index - 1] if index else None
             next_item = rows[index + 1] if index + 1 < len(rows) else None
             if item.get("atnah") == "1":
-                boundaries.append((item, previous_item, next_item, "ATNAH"))
+                boundaries.append((index, item, previous_item, next_item, "ATNAH"))
             if item.get("z_q") == "1":
-                boundaries.append((item, previous_item, next_item, "ZAQEF-QATAN"))
+                boundaries.append((index, item, previous_item, next_item, "ZAQEF-QATAN"))
         if not boundaries:
             continue
         entries = []
-        for item, previous_item, next_item, kind in boundaries:
-            result = analyze_boundary(text, item, previous_item, next_item, kind)
+        for index, item, previous_item, next_item, kind in boundaries:
+            atnah_index = next(
+                (i for i, row in enumerate(rows) if row.get("atnah") == "1"), None
+            )
+            prefix_rows = rows[: index + 1]
+            analysis_text = text
+            if "\n" in text and atnah_index is not None:
+                first_half, second_half = text.split("\n", 1)
+                if kind == "ATNAH":
+                    analysis_text = first_half + "\n"
+                elif index <= atnah_index:
+                    analysis_text = first_half
+                else:
+                    analysis_text = second_half
+                    prefix_rows = rows[atnah_index + 1:index + 1]
+            result = analyze_boundary(
+                analysis_text, item, prefix_rows,
+                previous_item, next_item, kind
+            )
             if not checks_only or result.startswith(("CHECK", "REVIEW")):
+                hebrew_word = html.unescape(item.get("h", "")).strip()
+                accent_name = "zaqef-qatan" if kind == "ZAQEF-QATAN" else "atnah"
                 entries.append(
-                    f"  {kind} {item['k'].split('_')[-1]} "
+                    f"  {hebrew_word} ({accent_name}, word {item['k'].split('_')[-1]}) "
                     f"[{decode_gloss(item.get('e', ''))}]: {result}"
                 )
         if checks_only and not entries:
