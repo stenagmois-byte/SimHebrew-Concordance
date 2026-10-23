@@ -25,7 +25,23 @@ def read_items(path: Path) -> list[dict[str, str]]:
         data = json.loads(raw)
     except json.JSONDecodeError:
         # The supplied export is a JSON object fragment beginning at "items":.
-        data = json.loads("{" + raw + "}")
+        fragment = raw.strip()
+        # Some SQL exports prepend a comma before the top-level property.
+        if fragment.startswith(","):
+            fragment = fragment[1:].lstrip()
+        try:
+            data = json.loads("{" + fragment + "}")
+        except json.JSONDecodeError:
+            # Some exports retain the closing wrappers from the larger JSON
+            # document they were copied from. Read the items array itself.
+            property_match = re.search(r'"items"\s*:\s*', fragment)
+            if not property_match:
+                raise
+            array_start = property_match.end()
+            while array_start < len(fragment) and fragment[array_start].isspace():
+                array_start += 1
+            items, _ = json.JSONDecoder().raw_decode(fragment, array_start)
+            data = {"items": items}
     items = data["items"] if isinstance(data, dict) else data
     if not isinstance(items, list):
         raise ValueError("Expected a top-level items list")
@@ -77,6 +93,48 @@ def aligned_gloss_span(
     anchor = max(prior_positions, key=lambda span: span[1])[1]
     following = [span for span in matches if span[0] >= anchor]
     return following[0] if len(following) == 1 else None
+
+
+def repeated_gloss_boundary_span(
+    text: str,
+    gloss: str,
+    next_gloss: str,
+    kind: str,
+) -> tuple[int, int] | None:
+    """Resolve repeats only when boundary evidence identifies one occurrence."""
+    matches = gloss_spans(text, gloss)
+    if len(matches) < 2:
+        return None
+
+    if kind == "ATNAH":
+        atnah_matches = [span for span in matches if line_break_after(text, span[1])]
+        if len(atnah_matches) == 1:
+            return atnah_matches[0]
+
+    if kind == "ZAQEF-QATAN":
+        comma_matches = [span for span in matches if punctuation_after(text, span[1]) == ","]
+        if len(comma_matches) == 1:
+            return comma_matches[0]
+        punctuated = [span for span in matches if punctuation_after(text, span[1])]
+        if len(punctuated) == 1:
+            return punctuated[0]
+
+    # Use the following Hebrew gloss as a forward anchor only if it occurs
+    # between exactly one candidate and the next repeated occurrence.
+    if next_gloss:
+        following_boundaries = []
+        for index, span in enumerate(matches):
+            window_end = matches[index + 1][0] if index + 1 < len(matches) else len(text)
+            next_spans = [
+                candidate
+                for candidate in gloss_spans(text, next_gloss, span[1])
+                if candidate[0] < window_end
+            ]
+            if len(next_spans) == 1:
+                following_boundaries.append(span)
+        if len(following_boundaries) == 1:
+            return following_boundaries[0]
+    return None
 
 
 def noun_this_boundary_span(
@@ -238,7 +296,10 @@ def final_gloss_word_before_newline(text: str, gloss: str) -> bool:
     if not final_word:
         return False
     matches = 0
-    for line in text.splitlines()[:-1]:
+    lines = text.splitlines()
+    if not text.endswith(("\n", "\r")):
+        lines = lines[:-1]
+    for line in lines:
         content = re.sub(r"[,;:.!?—–\s]+$", "", line)
         if re.search(r"(?<!\w)" + re.escape(final_word) + r"$", content, re.I):
             matches += 1
@@ -312,7 +373,10 @@ def analyze_boundary(
             return f"CHECK LINE BREAK at reordered Hebrew-prefix end ('{aligned_word}')"
         return f"CHECK punctuation at reordered Hebrew-prefix end ('{aligned_word}')"
 
-    span = aligned_gloss_span(text, gloss, prefix_rows)
+    next_gloss = decode_gloss(next_item.get("e", "")) if next_item else ""
+    span = repeated_gloss_boundary_span(text, gloss, next_gloss, kind)
+    if not span:
+        span = aligned_gloss_span(text, gloss, prefix_rows)
     ambiguous_gloss = len(gloss_spans(text, gloss)) > 1 and span is None
     trimmed_of = False
     inferred = False
@@ -332,7 +396,6 @@ def analyze_boundary(
     # English may reorder words inside the Hebrew-to-English alignment span.
     # Punctuation just before the next record's gloss can therefore represent
     # the boundary even when it does not follow this record's gloss.
-    next_gloss = decode_gloss(next_item.get("e", "")) if next_item else ""
     next_span = gloss_span(text, next_gloss, span[1]) if next_gloss else None
     before_next = punctuation_before(text, next_span[0]) if next_span else ""
     prior_comma = prior_initial_gloss_comma(text, previous_item)
