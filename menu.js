@@ -353,11 +353,12 @@ if (!isChapterScreen && !isMatrixScreen) {
     const resolveContextAddress = (e) => {
         const rawSelection = window.getSelection().toString().trim();
         if (rawSelection.length === 0) return;
+        // The popup resolves one Hebrew word at a time. A multiword selection
+        // should fall through to the browser's normal context menu.
+        if (/\s/u.test(rawSelection)) return;
 
         const cleanHebrew = stripHebrew(rawSelection);
         if (!cleanHebrew) return;
-
-        e.preventDefault();
 
         let padBook = cleanBook ? (bookSequenceMap[cleanBook] || "01") : "01";
         let padCh = String(chapterNum || 1).padStart(3, '0');
@@ -397,15 +398,19 @@ if (!isChapterScreen && !isMatrixScreen) {
             return itemNoprefix === selNoprefix && selNoprefix.length > 1;
         });
 
-        let localGloss = "Explore branches";
-        let localDomain = "General Lexicon";
-        let targetRoot = "cli";
+        // Never show a generic gloss/root when the selection could not be
+        // matched to an interlinear record.
+        if (!databaseRowMatch) return;
 
-        if (databaseRowMatch) {
-            if (databaseRowMatch.e) localGloss = databaseRowMatch.e;
-            if (databaseRowMatch.d) localDomain = databaseRowMatch.d;
-            if (databaseRowMatch.r) targetRoot = databaseRowMatch.r;
-        }
+        let localGloss = "";
+        let localDomain = "General Lexicon";
+        let targetRoot = "";
+
+        if (databaseRowMatch.e) localGloss = databaseRowMatch.e;
+        if (databaseRowMatch.d) localDomain = databaseRowMatch.d;
+        if (databaseRowMatch.r) targetRoot = databaseRowMatch.r;
+        if (!targetRoot) return;
+        e.preventDefault();
 
         const targetHash = targetRoot.replace(/f/g, 'T');
         const rawPrefix = targetRoot.substring(0, 2);
