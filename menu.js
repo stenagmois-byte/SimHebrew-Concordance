@@ -217,8 +217,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 <span class="btn-line2">Verse Twins</span>
             </a>
             <a href="${baseUrl}/reconciliation_matrix.html" class="top-nav-btn">
-                <span class="btn-line1">🔢 Phrase</span>
-                <span class="btn-line2">Index</span>
+                <span class="btn-line1">🎯 Sublinear</span>
+                <span class="btn-line2">Phrases </span>
             </a>
         </div>
     `;
