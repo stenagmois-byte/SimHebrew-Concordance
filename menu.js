@@ -328,7 +328,7 @@ if (currentUrl.includes('ornament_records.html')) {
 }
 
 const isChapterScreen = currentUrl.includes('ornament_chapter.html');
-const isMatrixScreen = currentUrl.includes('_matrix.html');
+const isMatrixScreen = currentUrl.includes('_matrix.html') && !currentUrl.includes('reconciliation_matrix.html');
 
 if (!isChapterScreen && !isMatrixScreen) {
     return;
