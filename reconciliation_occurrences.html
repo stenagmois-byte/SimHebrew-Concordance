@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="qstyles.css">
+  <script src="./menu.js" defer></script>
+  <title>Reconciliation Shape Occurrences</title>
+  <style>
+    body { background: #fffcf4; color: #292929; }
+    main { max-width: 1400px; margin: 0 auto; padding: 12px 20px 40px; }
+    h1 { color: #800000; font-weight: normal; margin-bottom: 4px; }
+    .subtitle { color: #555; margin-top: 0; }
+    .search-panel { position: sticky; top: 58px; z-index: 10; background: #fffcf4; border: 2px solid #800000; border-radius: 6px; padding: 12px 16px; box-shadow: 0 3px 9px rgba(0,0,0,.08); }
+    .shape-title { font-family: Georgia, serif; font-size: 1.25rem; color: #800000; font-weight: bold; }
+    .book-panel { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin: 16px 0; }
+    .book-panel-title { width: 100%; color: #666; font: bold .8rem sans-serif; text-transform: uppercase; }
+    .book-button { border: 1px solid #bbb; border-radius: 16px; background: white; padding: 5px 10px; cursor: pointer; }
+    .book-button:hover, .book-button.active { border-color: #800000; color: #800000; background: #f3f0e8; }
+    .badge { display: inline-block; margin-left: 5px; padding: 1px 6px; border-radius: 10px; color: white; background: #800000; font: .75rem sans-serif; }
+    .results-table { width: 100%; border-collapse: collapse; font-family: Georgia, serif; background: white; }
+    .results-table th, .results-table td { border: 1px solid #ddd; padding: 9px 11px; vertical-align: top; }
+    .results-table th { background: #f3f0e8; color: #800000; font: bold .85rem sans-serif; text-align: left; }
+    .reference-link { color: #800000; font-weight: bold; white-space: nowrap; }
+    .sequence { font-family: sans-serif; white-space: nowrap; }
+    .english { line-height: 1.5; }
+    .status { padding: 18px 8px; color: #666; }
+    @media (max-width: 700px) {
+      main { padding-left: 10px; padding-right: 10px; }
+      .results-table th, .results-table td { padding: 7px 6px; font-size: .9rem; }
+      .sequence { white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p><a href="reconciliation_matrix.html">← Back to the reconciliation matrix</a></p>
+    <h1>Complete segment occurrences</h1>
+    <p class="subtitle">These are complete verse segments with the selected diatonic shape. Sharps are ignored for matching; the original contour is shown below.</p>
+    <section class="search-panel" aria-live="polite">
+      <div id="shapeTitle" class="shape-title">Loading shape…</div>
+      <div id="resultSummary">Loading occurrence data…</div>
+    </section>
+    <div id="bookFilters" class="book-panel"></div>
+    <table class="results-table">
+      <thead><tr><th>Book</th><th>Verse</th><th>Original segment</th><th>English text</th></tr></thead>
+      <tbody id="resultsBody"><tr><td colspan="4" class="status">Loading occurrences…</td></tr></tbody>
+    </table>
+  </main>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const selectedShape = (params.get('shape') || '').trim().replace(/\s+/g, ' ');
+    const selectedContext = params.get('context') || '';
+    const selectedMode = params.get('mode') || 'prose';
+    const contextLabels = {
+      'Approaching the subdominant': 'Approaching the subdominant',
+      'Returning to the tonic': 'Returning to the tonic',
+      'No subdominant': 'No subdominant'
+    };
+    const bookFolders = {
+      JOSHUA: 'Joshua-Judges', JUDGES: 'Joshua-Judges',
+      '1_SAMUEL': 'Samuel', '2_SAMUEL': 'Samuel',
+      '1_KINGS': 'Kings', '2_KINGS': 'Kings',
+      ISAIAH: 'Isaiah', JEREMIAH: 'Jeremiah', EZEKIEL: 'Ezekiel',
+      HOSEA: 'The Twelve', JOEL: 'The Twelve', AMOS: 'The Twelve', OBADIAH: 'The Twelve',
+      JONAH: 'The Twelve', MICAH: 'The Twelve', NAHUM: 'The Twelve', HABAKKUK: 'The Twelve',
+      ZEPHANIAH: 'The Twelve', HAGGAI: 'The Twelve', ZECHARIAH: 'The Twelve', MALACHI: 'The Twelve',
+      PSALMS: 'The Psalms', PROVERBS: 'Proverbs', JOB: 'Job', SONG: 'The Five Scrolls',
+      RUTH: 'The Five Scrolls', LAMENTATIONS: 'The Five Scrolls', QOHELET: 'The Five Scrolls',
+      ESTHER: 'The Five Scrolls', DANIEL: 'Daniel-Ezra-Nehemiah', EZRA: 'Daniel-Ezra-Nehemiah',
+      NEHEMIAH: 'Daniel-Ezra-Nehemiah', '1_CHRONICLES': 'Chronicles', '2_CHRONICLES': 'Chronicles'
+    };
+    const canonicalOrder = {
+      GENESIS: 1, EXODUS: 2, LEVITICUS: 3, NUMBERS: 4, DEUTERONOMY: 5,
+      JOSHUA: 6, JUDGES: 7, '1_SAMUEL': 8, '2_SAMUEL': 9, '1_KINGS': 10, '2_KINGS': 11,
+      ISAIAH: 12, JEREMIAH: 13, EZEKIEL: 14, HOSEA: 15, JOEL: 16, AMOS: 17, OBADIAH: 18,
+      JONAH: 19, MICAH: 20, NAHUM: 21, HABAKKUK: 22, ZEPHANIAH: 23, HAGGAI: 24,
+      ZECHARIAH: 25, MALACHI: 26, PSALMS: 27, PROVERBS: 28, JOB: 29, SONG: 30, RUTH: 31,
+      LAMENTATIONS: 32, QOHELET: 33, ESTHER: 34, DANIEL: 35, EZRA: 36, NEHEMIAH: 37,
+      '1_CHRONICLES': 38, '2_CHRONICLES': 39
+    };
+    let visibleBook = 'ALL';
+    let matchingRecords = [];
+    let translations = {};
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    }
+    function renderEnglish(value) {
+      const text = String(value ?? '')
+        .replace(/&#(?:x([\da-f]{1,6})|(\d{1,7}));/gi, (entity, hex, decimal) => {
+          const codePoint = hex ? Number.parseInt(hex, 16) : Number.parseInt(decimal, 10);
+          return codePoint <= 0x10ffff && !(codePoint >= 0xd800 && codePoint <= 0xdfff)
+            ? String.fromCodePoint(codePoint)
+            : entity;
+        })
+        .replace(/𝄓/g, '\n');
+      return text.split(/(<\/?(?:b|strong)\s*>)/gi).map(part => {
+        if (/^<\s*b\s*>$/i.test(part)) return '<b>';
+        if (/^<\s*\/\s*b\s*>$/i.test(part)) return '</b>';
+        if (/^<\s*strong\s*>$/i.test(part)) return '<strong>';
+        if (/^<\s*\/\s*strong\s*>$/i.test(part)) return '</strong>';
+        return escapeHtml(part).replace(/\n/g, '<br>');
+      }).join('');
+    }
+    function displayBook(book) {
+      return book.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, ch => ch.toUpperCase());
+    }
+    function parseRef(ref) {
+      const m = ref.match(/^(.*)_(\d{3})_(\d{3})$/);
+      return m ? { book: m[1], chapter: Number(m[2]), verse: Number(m[3]) } : null;
+    }
+    function matrixUrl(ref) {
+      const parsed = parseRef(ref);
+      if (!parsed) return '#';
+      const folder = bookFolders[parsed.book] || parsed.book.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, ch => ch.toUpperCase());
+      const filename = `${parsed.book}_${String(parsed.chapter).padStart(3, '0')}_matrix.html`;
+      return `./musicscores/${encodeURIComponent(folder)}/${filename}#${ref}`;
+    }
+    function sortedRecords(records) {
+      return [...records].sort((a, b) => {
+        const ar = parseRef(a.ref), br = parseRef(b.ref);
+        if (!ar || !br) return a.ref.localeCompare(b.ref);
+        return (canonicalOrder[ar.book] || 999) - (canonicalOrder[br.book] || 999)
+          || ar.chapter - br.chapter || ar.verse - br.verse;
+      });
+    }
+    function render() {
+      const shown = sortedRecords(matchingRecords.filter(r => visibleBook === 'ALL' || parseRef(r.ref)?.book === visibleBook));
+      document.getElementById('resultSummary').textContent = `${shown.length} ${selectedMode} segment${shown.length === 1 ? '' : 's'} · ${contextLabels[selectedContext] || selectedContext}`;
+      const body = document.getElementById('resultsBody');
+      if (!shown.length) {
+        body.innerHTML = '<tr><td colspan="4" class="status">No occurrences match this selection.</td></tr>';
+        return;
+      }
+      body.innerHTML = shown.map(record => {
+        const parsed = parseRef(record.ref);
+        const label = parsed ? `${parsed.chapter}:${parsed.verse}` : record.ref;
+        const english = translations[record.ref] || '[English translation unavailable]';
+        return `<tr>
+          <td>${escapeHtml(displayBook(parsed?.book || ''))}</td>
+          <td><a class="reference-link" href="${matrixUrl(record.ref)}">${escapeHtml(label)} ↗</a></td>
+          <td class="sequence">[ ${escapeHtml(record.sequence)} ]</td>
+          <td class="english">${renderEnglish(english)}</td>
+        </tr>`;
+      }).join('');
+    }
+    function renderBookFilters() {
+      const counts = {};
+      matchingRecords.forEach(r => {
+        const book = parseRef(r.ref)?.book;
+        if (book) counts[book] = (counts[book] || 0) + 1;
+      });
+      const books = Object.keys(counts).sort((a,b) => (canonicalOrder[a] || 999) - (canonicalOrder[b] || 999));
+      const panel = document.getElementById('bookFilters');
+      panel.innerHTML = '<span class="book-panel-title">Filter occurrences by book</span>';
+      const addButton = (book, label, count) => {
+        const button = document.createElement('button');
+        button.className = `book-button${visibleBook === book ? ' active' : ''}`;
+        button.innerHTML = `${escapeHtml(label)}<span class="badge">${count}</span>`;
+        button.addEventListener('click', () => { visibleBook = book; renderBookFilters(); render(); });
+        panel.appendChild(button);
+      };
+      addButton('ALL', 'All books', matchingRecords.length);
+      books.forEach(book => addButton(book, displayBook(book), counts[book]));
+    }
+    async function initialize() {
+      if (!selectedShape || !contextLabels[selectedContext] || !['prose','poetry'].includes(selectedMode)) {
+        document.getElementById('shapeTitle').textContent = 'No shape selected';
+        document.getElementById('resultSummary').textContent = 'Return to the reconciliation matrix and choose a linked shape.';
+        document.getElementById('resultsBody').innerHTML = '<tr><td colspan="4" class="status">No shape was supplied.</td></tr>';
+        return;
+      }
+      document.getElementById('shapeTitle').textContent = `[ ${selectedShape} ] · ${selectedMode} · ${selectedContext}`;
+      try {
+        const [occurrenceResponse, translationResponse] = await Promise.all([
+          fetch(`reconciliation_occurrences.json?t=${Date.now()}`),
+          fetch(`translation.json?t=${Date.now()}`)
+        ]);
+        if (!occurrenceResponse.ok || !translationResponse.ok) throw new Error('Could not load occurrence or translation data.');
+        const [occurrences, translationData] = await Promise.all([occurrenceResponse.json(), translationResponse.json()]);
+        const items = translationData?.results?.[0]?.items || [];
+        items.forEach(item => {
+          if (!item.book_cd || !item.chapter_cd || !item.verse_cd) return;
+          const book = item.book_cd.toUpperCase().replace(/\s+/g, '_').trim();
+          const ref = `${book}_${String(item.chapter_cd).trim().padStart(3,'0')}_${String(item.verse_cd).trim().padStart(3,'0')}`;
+          translations[ref] = item.eng_text || '';
+        });
+        matchingRecords = occurrences.filter(r => r.shape === selectedShape && r.context === selectedContext && r.mode === selectedMode);
+        renderBookFilters();
+        render();
+      } catch (error) {
+        document.getElementById('resultSummary').textContent = `Could not load results: ${error.message}`;
+        document.getElementById('resultsBody').innerHTML = '<tr><td colspan="4" class="status">Occurrence data could not be loaded.</td></tr>';
+      }
+    }
+    initialize();
+  </script>
+</body>
+</html>

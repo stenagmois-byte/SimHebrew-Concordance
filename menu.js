@@ -216,6 +216,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 <span class="btn-line1">🔢 Gematria</span>
                 <span class="btn-line2">Verse Twins</span>
             </a>
+            <a href="${baseUrl}/reconciliation_matrix.html" class="top-nav-btn">
+                <span class="btn-line1">🔢 Phrase</span>
+                <span class="btn-line2">Index</span>
+            </a>
         </div>
     `;
     document.body.appendChild(navWrapper);

@@ -576,7 +576,7 @@ const ornamentGlyphMap = {
                     const wrapWithoutVowels = `<div title="${fullEnglishTranslation}" style="cursor:help; display:inline-block; width:100%; line-height: 1.8;">${plainTrackOutput}</div>`;
                     const wrapWithVowels = `<div title="${fullEnglishTranslation}" style="cursor:help; display:inline-block; width:100%; line-height: 1.8;">${voweledTrackOutput}</div>`;
 
-                    const matrixLinkUrl = getVolumeLink(item.b, item.c);
+                    const matrixLinkUrl = getVolumeLink(item.b, item.c, item.v);
                     recordsCache.push({
                         book: item.b,
                         location: `${item.b} ${item.c}:${item.v}`,
@@ -586,9 +586,10 @@ const ornamentGlyphMap = {
                     });
                 });
 
-function getVolumeLink(bookCd, chapterCd) {
+function getVolumeLink(bookCd, chapterCd, verseCd) {
     const bookUpper = bookCd.toUpperCase().trim();
     const chPad = String(chapterCd).padStart(3, '0');
+    const versePad = String(verseCd).padStart(3, '0');
     let volumeDir = "";
 
     // 🎯 Replicating your PL/SQL CASE WHEN logic exactly
@@ -616,7 +617,7 @@ function getVolumeLink(bookCd, chapterCd) {
 
     // Replicates replace(p_book_cd,' ','_')||'_'||p_chapter_cd||'_matrix.html'
     const fileBook = bookUpper.replace(/ /g, '_');
-    return `./musicscores/${volumeDir}/${fileBook}_${chPad}_matrix.html`;
+    return `./musicscores/${volumeDir}/${fileBook}_${chPad}_matrix.html#${fileBook}_${chPad}_${versePad}`;
 }
 
 function drawTableRows() {

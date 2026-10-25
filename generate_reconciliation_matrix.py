@@ -1,6 +1,10 @@
 import os
+import json
+import html as html_lib
 import pandas as pd
 from collections import Counter
+from pathlib import Path
+from urllib.parse import quote
 
 def build_reconciliation_matrix(master_sequence_log):
     print("🚀 Initializing Comparative Matrix with Reference Mapping...")
@@ -51,6 +55,29 @@ def build_reconciliation_matrix(master_sequence_log):
     df["sort_tier"] = df.apply(get_sort_tier, axis=1)
     df["functional_context"] = df.apply(get_functional_context, axis=1)
 
+    # Store every complete segment for the linked exact-shape occurrence view.
+    occurrence_records = []
+    for record in master_sequence_log:
+        original_sequence = " ".join(str(record.get("sequence_pattern", "")).split())
+        shape = " ".join(original_sequence.replace("#", "").split())
+        book = str(record.get("book", "")).strip().upper()
+        if not shape or not book:
+            continue
+        chapter = str(record.get("chapter", "1")).strip().zfill(3)
+        verse = str(record.get("verse", "1")).strip().zfill(3)
+        occurrence_records.append({
+            "shape": shape,
+            "sequence": original_sequence,
+            "context": get_functional_context(record),
+            "mode": "poetry" if str(record.get("is_poetry", "0")) == "1" else "prose",
+            "ref": f"{book}_{chapter}_{verse}",
+        })
+
+    project_root = Path(__file__).resolve().parent
+    occurrence_path = project_root / "reconciliation_occurrences.json"
+    with occurrence_path.open("w", encoding="utf-8") as occurrence_file:
+        json.dump(occurrence_records, occurrence_file, ensure_ascii=False, separators=(",", ":"))
+
     # 4. Compile Split Counter Subsets
     poetry_subset = df[df["is_poetry"] == "1"]
     prose_subset = df[df["is_poetry"] == "0"]
@@ -63,7 +90,7 @@ def build_reconciliation_matrix(master_sequence_log):
     unique_rows = unique_rows.sort_values(by=["sort_tier", "diatonic_shape"])
 
     # 6. HTML Page Generation
-    html_path = "reconciliation_matrix.html"
+    html_path = project_root / "reconciliation_matrix.html"
     
     html = """<!DOCTYPE html>
 <html lang="en">
@@ -71,6 +98,7 @@ def build_reconciliation_matrix(master_sequence_log):
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="qstyles.css">
+  <script src="./menu.js" defer></script>
   <title>Tanach Modal Comparison Matrix</title>
   <style>
     .matrix-table { width: 100%; border-collapse: collapse; font-family: 'Georgia', serif; margin: 25px 0; }
@@ -80,6 +108,8 @@ def build_reconciliation_matrix(master_sequence_log):
     .blank-cell { background-color: #fafafa; font-style: italic; color: #aaa; text-align: center; }
     .num-col { text-align: right; font-variant-numeric: tabular-nums; padding-right: 15px; }
     .sample-text { font-size: 0.85rem; color: #666; font-family: sans-serif; line-height: 1.4; display: block; max-width: 280px; word-wrap: break-word; }
+    .shape-link { color: #800000; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
+    .shape-link:hover { color: #4b0000; text-decoration-style: solid; }
     .reconcile-box { background-color: #fffcf4; border: 2px solid #800000; padding: 20px; margin-top: 40px; border-radius: 6px; }
     .reconcile-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
     .reconcile-table td { padding: 8px; border-bottom: 1px solid #e1e4e6; }
@@ -153,13 +183,21 @@ def build_reconciliation_matrix(master_sequence_log):
         
         # PROSE VIEW
         if prose_cnt > 0:
-            html += f"        <td><strong>[ {shape} ]</strong></td>\n"
+            shape_href = (
+                "reconciliation_occurrences.html?shape=" + quote(shape, safe="")
+                + "&context=" + quote(context_label, safe="") + "&mode=prose"
+            )
+            html += f"        <td><strong>[ <a class=\"shape-link\" href=\"{shape_href}\">{html_lib.escape(shape)}</a> ]</strong></td>\n"
         else:
             html += "        <td class=\"blank-cell\">— Not used in prose —</td>\n"
             
         # POETRY VIEW
         if poetry_cnt > 0:
-            html += f"        <td><strong>[ {shape} ]</strong></td>\n"
+            shape_href = (
+                "reconciliation_occurrences.html?shape=" + quote(shape, safe="")
+                + "&context=" + quote(context_label, safe="") + "&mode=poetry"
+            )
+            html += f"        <td><strong>[ <a class=\"shape-link\" href=\"{shape_href}\">{html_lib.escape(shape)}</a> ]</strong></td>\n"
         else:
             html += "        <td class=\"blank-cell\">— Not used in poetry —</td>\n"
             
