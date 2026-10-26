@@ -41,8 +41,9 @@
   <!--div class="nav">
     <a href="./musicscores/index.html">← Back to Volume Directory</a>
   </div></!-->
-<div id="truncationWarningText" style="display: none; color: #b36b00; font-family: sans-serif; font-size: 0.9rem; font-weight: bold; margin-top: 10px;">
-  ⚠️ Notice: Input is limited to between 3 and 5 reciting notes.
+<div id="truncationWarningText" style="display: none; color: #7a4b00; font-family: sans-serif; font-size: 0.9rem; margin: 10px 0;">
+  Motif Concordance searches 3–5 notes. For this full sequence, use
+  <a id="fullShapeSearchLink" class="search-btn" href="reconciliation_matrix.html" style="display: inline-block; text-decoration: none;">Search the Reconciliation Matrix</a>.
 </div>
 
   <h1>Musical Motif Concordance</h1>
@@ -235,19 +236,20 @@
       // 1. Clean and split the input string into individual notes
       let noteArray = rawInput.trim().replace(/\s+/g, ' ').split(' ');
   
-  // ✂️ AUTOMATIC 5-NOTE MAXIMUM SAFE GUARDRAIL
+  // The motif index supports 3–5 notes. Keep the full input intact and offer
+  // the Reconciliation Matrix as a direct search for other sequence lengths.
   const visualWarning = document.getElementById('truncationWarningText');
-  
-  if (noteArray.length < 3 || noteArray.length > 5) {
-      noteArray = noteArray.slice(0, 5);
-      document.getElementById('searchInput').value = noteArray.join(' ');
-      
-      // Reveal the visual warning banner straight to the user on the screen!
+  const normalizedInput = rawInput.trim().replace(/\s+/g, ' ');
+  if (normalizedInput && (noteArray.length < 3 || noteArray.length > 5)) {
+      const fullShapeLink = document.getElementById('fullShapeSearchLink');
+      fullShapeLink.href = `reconciliation_matrix.html?q=${encodeURIComponent(normalizedInput)}`;
       if (visualWarning) visualWarning.style.display = 'block';
   } else {
-      // Hide it if they search for a standard 3, 4, or 5-note motif
       if (visualWarning) visualWarning.style.display = 'none';
-  }  
+  }
+  // Preserve the existing motif behavior for long input by checking its first
+  // five notes; the button above sends the complete sequence to the matrix.
+  if (noteArray.length > 5) noteArray = noteArray.slice(0, 5);
       const searchStr = noteArray.join(' ').toUpperCase();
       //const searchStr = rawInput.trim().replace(/\s+/g, ' ').toUpperCase();
       

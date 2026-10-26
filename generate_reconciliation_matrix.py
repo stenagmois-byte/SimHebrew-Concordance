@@ -107,6 +107,7 @@ def build_reconciliation_matrix(master_sequence_log):
     .matrix-hdr { background-color: #f3f0e8; color: #800000; font-weight: bold; text-align: center; }
     .filter-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 18px 0 10px; padding: 12px 14px; background: #fffcf4; border: 1px solid #ddd; }
     .filter-controls select { padding: 5px 8px; }
+    .filter-controls input { padding: 6px 8px; min-width: 240px; flex: 1 1 280px; }
     #filterSummary { color: #555; margin-left: auto; font-size: .9rem; }
     .method-note { color: #555; font-size: .92rem; margin: 6px 0 12px; }
     .section-divider { background-color: #eaeaea; color: #222; font-weight: bold; padding: 10px 12px; font-size: 1.1rem; border-top: 3px solid #800000; }
@@ -135,6 +136,8 @@ def build_reconciliation_matrix(master_sequence_log):
     <select id="percentScope" aria-label="Percentage category">
       <option value="either">either prose or poetry</option><option value="prose">prose</option><option value="poetry">poetry</option>
     </select>
+    <label for="shapeSearch">Find a note sequence in a full phrase</label>
+    <input id="shapeSearch" type="search" placeholder="e.g. E4 F4 G4" aria-label="Search note sequence">
     <span id="filterSummary" aria-live="polite"></span>
   </div>
 
@@ -194,7 +197,7 @@ def build_reconciliation_matrix(master_sequence_log):
 
         samples_display_str = ", ".join(samples_list)
 
-        html += f'      <tr class="shape-row" data-prose-pct="{prose_pct:.6f}" data-poetry-pct="{poetry_pct:.6f}">\n'
+        html += f'      <tr class="shape-row" data-shape="{html_lib.escape(shape, quote=True)}" data-prose-pct="{prose_pct:.6f}" data-poetry-pct="{poetry_pct:.6f}">\n'
         
         # PROSE VIEW
         if prose_cnt > 0:
@@ -273,20 +276,23 @@ def build_reconciliation_matrix(master_sequence_log):
   (() => {{
     const threshold = document.getElementById('percentThreshold');
     const scope = document.getElementById('percentScope');
+    const shapeSearch = document.getElementById('shapeSearch');
     const rows = [...document.querySelectorAll('.shape-row')];
     const dividers = [...document.querySelectorAll('.section-divider')];
     const summary = document.getElementById('filterSummary');
     function applyPercentFilter() {{
       const minimum = Number(threshold.value);
+      const query = shapeSearch.value.trim().replace(/#/g, '').replace(/\\s+/g, ' ').toUpperCase();
       let visibleCount = 0;
       rows.forEach(row => {{
         const prose = Number(row.dataset.prosePct);
         const poetry = Number(row.dataset.poetryPct);
+        const shapeMatches = !query || row.dataset.shape.toUpperCase().includes(query);
         const passes = scope.value === 'prose' ? prose >= minimum
           : scope.value === 'poetry' ? poetry >= minimum
           : prose >= minimum || poetry >= minimum;
-        row.hidden = !passes;
-        if (passes) visibleCount++;
+        row.hidden = !(passes && shapeMatches);
+        if (!row.hidden) visibleCount++;
       }});
       dividers.forEach(divider => {{
         let next = divider.parentElement.nextElementSibling;
@@ -301,6 +307,9 @@ def build_reconciliation_matrix(master_sequence_log):
     }}
     threshold.addEventListener('change', applyPercentFilter);
     scope.addEventListener('change', applyPercentFilter);
+    shapeSearch.addEventListener('input', applyPercentFilter);
+    const initialQuery = new URLSearchParams(window.location.search).get('q');
+    if (initialQuery) shapeSearch.value = initialQuery;
     applyPercentFilter();
   }})();
 </script>
