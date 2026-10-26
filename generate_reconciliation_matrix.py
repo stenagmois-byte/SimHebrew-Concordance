@@ -103,7 +103,12 @@ def build_reconciliation_matrix(master_sequence_log):
   <style>
     .matrix-table { width: 100%; border-collapse: collapse; font-family: 'Georgia', serif; margin: 25px 0; }
     .matrix-table td { padding: 12px; border: 1px solid #ddd; vertical-align: middle; }
+    .matrix-table th { position: sticky; top: 58px; z-index: 20; padding: 12px; border: 1px solid #ddd; vertical-align: middle; }
     .matrix-hdr { background-color: #f3f0e8; color: #800000; font-weight: bold; text-align: center; }
+    .filter-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 18px 0 10px; padding: 12px 14px; background: #fffcf4; border: 1px solid #ddd; }
+    .filter-controls select { padding: 5px 8px; }
+    #filterSummary { color: #555; margin-left: auto; font-size: .9rem; }
+    .method-note { color: #555; font-size: .92rem; margin: 6px 0 12px; }
     .section-divider { background-color: #eaeaea; color: #222; font-weight: bold; padding: 10px 12px; font-size: 1.1rem; border-top: 3px solid #800000; }
     .blank-cell { background-color: #fafafa; font-style: italic; color: #aaa; text-align: center; }
     .num-col { text-align: right; font-variant-numeric: tabular-nums; padding-right: 15px; }
@@ -117,22 +122,32 @@ def build_reconciliation_matrix(master_sequence_log):
 </head>
 <body>
 
-  <!-- RESOLVED WARNING PATH: Fixed backslash to web forward slash -->
-  <div class="nav"><a href="musicscores/index.html">← Back to Volume Directory</a></div>
-
   <h1>Diatonic Alignment & Reconciliation Matrix</h1>
   <p>Isolated structural note paths compared by stripping accidentals. Grouped functionally to track occurrences and reference locations side-by-side.</p>
+  <p class="method-note">Each percentage is calculated separately for prose or poetry, using all phrase segments in the same structural tier as its denominator.</p>
+  <div class="filter-controls">
+    <label for="percentThreshold">Show shapes used at least</label>
+    <select id="percentThreshold" aria-label="Minimum percentage">
+      <option value="0">0% (all)</option><option value="0.25">0.25%</option><option value="0.5">0.5%</option>
+      <option value="1">1%</option><option value="2">2%</option><option value="5">5%</option><option value="10">10%</option>
+    </select>
+    <label for="percentScope">in</label>
+    <select id="percentScope" aria-label="Percentage category">
+      <option value="either">either prose or poetry</option><option value="prose">prose</option><option value="poetry">poetry</option>
+    </select>
+    <span id="filterSummary" aria-live="polite"></span>
+  </div>
 
   <table class="matrix-table">
     <thead>
       <tr>
-        <td class="matrix-hdr" style="width: 25%;">Prose Diatonic Phrase</td>
-        <td class="matrix-hdr" style="width: 25%;">Poetic Diatonic Phrase</td>
-        <td class="matrix-hdr" style="width: 25%;">Sample Text Reference Occurrences</td>
-        <td class="matrix-hdr" class="num-col">Prose Count</td>
-        <td class="matrix-hdr" class="num-col">Prose %</td>
-        <td class="matrix-hdr" class="num-col">Poetry Count</td>
-        <td class="matrix-hdr" class="num-col">Poetry %</td>
+        <th class="matrix-hdr" style="width: 25%;">Prose Diatonic Phrase</th>
+        <th class="matrix-hdr" style="width: 25%;">Poetic Diatonic Phrase</th>
+        <th class="matrix-hdr" style="width: 25%;">Sample Text Reference Occurrences</th>
+        <th class="matrix-hdr num-col">Prose Count</th>
+        <th class="matrix-hdr num-col">Prose %</th>
+        <th class="matrix-hdr num-col">Poetry Count</th>
+        <th class="matrix-hdr num-col">Poetry %</th>
       </tr>
     </thead>
     <tbody>"""
@@ -179,7 +194,7 @@ def build_reconciliation_matrix(master_sequence_log):
 
         samples_display_str = ", ".join(samples_list)
 
-        html += "      <tr>\n"
+        html += f'      <tr class="shape-row" data-prose-pct="{prose_pct:.6f}" data-poetry-pct="{poetry_pct:.6f}">\n'
         
         # PROSE VIEW
         if prose_cnt > 0:
@@ -254,6 +269,41 @@ def build_reconciliation_matrix(master_sequence_log):
     <p>Qualum Publishing · Computational Musicology Research Suite</p>
   </footer>
 
+<script>
+  (() => {{
+    const threshold = document.getElementById('percentThreshold');
+    const scope = document.getElementById('percentScope');
+    const rows = [...document.querySelectorAll('.shape-row')];
+    const dividers = [...document.querySelectorAll('.section-divider')];
+    const summary = document.getElementById('filterSummary');
+    function applyPercentFilter() {{
+      const minimum = Number(threshold.value);
+      let visibleCount = 0;
+      rows.forEach(row => {{
+        const prose = Number(row.dataset.prosePct);
+        const poetry = Number(row.dataset.poetryPct);
+        const passes = scope.value === 'prose' ? prose >= minimum
+          : scope.value === 'poetry' ? poetry >= minimum
+          : prose >= minimum || poetry >= minimum;
+        row.hidden = !passes;
+        if (passes) visibleCount++;
+      }});
+      dividers.forEach(divider => {{
+        let next = divider.parentElement.nextElementSibling;
+        let hasVisibleRows = false;
+        while (next && !next.classList.contains('section-divider')) {{
+          if (next.classList.contains('shape-row') && !next.hidden) hasVisibleRows = true;
+          next = next.nextElementSibling;
+        }}
+        divider.parentElement.hidden = !hasVisibleRows;
+      }});
+      summary.textContent = `Showing ${{visibleCount}} of ${{rows.length}} shapes`;
+    }}
+    threshold.addEventListener('change', applyPercentFilter);
+    scope.addEventListener('change', applyPercentFilter);
+    applyPercentFilter();
+  }})();
+</script>
 </body>
 </html>"""
 
