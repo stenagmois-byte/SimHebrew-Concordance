@@ -12,6 +12,11 @@
     .nav { margin-bottom: 25px; font-size: .9rem; font-weight: bold; }
     h1 { font-family: color: #800000; font-weight: normal; margin-bottom: 5px; }
     .controls, .summary { margin: 20px 0; padding: 14px 18px; background: #f3f0e8; border-left: 4px solid #800000; }
+    .controls { position: sticky; top: 58px; z-index: 1000; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; box-shadow: 0 3px 8px rgba(0,0,0,.12); }
+    .chapter-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+    .chapter-nav button { border: 1px solid #800000; border-radius: 4px; padding: 7px 11px; background: #800000; color: white; font: bold .9rem sans-serif; cursor: pointer; }
+    .chapter-nav button:hover:not(:disabled) { background: #600000; }
+    .chapter-nav button:disabled { background: #ddd; border-color: #bbb; color: #666; cursor: not-allowed; }
     label { cursor: pointer; }
     .verse { margin: 26px 0; padding: 18px 20px; background: white; border-top: 2px solid #800000; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
     .verse-heading { display: flex; justify-content: space-between; gap: 1rem; font: bold 1rem sans-serif; color: #800000; }
@@ -33,7 +38,10 @@
 <label style="margin-left: 20px; font-weight: normal; cursor: pointer; color: #800000;">
     <input type="checkbox" id="gematria-toggle"> Show Gematria Profiles
 </label>
-
+    <nav class="chapter-nav" aria-label="Chapter navigation">
+      <button type="button" id="previousChapter" disabled>← Previous chapter</button>
+      <button type="button" id="nextChapter" disabled>Next chapter →</button>
+    </nav>
   </div>
   <div id="summary" class="summary" hidden></div>
   <main id="chapter"></main>
@@ -45,7 +53,11 @@
     const chapterRoot = document.getElementById('chapter');
     const vowelToggle = document.getElementById('vowel-toggle');
     const gematriaToggle = document.getElementById('gematria-toggle');
+    const previousChapterButton = document.getElementById('previousChapter');
+    const nextChapterButton = document.getElementById('nextChapter');
     let activeChapter = null;
+    let chapterSequence = [];
+    let activeChapterIndex = -1;
     vowelToggle.checked = false; 
     gematriaToggle.checked = false; 
     function consonantsAndTeamim(text) {
@@ -69,6 +81,36 @@
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join('_');     // Rejoins with underscores for the filename
     }    
+    function updateChapterNavigation(chapters) {
+      chapterSequence = [...chapters].sort((a, b) =>
+        Number(a.s) - Number(b.s) || Number(a.c) - Number(b.c)
+      );
+      activeChapterIndex = chapterSequence.findIndex(chapter =>
+        chapter.b.toLowerCase() === requestedBook && String(chapter.c) === requestedChapter
+      );
+      const previous = chapterSequence[activeChapterIndex - 1];
+      const next = chapterSequence[activeChapterIndex + 1];
+      previousChapterButton.disabled = !previous;
+      nextChapterButton.disabled = !next;
+      if (previous) {
+        previousChapterButton.textContent = `← ${previous.b} ${previous.c}`;
+        previousChapterButton.title = `Go to ${previous.b} ${previous.c}`;
+      }
+      if (next) {
+        nextChapterButton.textContent = `${next.b} ${next.c} →`;
+        nextChapterButton.title = `Go to ${next.b} ${next.c}`;
+      }
+    }
+
+    function navigateChapter(direction) {
+      const target = chapterSequence[activeChapterIndex + direction];
+      if (!target) return;
+      const nextParams = new URLSearchParams(window.location.search);
+      nextParams.set('book', target.b);
+      nextParams.set('chapter', target.c);
+      window.location.assign(`${window.location.pathname}?${nextParams.toString()}`);
+    }
+
     function render() {
       if (!activeChapter) return;
       const showVowels = vowelToggle.checked;
@@ -238,6 +280,7 @@
           if (!activeChapter) {
               throw new Error('chapter not found');
           }
+          updateChapterNavigation(data.chapters);
           
           document.title = `${activeChapter.b} ${activeChapter.c} — Musical Profile`;
           document.getElementById('title').textContent = `${activeChapter.b} ${activeChapter.c}: Musical Profile`;
@@ -259,6 +302,8 @@
     }
     vowelToggle.addEventListener('change', render);
     gematriaToggle.addEventListener('change', render);
+    previousChapterButton.addEventListener('click', () => navigateChapter(-1));
+    nextChapterButton.addEventListener('click', () => navigateChapter(1));
 // Lightweight Experiment Module for ornament_chapter.html
   </script>
 </body>
