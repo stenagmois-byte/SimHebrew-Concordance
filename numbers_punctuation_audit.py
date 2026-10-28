@@ -252,6 +252,81 @@ def reordered_prefix_boundary(
     return boundary, bool(punctuation_after(text, boundary[1]))
 
 
+def reordered_preceding_glosses_span(
+    text: str, prefix_rows: list[dict[str, str]]
+) -> tuple[int, int] | None:
+    """Find preceding Hebrew glosses that all follow the marked gloss in English.
+
+    English may place the marked word before a suffix of its preceding Hebrew
+    glosses (for example, Hebrew ``fear / name / glorious / fearful / this``
+    versus English ``fear this glorious and fearful name``). Return the last
+    English word aligned to that reordered suffix, but only when its glosses
+    are uniquely alignable and all occur after the marked gloss.
+    """
+    if len(prefix_rows) < 2:
+        return None
+
+    marked_positions = record_word_positions(text, prefix_rows[-1])
+    if not marked_positions:
+        return None
+    marked_end = max(span[1] for span in marked_positions)
+
+    reordered_positions: list[tuple[int, int]] = []
+    marked_start = min(span[0] for span in marked_positions)
+    for row in reversed(prefix_rows[:-1]):
+        positions = record_word_positions(text, row)
+        if not positions:
+            break
+        if min(start for start, _ in positions) >= marked_end:
+            reordered_positions.extend(positions)
+            continue
+        if max(end for _, end in positions) <= marked_start:
+            break
+        # A gloss that straddles the marked word does not give a clear order.
+        return None
+
+    return max(reordered_positions, key=lambda span: span[1]) if reordered_positions else None
+
+
+def reordered_adjacent_gloss_boundary(
+    text: str, item: dict[str, str], previous_item: dict[str, str] | None
+) -> tuple[tuple[int, int], str] | None:
+    """Resolve a repeated marked gloss followed by the previous Hebrew gloss.
+
+    This handles concise reversals such as Hebrew ``said / God`` versus
+    English ``God said,``. It is accepted only when exactly one occurrence
+    of the marked gloss is followed by the previous gloss's final word and
+    punctuation.
+    """
+    if not previous_item:
+        return None
+    previous_words = WORD_RE.findall(decode_gloss(previous_item.get("e", "")))
+    if not previous_words:
+        previous_words = WORD_RE.findall(decode_gloss(previous_item.get("lemma", "")))
+    if not previous_words:
+        return None
+    previous_word = previous_words[-1]
+    marked_gloss = decode_gloss(item.get("e", ""))
+    target_spans = gloss_spans(text, marked_gloss)
+    pairs: list[tuple[tuple[int, int], str]] = []
+    for target_start, target_end in target_spans:
+        following = re.search(
+            r"(?<!\w)" + re.escape(previous_word) + r"(?!\w)",
+            text[target_end:],
+            re.I,
+        )
+        if not following:
+            continue
+        previous_span = (target_end + following.start(), target_end + following.end())
+        gap_words = len(WORD_RE.findall(text[target_end:previous_span[0]]))
+        if gap_words > 3:
+            continue
+        punctuation = punctuation_after(text, previous_span[1])
+        if punctuation:
+            pairs.append((previous_span, punctuation))
+    return pairs[0] if len(pairs) == 1 else None
+
+
 def punctuation_after(text: str, end: int) -> str:
     tail = text[end:]
     match = re.match(r"\s*([,;:.!?—–])", tail)
@@ -350,16 +425,26 @@ def analyze_boundary(
     kind: str,
 ) -> str:
     gloss = decode_gloss(item.get("e", ""))
-    noun_this_span = noun_this_boundary_span(text, item, previous_item)
-    if noun_this_span:
-        noun = text[noun_this_span[0]:noun_this_span[1]]
-        if kind == "ATNAH":
-            if line_break_after(text, noun_this_span[1]):
-                return f"PASS: Hebrew noun + 'this' aligns to English 'this {noun}' before the atnah line break"
-            return f"CHECK LINE BREAK after English noun following Hebrew 'this' ({noun})"
-        if punctuation_after(text, noun_this_span[1]):
-            return f"PASS: Hebrew noun + 'this' aligns through English noun '{noun}' and punctuation follows"
-        return f"CHECK punctuation after English noun following Hebrew 'this' ({noun})"
+    if kind == "ZAQEF-QATAN":
+        adjacent_reversal = reordered_adjacent_gloss_boundary(
+            text, item, previous_item
+        )
+        if adjacent_reversal:
+            boundary_span, mark = adjacent_reversal
+            boundary_word = text[boundary_span[0]:boundary_span[1]]
+            return (
+                "PASS: reordered adjacent Hebrew glosses align through "
+                f"'{boundary_word}' and punctuation follows ({mark})"
+            )
+        reordered_span = reordered_preceding_glosses_span(text, prefix_rows)
+        if reordered_span:
+            boundary_word = text[reordered_span[0]:reordered_span[1]]
+            mark = punctuation_after(text, reordered_span[1])
+            if mark:
+                return (
+                    "PASS: preceding Hebrew glosses all follow the marked gloss in "
+                    f"English order; punctuation follows '{boundary_word}' ({mark})"
+                )
     reordered = reordered_prefix_boundary(text, prefix_rows, kind)
     if reordered:
         boundary, represented = reordered
@@ -373,6 +458,16 @@ def analyze_boundary(
             return f"CHECK LINE BREAK at reordered Hebrew-prefix end ('{aligned_word}')"
         return f"CHECK punctuation at reordered Hebrew-prefix end ('{aligned_word}')"
 
+    noun_this_span = noun_this_boundary_span(text, item, previous_item)
+    if noun_this_span:
+        noun = text[noun_this_span[0]:noun_this_span[1]]
+        if kind == "ATNAH":
+            if line_break_after(text, noun_this_span[1]):
+                return f"PASS: Hebrew noun + 'this' aligns to English 'this {noun}' before the atnah line break"
+            return f"CHECK LINE BREAK after English noun following Hebrew 'this' ({noun})"
+        if punctuation_after(text, noun_this_span[1]):
+            return f"PASS: Hebrew noun + 'this' aligns through English noun '{noun}' and punctuation follows"
+        return f"CHECK punctuation after English noun following Hebrew 'this' ({noun})"
     next_gloss = decode_gloss(next_item.get("e", "")) if next_item else ""
     span = repeated_gloss_boundary_span(text, gloss, next_gloss, kind)
     if not span:
