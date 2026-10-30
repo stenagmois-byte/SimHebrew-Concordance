@@ -42,9 +42,27 @@ def read_items(path: Path) -> list[dict[str, str]]:
                 array_start += 1
             items, _ = json.JSONDecoder().raw_decode(fragment, array_start)
             data = {"items": items}
-    items = data["items"] if isinstance(data, dict) else data
+
+    if isinstance(data, list):
+        items = data
+    elif isinstance(data, dict) and isinstance(data.get("items"), list):
+        items = data["items"]
+    elif isinstance(data, dict) and isinstance(data.get("results"), list):
+        # SQL Developer can wrap a query result as
+        # {"results": [{"columns": [...], "items": [...]}]}.
+        result_sets = [
+            result["items"]
+            for result in data["results"]
+            if isinstance(result, dict) and isinstance(result.get("items"), list)
+        ]
+        if not result_sets:
+            raise ValueError("Oracle JSON has a results list but no result items")
+        items = [item for result_items in result_sets for item in result_items]
+    else:
+        raise ValueError("Expected an items list at the top level or under results[]")
+
     if not isinstance(items, list):
-        raise ValueError("Expected a top-level items list")
+        raise ValueError("Expected an items list")
     return items
 
 
@@ -583,6 +601,19 @@ def build_report(items: list[dict[str, str]], checks_only: bool = False) -> str:
                 analysis_text, item, prefix_rows,
                 previous_item, next_item, kind
             )
+            if kind == "ATNAH" and result.startswith("REVIEW: gloss not located ("):
+                # An atnah gloss found only in the second English half is
+                # evidence that the existing line break may be too early.
+                if "\n" in text:
+                    first_half, second_half = text.split("\n", 1)
+                    before_break = record_word_positions(first_half, item)
+                    after_break = record_word_positions(second_half, item)
+                    if after_break and not before_break:
+                        gloss = decode_gloss(item.get("e", ""))
+                        result = (
+                            "CHECK LINE BREAK LOCATION: atnah gloss appears after "
+                            f"the current newline ({gloss})"
+                        )
             if not checks_only or result.startswith(("CHECK", "REVIEW")):
                 hebrew_word = html.unescape(item.get("h", "")).strip()
                 accent_name = "zaqef-qatan" if kind == "ZAQEF-QATAN" else "atnah"
