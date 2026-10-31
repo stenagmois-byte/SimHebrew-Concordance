@@ -155,6 +155,38 @@ def repeated_gloss_boundary_span(
     return None
 
 
+def repeated_gloss_after_previous_record(
+    text: str,
+    gloss: str,
+    previous_item: dict[str, str] | None,
+) -> tuple[int, int] | None:
+    """Anchor a repeated gloss to the immediately preceding Hebrew gloss.
+
+    This resolves sequences such as ``and I will gather / you`` when ``you``
+    also occurs earlier in the verse: the occurrence immediately following
+    the aligned preceding gloss is the one marked by the current Hebrew accent.
+    """
+    if not previous_item:
+        return None
+    target_spans = gloss_spans(text, gloss)
+    if len(target_spans) < 2:
+        return None
+    previous_gloss = decode_gloss(previous_item.get("e", ""))
+    previous_spans = gloss_spans(text, previous_gloss)
+    if not previous_spans:
+        previous_gloss = decode_gloss(previous_item.get("lemma", ""))
+        previous_spans = gloss_spans(text, previous_gloss)
+    pairs = []
+    for previous_span in previous_spans:
+        for target_span in target_spans:
+            if target_span[0] < previous_span[1]:
+                continue
+            gap = len(WORD_RE.findall(text[previous_span[1]:target_span[0]]))
+            if gap <= 2:
+                pairs.append((previous_span, target_span))
+    return pairs[0][1] if len(pairs) == 1 else None
+
+
 def noun_this_boundary_span(
     text: str, item: dict[str, str], previous_item: dict[str, str] | None
 ) -> tuple[int, int] | None:
@@ -239,6 +271,29 @@ def record_word_positions(text: str, item: dict[str, str]) -> list[tuple[int, in
     if lemma and lemma.casefold() != gloss.casefold():
         return ordered_term_positions(text, lemma)
     return []
+
+
+def repeated_gloss_followed_by_next_record(
+    text: str,
+    item: dict[str, str],
+    next_item: dict[str, str] | None,
+) -> bool:
+    """Resolve a repeated gloss when only one occurrence precedes the next gloss."""
+    if not next_item:
+        return False
+    gloss = decode_gloss(item.get("e", ""))
+    next_gloss = decode_gloss(next_item.get("e", ""))
+    if not gloss or not next_gloss:
+        return False
+    candidates = gloss_spans(text, gloss)
+    if len(candidates) < 2:
+        return False
+    linked = []
+    for _, end in candidates:
+        following = gloss_spans(text, next_gloss, end)
+        if following and len(WORD_RE.findall(text[end:following[0][0]])) <= 2:
+            linked.append((_, end))
+    return len(linked) == 1
 
 
 def line_break_after(text: str, end: int) -> bool:
@@ -443,7 +498,46 @@ def analyze_boundary(
     kind: str,
 ) -> str:
     gloss = decode_gloss(item.get("e", ""))
+    if gloss == "--" and previous_item:
+        # An untranslated marked word may be represented by the preceding
+        # English gloss, with the boundary punctuation attached there.
+        previous_positions = record_word_positions(text, previous_item)
+        if previous_positions:
+            previous_end = max(end for _, end in previous_positions)
+            previous_gloss = decode_gloss(previous_item.get("e", ""))
+            if kind == "ATNAH":
+                if line_break_after(text, previous_end):
+                    return (
+                        "PASS: untranslated atnah gloss is represented at the "
+                        f"preceding gloss; its line break is present ({previous_gloss})"
+                    )
+                return (
+                    "CHECK LINE BREAK after preceding gloss for untranslated "
+                    f"atnah word ({previous_gloss})"
+                )
+            mark = punctuation_after(text, previous_end)
+            if mark:
+                return (
+                    "PASS: untranslated zaqef-qatan gloss is represented at the "
+                    f"preceding gloss; punctuation follows ({mark}; {previous_gloss})"
+                )
+            return (
+                "CHECK punctuation after preceding gloss for untranslated "
+                f"zaqef-qatan word ({previous_gloss})"
+            )
     if kind == "ZAQEF-QATAN":
+        # If the marked gloss itself occurs uniquely with punctuation, that
+        # boundary is direct evidence. Reordered-prefix alignment can otherwise
+        # be pulled toward a later repeated preceding gloss (for example,
+        # ``will consent`` later in the same verse).
+        direct_matches = gloss_spans(text, gloss)
+        if len(direct_matches) == 1:
+            direct_mark = punctuation_after(text, direct_matches[0][1])
+            if direct_mark:
+                return (
+                    f"PASS: punctuation follows the uniquely located marked gloss "
+                    f"({direct_mark}; {gloss})"
+                )
         adjacent_reversal = reordered_adjacent_gloss_boundary(
             text, item, previous_item
         )
@@ -488,6 +582,8 @@ def analyze_boundary(
         return f"CHECK punctuation after English noun following Hebrew 'this' ({noun})"
     next_gloss = decode_gloss(next_item.get("e", "")) if next_item else ""
     span = repeated_gloss_boundary_span(text, gloss, next_gloss, kind)
+    if not span and kind == "ZAQEF-QATAN":
+        span = repeated_gloss_after_previous_record(text, gloss, previous_item)
     if not span:
         span = aligned_gloss_span(text, gloss, prefix_rows)
     ambiguous_gloss = len(gloss_spans(text, gloss)) > 1 and span is None
@@ -608,7 +704,10 @@ def build_report(items: list[dict[str, str]], checks_only: bool = False) -> str:
                     first_half, second_half = text.split("\n", 1)
                     before_break = record_word_positions(first_half, item)
                     after_break = record_word_positions(second_half, item)
-                    if after_break and not before_break:
+                    repeated_alignment = repeated_gloss_followed_by_next_record(
+                        second_half, item, next_item
+                    )
+                    if (after_break or repeated_alignment) and not before_break:
                         gloss = decode_gloss(item.get("e", ""))
                         result = (
                             "CHECK LINE BREAK LOCATION: atnah gloss appears after "
