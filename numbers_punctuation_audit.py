@@ -187,6 +187,31 @@ def repeated_gloss_after_previous_record(
     return pairs[0][1] if len(pairs) == 1 else None
 
 
+def repeated_gloss_reordered_prefix_boundary(
+    text: str,
+    prefix_rows: list[dict[str, str]],
+) -> tuple[tuple[int, int], bool] | None:
+    """Resolve a repeated marked gloss before reordered preceding glosses."""
+    if len(prefix_rows) < 2:
+        return None
+    marked_gloss = decode_gloss(prefix_rows[-1].get("e", ""))
+    candidates = gloss_spans(text, marked_gloss)
+    if len(candidates) < 2:
+        return None
+    resolved = []
+    for marked_span in candidates:
+        following_prefix_spans = [
+            span
+            for row in prefix_rows[:-1]
+            for span in record_word_positions(text, row)
+            if span[0] >= marked_span[1]
+        ]
+        if following_prefix_spans:
+            boundary = max(following_prefix_spans, key=lambda span: span[1])
+            resolved.append((boundary, bool(punctuation_after(text, boundary[1]))))
+    return resolved[0] if len(resolved) == 1 else None
+
+
 def noun_this_boundary_span(
     text: str, item: dict[str, str], previous_item: dict[str, str] | None
 ) -> tuple[int, int] | None:
@@ -321,8 +346,47 @@ def reordered_prefix_boundary(
         return None
     boundary = max(previous_positions + current_positions, key=lambda span: span[1])
     if kind == "ATNAH":
+        # A repeated prior gloss can be ambiguous on its own (for example,
+        # ``to me``), yet uniquely align after the reordered phrase's known
+        # endpoint (``gave``). Include that occurrence before judging where the
+        # atnah line break falls.
+        for row in prefix_rows[:-1]:
+            if record_word_positions(scope, row):
+                continue
+            terms = [decode_gloss(row.get("e", "")), decode_gloss(row.get("lemma", ""))]
+            candidates: list[tuple[int, int]] = []
+            for term in dict.fromkeys(term for term in terms if term and term != "--"):
+                candidates = gloss_spans(scope, term)
+                if candidates:
+                    break
+            following = [
+                span for span in candidates
+                if span[0] >= boundary[1]
+                and len(WORD_RE.findall(scope[boundary[1]:span[0]])) <= MAX_GLOSS_GAP_WORDS
+            ]
+            if len(following) == 1:
+                boundary = following[0]
         return boundary, line_break_after(text, boundary[1])
     return boundary, bool(punctuation_after(text, boundary[1]))
+
+
+def gloss_ending_at_boundary(
+    text: str,
+    boundary: tuple[int, int],
+    prefix_rows: list[dict[str, str]],
+) -> str:
+    """Return the full aligned gloss when it uniquely ends at this boundary."""
+    for row in reversed(prefix_rows[:-1]):
+        gloss = decode_gloss(row.get("e", ""))
+        if not gloss or gloss == "--":
+            continue
+        positions = record_word_positions(text, row)
+        if boundary not in positions:
+            continue
+        matches = gloss_spans(text, gloss)
+        if len(matches) == 1 and matches[0][1] == boundary[1]:
+            return gloss
+    return ""
 
 
 def reordered_preceding_glosses_span(
@@ -538,6 +602,16 @@ def analyze_boundary(
                     f"PASS: punctuation follows the uniquely located marked gloss "
                     f"({direct_mark}; {gloss})"
                 )
+        repeated_reorder = repeated_gloss_reordered_prefix_boundary(text, prefix_rows)
+        if repeated_reorder:
+            boundary, represented = repeated_reorder
+            boundary_word = text[boundary[0]:boundary[1]]
+            if represented:
+                return (
+                    "PASS: reordered preceding Hebrew glosses align through "
+                    f"'{boundary_word}' and punctuation follows"
+                )
+            return f"CHECK punctuation at reordered Hebrew-prefix end ('{boundary_word}')"
         adjacent_reversal = reordered_adjacent_gloss_boundary(
             text, item, previous_item
         )
@@ -560,7 +634,9 @@ def analyze_boundary(
     reordered = reordered_prefix_boundary(text, prefix_rows, kind)
     if reordered:
         boundary, represented = reordered
-        aligned_word = text[boundary[0]:boundary[1]]
+        aligned_word = gloss_ending_at_boundary(text, boundary, prefix_rows)
+        if not aligned_word:
+            aligned_word = text[boundary[0]:boundary[1]]
         if represented:
             return (
                 f"PASS: reordered Hebrew prefix aligns through '{aligned_word}' and "
