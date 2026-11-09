@@ -34,13 +34,13 @@ The project comprises two parallel, interrelated production tracks governed by a
   - SVG ePubs remain up to 70% smaller, providing better page turns and lower delivery fees where supported.
 * **File names and dates: epubs**
   - The original volume name [bookname] - [authorname].epub -- the way that Calibre named it, is the master copy with SVG images, and the source for the PDF of the same name.
-  - The epub that is named with -MOTB- as its second part is the Kindle epub and has PNG images instead of SVG images.
+  - The epub that is named with -MOTB- as its second part is the Kindle epub and has PNG images instead of SVG images. The renaming is done by the copyepub.bat in the output directory. 
   - An -MOTB- epub that has been uploaded to Amazon has a date appended to the name
 * **File names and dates: PDFs**
   - The original volume name [bookname] - [authorname].pdf is created from the SVG source.
   - For volumes requiring a wider spine (e.g. Psalms) the pdf will contain the suffix _KDP.pdf
   - A pdf that has been uploaded to Amazon is renamed with a date appended to the name.
-* So a file named with a date-stamp less than the latest non-date-stamped file indicates that there are pending changes. 
+* So a published file named with a date-stamp less than the latest non-date-stamped file indicates that there are pending changes. Also a pdf file with a date stamp less than the corresponding epub shows that it is out of date.
 
 ### 2. Creating the SimHebrew Bible from Scratch
 1. **Database Export:** Generate the 24 canonical text files from the Oracle database.
@@ -49,13 +49,14 @@ The project comprises two parallel, interrelated production tracks governed by a
 4. **Import Files:** Import the 24 canonical files.
    - The `00` files will still be at the top.
    - Move the `9x` series files to the bottom of the manifest.
+   - in principle this can be done by my agent but it is not yet possible to compare results to comfirm that it was done without error.
 5. **Heading & TOC Preparation:** -- appears to require no changes now after small changes to the ebook generation routine.
-   - Ensure `<h4 class="chapter-head">` is correctly placed.
+   - Ensure `<h4 class="chapter-head">` is correctly placed. Done by new export.
    - For single-book files, remove redundant initial heading h4. Done - no longer required.
-   - For composite books containing multiple biblical texts, move the heading h4 after the internal book table of contents to the line before  `<div class="book_hdr">`.
+   - For composite books containing multiple biblical texts, move the heading h4 after the internal book table of contents to the line before  `<div class="book_hdr">`. DONE no longer part of the process.
 Composite books are Samuel `08wmual.html`, `09mlcim.html` Kings, `13tri_ywr.html` The Twelve, `23yzra.html` Ezra-Nehemiah and `24dibri_himim.html` Chronicles. Also done.
 6. **File Splitting in Calibre:**
-   - work bottom to top for easiest splitting.
+   - work bottom to top for easiest splitting. We may do this with a Calibre program prior to loading the new files.
    - Right-click and split the file using XPath:
      ```xpath
      //h:h4[re:test(@class, "chapter-head", "i")]
@@ -133,6 +134,7 @@ The interactive gloss popup in `menu.js` (activated by double-click or text sele
    python split_interlin-v2.py
    ```
    *(Slices the master array into individual chapter JSON files in `/chapters/<Book>/`).*
+   Don't confuse these with the volume level syllabic jsons of the same names. See below under track 3 step 2.
 
 ### 3. Translation Updates & Concordance Synchronization
 When an English translation string or liturgical punctuation is revised (e.g., Ezekiel 16:49 pause `הִנֵּה־זֶ֣ה הָיָ֔ה`, Lamentations 1:1):
@@ -148,7 +150,7 @@ When an English translation string or liturgical punctuation is revised (e.g., E
 
 ### 4. Whole-Volume HTML Regeneration from Oracle
 If all web HTML pages for a biblical volume require rebuilding:
-1. Run `workfile.sql` in Oracle SQL Developer, filtering by canonical sequence range (e.g., Lamentations through Ecclesiastes, sequence 30–34):
+1. Run `workfile.sql` in Oracle SQL Developer, filtering by canonical sequence range (e.g., Lamentations through Esther, sequence 30–34):
    ```sql
    select 'OutputResultToFile("select xml_line1 xml_line1 from table (bsadmin.tlmdbook.tlmdbook('
    ||''''||''','''||book_cd||''','''||chapter_cd||''',''001'',''999'',1,''.svg'')) where xml_id in (''HTML'',''item-trans'',''Frame'') order by xml_seq","'
@@ -189,7 +191,7 @@ If all web HTML pages for a biblical volume require rebuilding:
 ### Step 1: Master Score Correction (`.mscz`)
 1. Open the chapter score in MuseScore 4:  
    `musicscores/[Volume]/[BOOK]_[CH].mscz` (e.g., `musicscores/The Psalms/PSALMS_008.mscz`).
-2. Correct the notes (e.g., change verse 10 E4 pitches to A4).
+2. Correct the notes (e.g., change verse 10 E4 pitches to A4). And other corrections if the Hebrew has been corrected.
 3. Save the `.mscz` file.  
    *(The `.mscz` archive is the master source for both audio compilation and matrix reduction).*
 
@@ -201,7 +203,8 @@ The 929 chapter JSON files (`musicscores/[Volume]/[BOOK]_[CH].json`) drive the b
   "lyric_syll": "-retz", "syll_note": "A4"
   ```
   *(Saves having to re-run full database export jobs for minor corrections).*
-
+  But -- the corrections must be run eventually -- e.g. if pitches change due to identified ms errors  - recreate recitations (from recitations.sql) and export to syllables_master.json - run split_master_syllables.py and rerun generate_ornament_pitch_table.py to rebuild composite score level jsons by chapter.
+  
 ### Step 3: Audio Compilation & Skip-Check Protocol
 Both `chapter_mp3s.py` and `verse_mp3s.py` include skip-guards (`if mp3_out.exists(): continue`). They will silently skip any file that already exists on disk.
 
@@ -263,7 +266,7 @@ python mass_produce_and_log_matrices.py
 * `R`: Lexical root / SimHebrew key
 * `E`: English gloss definition
 * `D`: Semantic domain
-
+Always check translation for misplaced or doubled commas. 
 #### Master Translation (`translation.json`):
 ```json
 {"results":[{"columns":[
@@ -301,7 +304,7 @@ python mass_produce_and_log_matrices.py
 * **Ezekiel 16:49:** The mid-phrase comma in *"Behold this was, the iniquity of Sodom..."* reflects the critical Zaqef-Qatan pause on `הִנֵּה־זֶ֣ה הָיָ֔ה`, demanding an intentional vocal breath to summon listener attention.
 Run from any command-line shell with Python 3.10 or later installed (PowerShell example):
 ```powershell
-python numbers_punctuation_audit.py "input.json" "output.txt" --checks-only
+python punctuation_audit.py "input.json" "output.txt" --checks-only
 ```
 On systems where the Python command is `python3`, use `python3` instead of `python`. This checks English breath marks in books not yet reviewed.
 * **Lamentations 1:1:** Punctuation preserves verse half-divisions dictated by Atnah cadences.The punctuation frequently is required to prevent misreading the text.
