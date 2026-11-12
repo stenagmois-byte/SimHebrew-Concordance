@@ -4,10 +4,9 @@ import html
 import sys
 from collections import defaultdict
 
-def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
+def run_distribution_analysis(chapter_index_only=False):
     PITCH_KEYS = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
     PITCH_LABELS = ['c', 'd', 'e', 'f', 'g', 'A', 'B', 'C']
-    
     # 🏛️ TRADITIONAL HEBREW PITCH NAMES MAPPING
     PITCH_TO_HEBREW_NAME = {
         "c": "Darga",
@@ -19,84 +18,12 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
         "B": "Munach",
         "C": "Mahpach/Yetiv"
     }
-
-    # 📜 HEBREW ORNAMENT GLYPH MAPPING (Superlinear accents on carrier Aleph)
-    ORNAMENT_GLYPHS = {
-        "zaqef-qatan": "&#x05D0;&#x0594;",
-        "pashta": "&#x05D0;&#x0599;",
-        "revia": "&#x05D0;&#x0597;",
-        "qadma": "&#x05D0;&#x0598;",
-        "azla": "&#x05D0;&#x059C;",
-        "geresh": "&#x05D0;&#x0597;",
-        "telisha-qetana": "&#x05D0;&#x05A9;",
-        "tarsin": "&#x05D0;&#x059E;",
-        "zaqef-gadol": "&#x05D0;&#x0595;",
-        "tsinnor": "&#x05D0;&#x05AE;",
-        "telisha-gedola": "&#x05D0;&#x05A0;",
-        "segol": "&#x05D0;&#x0596;",
-        "pazer": "&#x05D0;&#x05A1;",
-        "ole": "&#x05D0;&#x05AB;",
-        "revia-mugrash": "&#x05D0;&#x059D;&#x0597;",
-        "zarqa": "&#x05D0;&#x0598;",
-        "illuy": "&#x05D0;&#x05AC;",
-        "shalshelet": "&#x05D0;&#x0593;",
-        "qarne-farah": "&#x05D0;&#x059F;",
-        "pashta pashta": "&#x05D0;&#x0599;&#x0599;",
-        "z-qatan pazer": "&#x05D0;&#x0594;&#x05A1;",
-        "z-qatan tsinnor": "&#x05D0;&#x0594;&#x05AE;",
-        "pazer z-qatan": "&#x05D0;&#x05A1;&#x0594;",
-        "azla z-qatan": "&#x05D0;&#x059C;&#x0594;",
-        "tarsin revia": "&#x05D0;&#x059E;&#x0597;",
-        "azla t-qetana": "&#x05D0;&#x059C;&#x05A9;",
-        "revia z-qatan": "&#x05D0;&#x0597;&#x0594;",
-        "z-qatan azla": "&#x05D0;&#x0594;&#x059C;",
-        "pazer azla": "&#x05D0;&#x05A1;&#x059C;",
-        "azla pashta": "&#x05D0;&#x059C;&#x0599;",
-        "z-gadol pashta": "&#x05D0;&#x0595;&#x0599;",
-        "telisha-gedola azla": "&#x05D0;&#x05A0;&#x059C;"
-    }
-
-    # 🏷️ DISPLAY NAME OVERRIDES FOR ELEGANT TYPOGRAPHY
-    ORNAMENT_DISPLAY_NAMES = {
-        "zaqef-qatan": "Zaqef-Qatan",
-        "pashta": "Pashta",
-        "revia": "Revia",
-        "qadma": "Qadma",
-        "azla": "Azla",
-        "geresh": "Geresh",
-        "telisha-qetana": "Telisha Qetana",
-        "tarsin": "Tarsin / Gershaim",
-        "zaqef-gadol": "Zaqef-Gadol",
-        "tsinnor": "Tsinnor",
-        "telisha-gedola": "Telisha-Gedola",
-        "segol": "Segol",
-        "pazer": "Pazer",
-        "ole": "Ole",
-        "revia-mugrash": "Revia-Mugrash",
-        "zarqa": "Tsinnorit (poetic Zarqa)",
-        "illuy": "Illuy",
-        "shalshelet": "Shalshalet",
-        "qarne-farah": "Qarne-Farah",
-        "pashta pashta": "Pashta Pashta",
-        "z-qatan pazer": "Z-Qatan Pazer",
-        "z-qatan tsinnor": "Z-Qatan Tsinnor",
-        "pazer z-qatan": "Pazer Z-Qatan",
-        "azla z-qatan": "Azla Z-Qatan",
-        "tarsin revia": "Tarsin Revia",
-        "azla t-qetana": "Azla T-Qetana",
-        "revia z-qatan": "Revia Z-Qatan",
-        "z-qatan azla": "Z-Qatan Azla",
-        "pazer azla": "Pazer Azla",
-        "azla pashta": "Azla Pashta",
-        "z-gadol pashta": "Z-Gadol Pashta",
-        "telisha-gedola azla": "T-Gedola Azla"
-    }
-
+    
     matrix = defaultdict(lambda: defaultdict(int))
     target_dirs = ["./musicscores"]
     search_index = defaultdict(lambda: defaultdict(list))
     chapter_index = {}
-
+    
     found_any_files = False
     for t_dir in target_dirs:
         if os.path.exists(t_dir):
@@ -118,13 +45,13 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
                                 elif isinstance(data, dict):
                                     rows = data.get('rows', [data])
                                 
-                                # 1. PRE-MAP VERSE TEXTS FOR THIS CHAPTER
                                 chapter_verse_text_map = {}
                                 for row in rows:
                                     if not isinstance(row, dict): continue
                                     
                                     c_cd = str(row.get('chapter_cd', '')).lstrip('0')
                                     v_cd = str(row.get('verse_cd', '')).lstrip('0')
+                                    
                                     text_val = str(row.get('heb_text', row.get('HEB_TEXT', ''))).strip()
                                     
                                     if text_val and (c_cd, v_cd) not in chapter_verse_text_map:
@@ -146,7 +73,6 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
                                             "ornaments": []
                                         })
 
-                                # 2. RUN ORNAMENT PROCESSING LOOP
                                 for row in rows:
                                     if not isinstance(row, dict): continue
                                     
@@ -159,7 +85,6 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
                                     raw_pitch = row.get('syll_note', row.get('SYLL_NOTE', ''))
                                     raw_pitch = str(raw_pitch).strip().upper()
                                     
-                                    # 🎯 FIX: Isolate ONLY the first character (e.g. 'F4' -> 'F')
                                     base_letter = raw_pitch[0] if len(raw_pitch) > 0 else ''
                                     is_octave_5 = '5' in raw_pitch
                                     
@@ -219,8 +144,12 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
         sorted_rows.append((total, orn, pitch_counts))
         
     sorted_rows.sort(key=lambda x: x[0], reverse=True)
+    
+    header_cells = ""
+    for lbl in PITCH_LABELS:
+        heb_name = PITCH_TO_HEBREW_NAME.get(lbl, lbl)
+        header_cells += f"<th>{lbl}<br><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>{heb_name}</span></th>"
 
-    # 🏛️ HTML OUTPUT TEMPLATE
     html_output = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -229,7 +158,7 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
     <link rel="stylesheet" href="qstyles.css">
     <title>Ornament Usage by Recitation Pitch — Tanach Musical Concordance</title>
     <style>
-        body {{ font-family: 'Georgia', serif; margin: 40px auto; max-width: 1050px; color: #222222; line-height: 1.65; background-color: #fffcf4; padding: 0 20px; }}
+        body {{ font-family: 'Georgia', serif; margin: 40px auto; max-width: 1100px; color: #222222; line-height: 1.65; background-color: #fffcf4; padding: 0 20px; }}
         .nav {{ margin-bottom: 25px; font-family: sans-serif; font-size: 0.9rem; }}
         .nav a {{ color: #800000; text-decoration: none; font-weight: bold; }}
         .nav a:hover {{ text-decoration: underline; }}
@@ -244,32 +173,18 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
         .zero-count {{ color: #ccc; font-weight: 300; }}
         .footnote {{ margin-top: 40px; font-family: 'Georgia', serif; font-size: 1.05rem; border-top: 1px solid #800000; padding-top: 20px; color: #444; }}
         .footnote p {{ text-align: justify; line-height: 1.6; }}
-        .glyph-cell {{
-            font-family: "SBL Hebrew", "Ezra SIL", "Times New Roman", serif;
-            font-size: 1.75rem;
-            line-height: 1;
-            text-align: center;
-            color: #800000;
-            width: 48px;
-        }}
-        .heb-carrier {{
-            font-family: "SBL Hebrew", "Ezra SIL", "Times New Roman", serif;
-            font-size: 1.6rem;
-            line-height: normal;
-            font-weight: normal !important;
-            color: #800000;
-            display: inline;
-            margin: 0 3px;
-            text-rendering: optimizeLegibility;
-            -webkit-font-smoothing: antialiased;
-        }}
+        .hebrew-cell {{ font-family: 'SBL Hebrew', 'Ezra SIL', 'David', serif; font-size: 1.25rem; font-weight: bold; color: #000; }}
+        .badge-code {{ background: #f4f0e6; padding: 2px 5px; border-radius: 3px; font-size: 0.75rem; font-family: monospace; color: #666; display: inline-block; margin-top: 2px; }}
+        .pitch-degree {{ font-size: 0.82rem; font-weight: bold; color: #800000; }}
     </style>
-    <script src="./menu.js" defer></script>
+<script src="./menu.js" defer></script>
+<script src="./hebrew_accent_parser.js" defer></script>
 </head>
 <body>
 
     <h1>Ornament Usage by Recitation Pitch</h1>
-    <p>The deciphering key reveals relationships that have been hidden since antiquity, specifically, the relationship of the accents above the text (ornaments) with the accent below the text that immediately precedes them, and which defines the recitation pitch that governs them. The music of these pages and scores is the demonstration.</p>
+    <p>The deciphering key reveals relationships that have been hidden since antiquity, specifically, the relationship of the accents above the text (ornaments) with the accent below the text that immediately precedes them, and which defines the recitation pitch that governs them. The music of these pages and scores is the demonstration.
+    </p>
 
     <form id="chapter-explorer-form" style="margin: 25px 0; padding: 18px; background: #f3f0e8; border-left: 4px solid #800000; font-family: sans-serif;">
         <strong style="color: #800000;">Trope for a chapter</strong>
@@ -282,50 +197,12 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
         <button type="submit" style="margin-left: 12px; padding: 6px 12px; color: white; background: #800000; border: 0; border-radius: 3px; cursor: pointer;">Show chapter</button>
     </form>
 
-    <table>
+    <table id="ornament-table">
         <thead>
             <tr>
-                <th colspan="2" rowspan="2" class="left-align" style="vertical-align: middle;">Ornament &amp; Name</th>
-                <th rowspan="3" class="total-cell" style="vertical-align: middle;">Total</th>
-                <th>c</th>
-                <th>d</th>
-                <th>e</th>
-                <th>f</th>
-                <th>g</th>
-                <th>A</th>
-                <th>B</th>
-                <th>C</th>
-            </tr>
-            <tr>
-                <th><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Darga</span></th>
-                <th><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Tevir/Galgal</span></th>
-                <th><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Silluq</span></th>
-                <th><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Mercha</span></th>
-                <th><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Tifha/D'khi</span></th>
-                <th><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Atnah</span></th>
-                <th><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Munach</span></th>
-                <th><span style='font-size: 0.75rem; font-weight: normal; text-transform: none; color: #555;'>Mahpach/Yetiv</span></th>
-            </tr>
-            <tr>
-                <th style="font-size: 0.75rem; font-weight: normal; text-transform: none; width: 48px;">Ornament</th>
-                <th class="left-align" style="font-size: 0.75rem; font-weight: normal; text-transform: none;">Name</th>
-                <th><span class="heb-carrier" title="Darga">&#x05D0;&#x05A7;</span></th>
-                <th>
-                    <span class="heb-carrier" title="Tevir (prose)">&#x05D0;&#x059B;</span>
-                    <span class="heb-carrier" title="Galgal / Yerah (poetry)">&#x05D0;&#x05AA;</span>
-                </th>
-                <th><span class="heb-carrier" title="Silluq">&#x05D0;&#x05BD;</span></th>
-                <th><span class="heb-carrier" title="Mercha">&#x05D0;&#x05A5;</span></th>
-                <th>
-                    <span class="heb-carrier" title="Tifha">&#x05D0;&#x0596;</span>
-                    <span class="heb-carrier" title="D'khi">&#x05D0;&#x05AD;</span>
-                </th>
-                <th><span class="heb-carrier" title="Atnah">&#x05D0;&#x0591;</span></th>
-                <th><span class="heb-carrier" title="Munach">&#x05D0;&#x05A3;</span></th>
-                <th>
-                    <span class="heb-carrier" title="Mahpach">&#x05D0;&#x05A4;</span>
-                    <span class="heb-carrier" title="Yetiv">&#x05D0;&#x059A;</span>
-                </th>
+                <th class='left-align'>Ornament Name</th>
+                <th class='total-cell'>Total</th>
+                {header_cells}
             </tr>
         </thead>
         <tbody>
@@ -333,15 +210,12 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
 
     if not sorted_rows:
         html_output += """        <tr>
-            <td colspan="11" style="padding: 40px; color: #800000; font-style: italic;">
+            <td colspan="10" style="padding: 40px; color: #800000; font-style: italic;">
                 ❌ Verification Warning: Evaluated 0 valid ornament entries inside JSON data structures.
             </td>
         </tr>"""
     else:
         for total, orn, counts in sorted_rows:
-            display_name = ORNAMENT_DISPLAY_NAMES.get(orn, orn.title())
-            glyph = ORNAMENT_GLYPHS.get(orn, "&#x05D0;")
-
             counts_str = ""
             for idx, c in enumerate(counts):
                 lbl = PITCH_LABELS[idx]
@@ -357,8 +231,7 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
                     </td>"""
             
             html_output += f"""        <tr>
-                <td class="glyph-cell">{glyph}</td>
-                <td class="left-align">{html.escape(display_name)}</td>
+                <td class="left-align">{html.escape(orn.upper())}</td>
                 <td class="total-cell">{total}</td>
                 {counts_str}
             </tr>\n"""
@@ -367,19 +240,32 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
     </table>
 
     <div class="footnote">
-        <p>We can see immediately which ornaments are rarely or frequently used and on which pitches. The last 13 rows are the rare double accents on a single syllable. Notice the sole tarsin on the low c in the table above. It is from 2 Chronicles 24:27 in the Leningrad Codex. It is not in the Aleppo codex online at mgketer.org. So using the terms of the deciphering key, no <i>ornament</i> ever occurs on a low c. In the language of traditional Hebrew names, no accent <i>above the text</i> ever occurs following a darga and before another accent under the text is encountered.</p>
-        <p>The largest contributor to the musical corpus of the accents above the text is the zaqef-qatan. This is a significant division of the text into phrases, sometimes in surprising contexts where one would not expect a pause in the recitation.</p>
+    <p>We can see immediately which ornaments are rarely or frequently used and on which pitches. The last 13 rows are double accents on a single syllable. They are noted in the publications. They are all rare. Several are in the decalogues. Notice the sole tarsin on the low c in the table above. It is from 2 Chronicles 24:27 in the Leningrad Codex. It is not in the Aleppo codex online at mgketer.org. So in the terms of the deciphering key, no ornament ever occurs on a low c. In terms of traditional Hebrew names, no accent above the text ever occurs following a darga and before another accent under the text is encountered. The largest contributor to the musical corpus of the accents above the text is the zaqef-qatan. This is a significant division of the text into phrases, sometimes in surprising contexts where one would not expect to breathe. Each has to be looked at individually.
+    </p>
     </div>
 
 <script>
 const chapterBooks = ["Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua", "Judges", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings", "Isaiah", "Jeremiah", "Ezekiel", "Hosea", "Joel", "Amos", "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi", "Psalms", "Proverbs", "Job", "Song", "Ruth", "Lamentations", "Qohelet", "Esther", "Daniel", "Ezra", "Nehemiah", "1 Chronicles", "2 Chronicles"];
 const chapterBookSelect = document.getElementById("chapter-book");
-chapterBooks.forEach(book => chapterBookSelect.add(new Option(book, book)));
-document.getElementById("chapter-explorer-form").addEventListener("submit", event => {
-    event.preventDefault();
-    const book = chapterBookSelect.value;
-    const chapter = document.getElementById("chapter-number").value;
-    window.location.href = `ornament_chapter.html?book=${encodeURIComponent(book)}&chapter=${encodeURIComponent(chapter)}`;
+if (chapterBookSelect) {
+    chapterBooks.forEach(book => chapterBookSelect.add(new Option(book, book)));
+    document.getElementById("chapter-explorer-form").addEventListener("submit", event => {
+        event.preventDefault();
+        const book = chapterBookSelect.value;
+        const chapter = document.getElementById("chapter-number").value;
+        window.location.href = `ornament_chapter.html?book=${encodeURIComponent(book)}&chapter=${encodeURIComponent(chapter)}`;
+    });
+}
+
+// 🏛️ HEBREW ACCENT PARSER INITIALIZATION
+document.addEventListener('DOMContentLoaded', async () => {
+    if (typeof HebrewAccentParser !== 'undefined') {
+        const parser = new HebrewAccentParser();
+        const loaded = await parser.init('./hebrew_accent_dictionary.json');
+        if (loaded) {
+            parser.enhanceOrnamentTable('#ornament-table');
+        }
+    }
 });
 </script>
 </body>
@@ -392,29 +278,17 @@ document.getElementById("chapter-explorer-form").addEventListener("submit", even
             for key in sorted(chapter["verses"], key=lambda value: int(value))
         ]
         chapter_output["chapters"].append(chapter)
-    
-    # Save ornament_chapters.json
-    dump_kwargs = {"ensure_ascii": False}
-    if pretty_json:
-        dump_kwargs["indent"] = 2
-    else:
-        dump_kwargs["separators"] = (",", ":")
-
     with open("ornament_chapters.json", "w", encoding="utf-8") as chapter_f:
-        json.dump(chapter_output, chapter_f, **dump_kwargs)
+        json.dump(chapter_output, chapter_f, ensure_ascii=False, separators=(",", ":"))
     print("Chapter-first index 'ornament_chapters.json' compiled successfully!")
 
     if not chapter_index_only:
         with open("ornament_usage_by_pitch.html", "w", encoding="utf-8") as out_f:
             out_f.write(html_output)
-        print("📈 Success! 'ornament_usage_by_pitch.html' compiled via direct file list extraction.")
-        
+        print("📈 Success! 'ornament_usage_by_pitch.html' compiled with Hebrew Accent Parser integration.")
         with open("./ornament_index.json", "w", encoding="utf-8") as index_f:
-            json.dump(search_index, index_f, **dump_kwargs)
+            json.dump(search_index, index_f, ensure_ascii=False)
         print("📁 Master database file 'ornament_index.json' compiled successfully!")
 
 if __name__ == "__main__":
-    run_distribution_analysis(
-        chapter_index_only="--chapter-index-only" in sys.argv,
-        pretty_json="--pretty" in sys.argv
-    )
+    run_distribution_analysis(chapter_index_only="--chapter-index-only" in sys.argv)
