@@ -272,26 +272,16 @@ const PITCH_NAMES = {
 
             const self = this;
 
-function getAudioUrl(rawBookCode, chNum, vsNum) {
-    if (!rawBookCode) return '';
+            function getAudioUrl(rawBookCode, chNum, vsNum) {
+                if (!rawBookCode) return '';
 
-    // 1. DIRECTORY: Proper Case (e.g., "1_CHRONICLES" -> "1 Chronicles" or "1_Chronicles")
-    const folderName = String(rawBookCode)
-        .trim()
-        .toLowerCase()
-        .split(/[\s_]+/)
-        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(' '); // Change ' ' to '_' if your physical folders use underscores like "1_Chronicles"
+                   const folderName = String(rawBookCode).trim().replace(/_/g, ' ').toUpperCase();
+                   const properBook = folderName.toLowerCase().split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('_');
+                   const c = String(chNum).replace(/^0+/, '') || '1';
+                   const v = String(vsNum).replace(/^0+/, '') || '1';
+                   const audioFileName = `${properBook}_${c}_${v}.mp3`;
 
-    // 2. FILENAME: UPPERCASE with underscores (e.g., "GENESIS_21_23.mp3" or "1_CHRONICLES_1_28.mp3")
-    const upperBook = String(rawBookCode).trim().toUpperCase().replace(/\s+/g, '_');
-    const c = String(chNum).replace(/^0+/, '') || '1';
-    const v = String(vsNum).replace(/^0+/, '') || '1';
-
-    const audioFileName = `${upperBook}_${c}_${v}.mp3`;
-
-    // 3. FULL URL
-    return `./musicscores/audio/${encodeURIComponent(folderName)}/${audioFileName}`;
+                   return `./musicscores/audio/${encodeURIComponent(folderName)}/${audioFileName}`;
 }
             function renderView() {
                 const filteredRecords = selectedBook === 'ALL' 
