@@ -273,20 +273,25 @@ const PITCH_NAMES = {
             const self = this;
 
 function getAudioUrl(rawBookCode, chNum, vsNum) {
-    // 1. Folder Name: replace underscores with spaces ("1_CHRONICLES" -> "1 CHRONICLES")
-    const folderName = String(rawBookCode || '').trim().replace(/_/g, ' ');
+    if (!rawBookCode) return '';
 
-    // 2. File Name: Title Case with underscores ("1_CHRONICLES" -> "1_Chronicles")
-    const properBookName = folderName
+    // 1. DIRECTORY: Proper Case (e.g., "1_CHRONICLES" -> "1 Chronicles" or "1_Chronicles")
+    const folderName = String(rawBookCode)
+        .trim()
         .toLowerCase()
-        .split(/\s+/)
+        .split(/[\s_]+/)
         .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-        .join('_');
+        .join(' '); // Change ' ' to '_' if your physical folders use underscores like "1_Chronicles"
 
-    const audioFileName = `${properBookName}_${chNum}_${vsNum}.mp3`;
+    // 2. FILENAME: UPPERCASE with underscores (e.g., "GENESIS_21_23.mp3" or "1_CHRONICLES_1_28.mp3")
+    const upperBook = String(rawBookCode).trim().toUpperCase().replace(/\s+/g, '_');
+    const c = String(chNum).replace(/^0+/, '') || '1';
+    const v = String(vsNum).replace(/^0+/, '') || '1';
 
-    // 3. URL: encode spaces in folder (%20) while keeping proper-cased filename
-    return `musicscores/audio/${encodeURIComponent(folderName)}/${audioFileName}`;
+    const audioFileName = `${upperBook}_${c}_${v}.mp3`;
+
+    // 3. FULL URL
+    return `./musicscores/audio/${encodeURIComponent(folderName)}/${audioFileName}`;
 }
             function renderView() {
                 const filteredRecords = selectedBook === 'ALL' 
