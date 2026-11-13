@@ -1,7 +1,7 @@
 /**
- * Hebrew Accent Parser & Musical Concordance Enhancer
- * Project: SimHebrew Concordance / Hebrew Bible Site Pipeline
- * Author: D. Robert MacDonald & Gemini Notebook
+ * Hebrew Accent Parser -- supports ornament_records.html
+ * Project: SimHebrew Concordance / The Hebrew Bible as Music 
+ * assisted by AI -- somewhat randomly
  */
 
 (function(global) {
@@ -17,20 +17,21 @@
         "Nehemiah", "1 Chronicles", "2 Chronicles"
     ];
 
-    const PITCH_NAMES = {
-        "c": "Darga",
-        "d": "Tevir/Galgal",
-        "e": "Silluq",
-        "f": "Mercha",
-        "g": "Tifha/D'khi",
-        "A": "Atnah",
-        "B": "Munach",
-        "C": "Mahpach/Yetiv"
+const PITCH_NAMES = {
+        "c": "darga",
+        "d": "tevir/galgal",
+        "e": "silluq",
+        "f": "mercha",
+        "g": "tifha/d'khi",
+        "A": "atnah",
+        "B": "munach",
+        "C": "mahpach/yetiv"
     };
 
     class HebrewAccentParser {
         constructor() {
             this.dictionary = {};
+            this.translations = {};
             this.byDecimal = new Map();
             this.byHex = new Map();
             this.bySlug = new Map();
@@ -44,19 +45,57 @@
                     const response = await fetch(dataOrUrl);
                     this.dictionary = await response.json();
                 } catch (err) {
-                    console.error('Failed to load accent dictionary from URL:', err);
-                    return false;
+                    console.error('Failed to load accent dictionary:', err);
                 }
             } else if (typeof dataOrUrl === 'object' && dataOrUrl !== null) {
                 this.dictionary = dataOrUrl;
-            } else {
-                console.error('Invalid data or URL provided to HebrewAccentParser');
-                return false;
+            }
+
+            try {
+                const transResp = await fetch('./translation.json');
+                if (transResp.ok) {
+                    const rawTrans = await transResp.json();
+                    this._buildTranslationMap(rawTrans);
+                }
+            } catch(e) {
+                this.translations = {};
             }
 
             this._buildIndexes();
             this.isLoaded = true;
             return true;
+        }
+
+        _buildTranslationMap(rawTrans) {
+            this.translations = {};
+            if (!rawTrans) return;
+
+            const items = Array.isArray(rawTrans) ? rawTrans : (rawTrans.results?.[0]?.items || rawTrans.items || []);
+
+            items.forEach(item => {
+                const rawBook = String(item.book_cd || item.BOOK_CD || item.b || '').replace(/_/g, ' ').trim();
+                if (!rawBook) return;
+
+                const titleBook = rawBook.split(/\s+/)
+                    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+                    .join(' ');
+                
+                const underscoreTitle = titleBook.replace(/\s+/g, '_');
+                const underscoreRaw = rawBook.replace(/\s+/g, '_');
+
+                const ch = String(item.chapter_cd || item.CHAPTER_CD || item.c || '').replace(/^0+/, '');
+                const v = String(item.verse_cd || item.VERSE_CD || item.v || '').replace(/^0+/, '');
+                const text = item.eng_text || item.ENG_TEXT || item.text || item.t || '';
+
+                if (ch && v && text) {
+                    this.translations[`${titleBook}_${ch}_${v}`] = text;
+                    this.translations[`${underscoreTitle}_${ch}_${v}`] = text;
+                    this.translations[`${rawBook}_${ch}_${v}`] = text;
+                    this.translations[`${underscoreRaw}_${ch}_${v}`] = text;
+                    this.translations[`${titleBook}|${ch}|${v}`] = text;
+                    this.translations[`${titleBook} ${ch}:${v}`] = text;
+                }
+            });
         }
 
         _buildIndexes() {
@@ -66,13 +105,16 @@
             this.byHebrew.clear();
 
             for (const [key, entry] of Object.entries(this.dictionary)) {
-                const hexNormalized = String(entry.hex).toUpperCase();
-                const hexRaw = String(entry.hex_raw).toUpperCase();
-                this.byHex.set(hexNormalized, entry);
-                this.byHex.set(hexRaw, entry);
+                const hexNormalized = String(entry.hex || '').toUpperCase();
+                const hexRaw = String(entry.hex_raw || '').toUpperCase();
+                if (hexNormalized) this.byHex.set(hexNormalized, entry);
+                if (hexRaw) this.byHex.set(hexRaw, entry);
 
-                if (entry.decimal) {
-                    this.byDecimal.set(Number(entry.decimal), entry);
+                if (entry.decimal !== undefined) {
+                    this.byDecimal.set(String(entry.decimal), entry);
+                    if (typeof entry.decimal === 'number') {
+                        this.byDecimal.set(entry.decimal, entry);
+                    }
                 }
 
                 if (entry.name_translit) {
@@ -83,29 +125,17 @@
                 if (entry.name_hebrew) {
                     this.byHebrew.set(entry.name_hebrew.trim(), entry);
                     const unpointed = entry.name_hebrew.replace(/[\u0591-\u05C7]/g, '').trim();
-                    if (unpointed) {
-                        this.byHebrew.set(unpointed, entry);
-                    }
+                    if (unpointed) this.byHebrew.set(unpointed, entry);
                 }
             }
         }
 
         _normalizeSlug(str) {
-            let s = String(str).toLowerCase().trim();
-            s = s.replace(/\bz-qatan\b/g, 'zaqefqatan')
-                 .replace(/\bz-gadol\b/g, 'zaqefgadol')
-                 .replace(/\bt-gedola\b/g, 'telishagedola')
-                 .replace(/\bt-gedolah\b/g, 'telishagedola')
-                 .replace(/\bt-qetana\b/g, 'telishaqetana')
-                 .replace(/\bzqatan\b/g, 'zaqefqatan')
-                 .replace(/\bzgadol\b/g, 'zaqefgadol')
-                 .replace(/\btgedola\b/g, 'telishagedola')
-                 .replace(/\btqetana\b/g, 'telishaqetana');
-            return s.replace(/[^a-z0-9]/g, '');
+            return String(str).toLowerCase().replace(/[^a-z0-9]/g, '');
         }
 
         getByDecimal(dec) {
-            return this.byDecimal.get(Number(dec)) || null;
+            return this.byDecimal.get(String(dec)) || this.byDecimal.get(Number(dec)) || null;
         }
 
         getByHex(hex) {
@@ -119,24 +149,7 @@
         getByName(name) {
             if (!name) return null;
             const slug = this._normalizeSlug(name);
-            let found = this.bySlug.get(slug) || null;
-            if (found) return found;
-
-            const parts = name.split(/[-_\s]+/);
-            if (parts.length > 1) {
-                const matchedParts = parts.map(p => this.getByName(p)).filter(Boolean);
-                if (matchedParts.length > 0) {
-                    return {
-                        hex: matchedParts.map(m => m.hex).join('+'),
-                        symbol: matchedParts.map(m => m.symbol).join(''),
-                        symbol_on_aleph: 'א' + matchedParts.map(m => m.symbol).join(''),
-                        name_hebrew: matchedParts.map(m => m.name_hebrew).join(' / '),
-                        name_translit: matchedParts.map(m => m.name_translit).join(' / '),
-                        pitch_or_interval: matchedParts.map(m => m.pitch_or_interval).join('\n')
-                    };
-                }
-            }
-            return null;
+            return this.bySlug.get(slug) || null;
         }
 
         parseVerseText(text) {
@@ -153,295 +166,234 @@
                         hex: accent.hex,
                         nameHebrew: accent.name_hebrew,
                         nameTranslit: accent.name_translit,
-                        symbolOnAleph: accent.symbol_on_aleph || ('א' + accent.symbol),
-                        pitchOrInterval: accent.pitch_or_interval
+                        category: accent.category,
+                        pitchOrInterval: accent.pitch_or_interval,
+                        symbolOnAleph: accent.symbol_on_aleph
                     });
                 }
             }
             return results;
         }
 
-        stripNiqqud(text) {
-            if (!text || typeof text !== 'string') return '';
-            return text.replace(/[\u05B0-\u05BC\u05C1\u05C2\u05C4\u05C5\u05C7]/g, '');
-        }
+        /**
+         * Render Ornament Records (ornament_records.html)
+         */
+        renderOrnamentRecords(containerSelector, indexData, targetOrn, targetPitch) {
+            const container = typeof containerSelector === 'string' ? document.querySelector(containerSelector) : containerSelector;
+            if (!container) return;
+            const pitchHebrewName = PITCH_NAMES[targetPitch] || targetPitch;
+            const accent = this.getByName(targetOrn);
+/*            const displayName = accent ? accent.name_translit : (targetOrn ? targetOrn.charAt(0).toUpperCase() + targetOrn.slice(1) : 'Ornament');
+*/
+            const ornKey = this._normalizeSlug(targetOrn || '');
+            const pitchKey = String(targetPitch || '').trim();
 
-        calculateGematria(text) {
-            if (!text || typeof text !== 'string') return { total: 0, factorsStr: '', weightsStr: '' };
-            const gematriaMap = {
-                'א':1, 'ב':2, 'ג':3, 'ד':4, 'ה':5, 'ו':6, 'ז':7, 'ח':8, 'ט':9,
-                'י':10, 'כ':20, 'ך':20, 'ל':30, 'מ':40, 'ם':40, 'נ':50, 'ן':50,
-                'ס':60, 'ע':70, 'פ':80, 'ף':80, 'צ':90, 'ץ':90, 'ק':100, 'ר':200,
-                'ש':300, 'ת':400
-            };
-            const words = text.trim().split(/\s+/);
-            const wordWeightsRTL = [];
-            let total = 0;
-
-            for (let w = words.length - 1; w >= 0; w--) {
-                let wSum = 0;
-                for (const char of words[w]) {
-                    if (gematriaMap[char]) wSum += gematriaMap[char];
-                }
-                wordWeightsRTL.push(wSum);
-                total += wSum;
-            }
-
-            const factors = [];
-            let d = 2;
-            let temp = total;
-            while (temp >= 2) {
-                if (temp % d === 0) {
-                    factors.push(d);
-                    temp = Math.floor(temp / d);
-                } else {
-                    d++;
-                    if (d * d > temp) {
-                        if (temp > 1) factors.push(temp);
-                        break;
+            // Find matching entries in indexData
+            let rawRecords = [];
+            if (indexData) {
+                for (const [oKey, pitchMap] of Object.entries(indexData)) {
+                    if (this._normalizeSlug(oKey) === ornKey) {
+                        for (const [pKey, list] of Object.entries(pitchMap)) {
+                            if (pKey.toLowerCase() === pitchKey.toLowerCase()) {
+                                rawRecords = list;
+                                break;
+                            }
+                        }
                     }
                 }
             }
 
-            return {
-                total: total,
-                factorsStr: factors.length > 0 ? factors.join(', ') : String(total),
-                weightsStr: wordWeightsRTL.join(' + ')
-            };
-        }
-
-        isPoeticContext(book, c, v) {
-            const b = String(book || '').trim();
-            const cNum = parseInt(c) || 0;
-            const vNum = parseInt(v) || 0;
-            if (b === 'Psalms' || b === 'Proverbs') return true;
-            if (b === 'Job') {
-                if (cNum > 3 && cNum < 42) return true;
-                if (cNum === 3 && vNum >= 2) return true;
-                if (cNum === 42 && vNum <= 6) return true;
-            }
-            return false;
-        }
-
-        getTrimmedPitch(accent, book, c, v) {
-            if (!accent) return '';
-            const isPoetic = this.isPoeticContext(book, c, v);
-            const slug = accent.nameTranslit ? accent.nameTranslit.toLowerCase() : (accent.name_translit ? accent.name_translit.toLowerCase() : '');
-            
-            if (slug.includes('revia') && !slug.includes('mugrash')) {
-                return isPoetic ? '-1+0' : '-0-1';
-            }
-            if (slug.includes('tifha') || slug.includes('dkhi')) {
-                return isPoetic ? 'g#' : 'g';
-            }
-            if (slug.includes('mercha') && !slug.includes('kefula')) {
-                return isPoetic ? 'f#' : 'f';
-            }
-            return (accent.pitchOrInterval || accent.pitch_or_interval || '').split('\n')[0].trim();
-        }
-
-        renderOrnamentRecords(containerSelector, indexData, ornParam, pitchParam, urlBookParam = '') {
-            const container = typeof containerSelector === 'string' ? document.querySelector(containerSelector) : containerSelector;
-            if (!container || !indexData) return;
-
-            const targetSlug = this._normalizeSlug(ornParam);
-            let matchedKey = Object.keys(indexData).find(k => this._normalizeSlug(k) === targetSlug);
-            if (!matchedKey) {
-                matchedKey = Object.keys(indexData).find(k => k.toLowerCase() === ornParam.toLowerCase());
-            }
-
-            const pitchHebrewName = PITCH_NAMES[pitchParam] || pitchParam;
-            const accent = this.getByName(ornParam);
-            const displayName = accent ? accent.name_translit : (ornParam ? ornParam.charAt(0).toUpperCase() + ornParam.slice(1) : 'Ornament');
-
-            let allRecords = [];
-            if (matchedKey && indexData[matchedKey] && indexData[matchedKey][pitchParam]) {
-                allRecords = indexData[matchedKey][pitchParam];
-            }
-
-            // Collect unique book names from records
-            const uniqueBooksSet = new Set();
-            allRecords.forEach(r => { if (r.b) uniqueBooksSet.add(r.b.trim()); });
-
-            // Sort available books in CANONICAL order
-            const availableBooks = [];
-            CANONICAL_BOOKS.forEach(b => {
-                if (uniqueBooksSet.has(b)) availableBooks.push(b);
-            });
-            uniqueBooksSet.forEach(b => {
-                if (!availableBooks.includes(b)) availableBooks.push(b);
+            // Deduplicate records by verse
+            const seenVerses = new Set();
+            const allRecords = rawRecords.filter(r => {
+                const vKey = `${r.b}_${r.c}_${r.v}`;
+                if (seenVerses.has(vKey)) return false;
+                seenVerses.add(vKey);
+                return true;
             });
 
-            // Determine default selected book:
-            // 1. If urlBookParam is passed and present in availableBooks -> use it
-            // 2. Otherwise default to first available canonical book (availableBooks[0])
-            // 3. Fallback to 'ALL' if no books exist
-            let defaultBook = 'ALL';
-            if (urlBookParam && availableBooks.includes(urlBookParam)) {
-                defaultBook = urlBookParam;
-            } else if (availableBooks.length > 0) {
-                defaultBook = availableBooks[0];
+            if (allRecords.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 30px; background: #fff; border: 1px solid #e2ddd0; border-radius: 6px; font-family: sans-serif;">
+                        <h3 style="color: #800000; margin-top:0;">No Records Found</h3>
+                        <p>No occurrences found for ornament <strong>${targetOrn || '—'}</strong> on reciting pitch <strong>${targetPitch || '—'}</strong>.</p>
+                    </div>`;
+                return;
             }
 
-            let html = `
-                <div class="records-header-box" style="margin-bottom: 20px;">
-                    <!-- LINE 2: Header Title -->
-                    <h2 style="margin: 0 0 12px 0; color: #800000; font-family: sans-serif; font-size: 1.5rem; font-weight: normal;">
-                        ${displayName} on Recitation Pitch: ${pitchParam} (${pitchHebrewName})
-                    </h2>
+            // Find target ornament codepoints/symbols for word-level highlighting
+            const accentEntry = this.getByName(targetOrn);
+            const targetSymbols = [];
+            const targetDecimals = [];
+            if (accentEntry) {
+                if (accentEntry.symbol) targetSymbols.push(accentEntry.symbol);
+                if (accentEntry.decimal) targetDecimals.push(Number(accentEntry.decimal));
+            }
 
-                    <!-- LINE 3: Controls & Canonical Book Filter Toolbar -->
-                    <div class="controls-toolbar" style="display: flex; flex-wrap: wrap; gap: 18px; align-items: center; font-family: sans-serif; font-size: 0.9rem; color: #444; background: #f3f0e8; padding: 10px 14px; border-radius: 4px;">
-                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                            <input type="checkbox" id="toggle-niqqud" style="cursor: pointer;">
-                            <strong>Show vowel points (niqqud)</strong>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                            <input type="checkbox" id="toggle-descriptions" style="cursor: pointer;">
-                            <strong>Show extended description</strong>
-                        </label>
-                        <div style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
-                            <strong>Filter by Book:</strong>
-                            <select id="book-filter-select" style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 3px; font-family: sans-serif; cursor: pointer;">
-                                <option value="ALL">All Books (${allRecords.length} records)</option>
-                                ${availableBooks.map(b => {
-                                    const cnt = allRecords.filter(r => r.b === b).length;
-                                    return `<option value="${b}">${b} (${cnt} records)</option>`;
-                                }).join('')}
-                            </select>
+            // Group records by Book & count
+            const bookCounts = {};
+            allRecords.forEach(r => {
+                bookCounts[r.b] = (bookCounts[r.b] || 0) + 1;
+            });
+            const bookNames = Object.keys(bookCounts);
+
+            // AUTO-SELECT FIRST CANONICAL BOOK WITH RECORDS (Prevents browser freeze on 13,000 records)
+            let selectedBook = bookNames.length > 0 ? bookNames[0] : 'ALL';
+
+            const self = this;
+
+function getAudioUrl(rawBookCode, chNum, vsNum) {
+    // 1. Folder Name: replace underscores with spaces ("1_CHRONICLES" -> "1 CHRONICLES")
+    const folderName = String(rawBookCode || '').trim().replace(/_/g, ' ');
+
+    // 2. File Name: Title Case with underscores ("1_CHRONICLES" -> "1_Chronicles")
+    const properBookName = folderName
+        .toLowerCase()
+        .split(/\s+/)
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join('_');
+
+    const audioFileName = `${properBookName}_${chNum}_${vsNum}.mp3`;
+
+    // 3. URL: encode spaces in folder (%20) while keeping proper-cased filename
+    return `musicscores/audio/${encodeURIComponent(folderName)}/${audioFileName}`;
+}
+            function renderView() {
+                const filteredRecords = selectedBook === 'ALL' 
+                    ? allRecords 
+                    : allRecords.filter(r => r.b === selectedBook);
+
+                let htmlStr = `
+                <div class="ornament-records-view">
+                    <div class="filter-bar" style="margin-bottom: 20px; padding: 15px 20px; background: #f9f6f0; border: 1px solid #e2ddd0; border-radius: 6px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                        <div>
+                            <h2 style="font-family: sans-serif; color: #800000; margin: 0 0 4px 0; font-size: 1.4rem;">
+                                ${targetOrn} on recitation pitch: ${targetPitch} (${pitchHebrewName})
+                            </h2>
+                            <span style="font-size: 0.88rem; color: #666;">
+                                Showing ${filteredRecords.length} of ${allRecords.length} records (Total: ${allRecords.length})
+                            </span>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 10px; font-family: sans-serif; font-size: 0.85rem; color: #444;">
+                                <label style="cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                                    <input type="checkbox" id="toggle-vowels"> Show vowel points (niqqud)
+                                </label>
+                                <label style="cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                                    <input type="checkbox" id="toggle-ext-desc"> Show extended description
+                                </label>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 8px; font-family: sans-serif; font-size: 0.9rem;">
+                                <label for="book-filter-select" style="font-weight: bold; color: #800000;">Filter by Book:</label>
+                                <select id="book-filter-select" style="padding: 5px 10px; border-radius: 4px; border: 1px solid #c8c0b0; font-family: sans-serif; background: #fff; cursor: pointer;">
+                                    <option value="ALL" ${selectedBook === 'ALL' ? 'selected' : ''}>All Books (${allRecords.length})</option>
+                                    ${bookNames.map(b => `<option value="${b}" ${b === selectedBook ? 'selected' : ''}>${b} (${bookCounts[b]})</option>`).join('')}
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div id="verse-cards-container"></div>
-            `;
+                    <div class="records-cards-container">
+                `;
 
-            container.innerHTML = html;
-
-            const selectEl = container.querySelector('#book-filter-select');
-            if (selectEl) {
-                selectEl.value = defaultBook;
-            }
-
-            const renderCards = (selectedBook) => {
-                const cardsContainer = container.querySelector('#verse-cards-container');
-                if (!cardsContainer) return;
-
-                let filtered = allRecords;
-                if (selectedBook && selectedBook !== 'ALL') {
-                    filtered = allRecords.filter(r => r.b === selectedBook);
-                }
-
-                if (filtered.length === 0) {
-                    cardsContainer.innerHTML = `<div style="padding: 30px; background: #fff; border: 1px solid #e2ddd0; border-radius: 6px; color: #800000; font-style: italic;">No records found for the selected book filter.</div>`;
-                    return;
-                }
-
-                // Guard against browser freeze if ALL is chosen for high-frequency ornaments
-                const MAX_CARDS = 250;
-                const countToRender = Math.min(filtered.length, MAX_CARDS);
-                let cardsHtml = '';
-
-                if (filtered.length > MAX_CARDS && selectedBook === 'ALL') {
-                    cardsHtml += `
-                        <div style="padding: 10px 14px; background: #fff8e7; border: 1px solid #e0c975; border-radius: 4px; margin-bottom: 15px; font-family: sans-serif; font-size: 0.88rem; color: #7a5e00;">
-                            Showing first <strong>${MAX_CARDS}</strong> of <strong>${filtered.length}</strong> records across All Books. Select a specific book above to view all its records.
-                        </div>
-                    `;
-                }
-
-                for (let i = 0; i < countToRender; i++) {
-                    const rec = filtered[i];
+                filteredRecords.forEach(rec => {
+                    const verseKey = `${rec.b}_${rec.c}_${rec.v}`;
+                    const transText = self.translations[verseKey] || self.translations[`${rec.b}|${rec.c}|${rec.v}`] || self.translations[`${rec.b} ${rec.c}:${rec.v}`] || '';
+                    
                     const rawText = rec.t || '';
-                    const strippedText = this.stripNiqqud(rawText);
+                    const strippedText = rawText.replace(/[\u05B0-\u05BD\u05BF\u05C1\u05C2\u05C4\u05C5\u05C7]/g, '');
 
-                    // Parse verse accents for inline single-line RTL sequence
-                    const verseAccents = this.parseVerseText(rawText);
-                    const extDescItems = verseAccents.map(acc => {
-                        const sym = acc.symbolOnAleph || ('א' + acc.char);
-                        const pStr = this.getTrimmedPitch(acc, rec.b, rec.c, rec.v);
-                        return `<span style="white-space: nowrap;"><span style="font-family: 'SBL Hebrew', serif; color: #800000; font-size: 1.1rem;">${sym}</span> <strong>${acc.nameTranslit}</strong> <span style="font-family: monospace; color: #1a5276;">(${pStr})</span></span>`;
-                    });
+                    // Highlight target words
+                    function highlightWords(txt) {
+                        if (!txt) return '';
+                        if (targetSymbols.length === 0 && targetDecimals.length === 0) return txt;
+                        
+                        return txt.split(/\s+/).map(w => {
+                            const hasSym = targetSymbols.some(s => s && w.includes(s));
+                            const hasDec = targetDecimals.some(d => Array.from(w).some(c => c.codePointAt(0) === d));
+                            if (hasSym || hasDec) {
+                                return `<span class="highlight-word" style="background-color: #fff2cc; border-bottom: 2px dashed #d99600; padding: 0 4px; border-radius: 3px; display: inline-block;">${w}</span>`;
+                            }
+                            return w;
+                        }).join(' ');
+                    }
 
-                    const extDescHtml = extDescItems.length > 0 ? extDescItems.join('&nbsp;&nbsp;&bull;&nbsp;&nbsp;') : '';
+                    const rawHighlighted = highlightWords(rawText);
+                    const strippedHighlighted = highlightWords(strippedText);
 
-                    cardsHtml += `
+                    const audioSrc = getAudioUrl(rec.b, rec.c, rec.v);
+                    const parseAccents = self.parseVerseText(rawText);
+
+                    htmlStr += `
                         <div class="verse-card" style="margin-bottom: 22px; padding: 16px 20px; background: #ffffff; border: 1px solid #e2ddd0; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.03); max-width: 100%; box-sizing: border-box; white-space: normal;">
-                            <!-- HEADER LINE: Book Chapter:Verse Link + Inline Audio Player -->
                             <div class="verse-header-line" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f2eee5; padding-bottom: 8px; margin-bottom: 12px;">
                                 <span class="verse-title" style="font-family: sans-serif; font-size: 1.1rem; font-weight: bold;">
-                                    <a href="ornament_chapter.html?book=${encodeURIComponent(rec.b)}&chapter=${encodeURIComponent(rec.c)}" style="color: #800000; text-decoration: none;">
+                                    <a href="ornament_chapter.html?book=${encodeURIComponent(rec.b)}&chapter=${rec.c}" style="color: #800000; text-decoration: none;">
                                         ${rec.b} ${rec.c}:${rec.v} 📖
                                     </a>
                                 </span>
                                 <div class="verse-audio-box">
                                     <audio controls style="height: 30px; vertical-align: middle;">
-                                        <source src="./musicscores/audio/${encodeURIComponent(rec.b)}/${encodeURIComponent(rec.b)}_${rec.c}_${rec.v}.mp3" type="audio/mpeg">
-                                        <source src="./musicscores/audio/${encodeURIComponent(rec.b)}_${rec.c}_${rec.v}.mp3" type="audio/mpeg">
+                                        <source src="${audioSrc}" type="audio/mpeg">
                                     </audio>
                                 </div>
                             </div>
 
-                            <!-- VERSE HEBREW TEXT -->
-                            <div class="verse-text" data-raw="${this._escapeAttr(rawText)}" data-stripped="${this._escapeAttr(strippedText)}" style="direction: rtl; text-align: right; font-family: 'SBL Hebrew', 'Ezra SIL', serif; font-size: 1.55rem; line-height: 1.9; color: #111; margin-bottom: 8px;">
-                                ${rawText}
+                            <div class="verse-text" title="${transText.replace(/"/g, '&quot;')}" data-raw="${rawHighlighted.replace(/"/g, '&quot;')}" data-stripped="${strippedHighlighted.replace(/"/g, '&quot;')}" style="direction: rtl; text-align: right; font-family: 'SBL Hebrew', 'Ezra SIL', serif; font-size: 1.55rem; line-height: 1.9; color: #111; margin-bottom: 8px;">
+                                ${strippedHighlighted}
                             </div>
 
-                            <!-- EXTENDED DESCRIPTION: SINGLE-LINE RTL INLINE ACCENT SEQUENCE -->
-                            <div class="verse-ext-desc" style="display: block; direction: rtl; text-align: right; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e5dfd3; font-family: sans-serif; font-size: 0.88rem; color: #333; width: 100%; max-width: 100%; box-sizing: border-box; white-space: normal !important; word-break: break-word !important;">
-                                ${extDescHtml}
+                            <div class="verse-ext-desc" style="display: none; direction: rtl; text-align: right; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e5dfd3; font-family: sans-serif; font-size: 0.88rem; color: #333; width: 100%; max-width: 100%; box-sizing: border-box; white-space: normal !important; word-break: break-word !important;">
+                                ${parseAccents.map(a => `
+                                    <span style="white-space: nowrap;">
+                                        <span style="font-family: 'SBL Hebrew', serif; color: #800000; font-size: 1.1rem;">${a.symbolOnAleph || ('א' + a.char)}</span>
+                                        <strong>${a.nameTranslit}</strong>
+                                        <span style="font-family: monospace; color: #1a5276;">(${a.pitchOrInterval})</span>
+                                    </span>
+                                `).join('&nbsp;&nbsp;&bull;&nbsp;&nbsp;')}
                             </div>
                         </div>
                     `;
-                }
-
-                cardsContainer.innerHTML = cardsHtml;
-                applyToggles();
-            };
-
-            const applyToggles = () => {
-                const niqqudCb = container.querySelector('#toggle-niqqud');
-                const descCb = container.querySelector('#toggle-descriptions');
-
-                if (niqqudCb) {
-                    const showNiqqud = niqqudCb.checked;
-                    container.querySelectorAll('.verse-text').forEach(el => {
-                        el.textContent = showNiqqud ? el.dataset.raw : el.dataset.stripped;
-                    });
-                }
-
-                if (descCb) {
-                    const showDesc = descCb.checked;
-                    container.querySelectorAll('.verse-ext-desc').forEach(el => {
-                        el.style.display = showDesc ? 'block' : 'none';
-                    });
-                }
-            };
-
-            // Event Listeners for controls
-            const niqqudCb = container.querySelector('#toggle-niqqud');
-            const descCb = container.querySelector('#toggle-descriptions');
-            if (niqqudCb) niqqudCb.addEventListener('change', applyToggles);
-            if (descCb) descCb.addEventListener('change', applyToggles);
-
-            if (selectEl) {
-                selectEl.addEventListener('change', (e) => {
-                    renderCards(e.target.value);
                 });
+
+                htmlStr += `</div></div>`;
+                container.innerHTML = htmlStr;
+
+                // Bind Event Listeners
+                const bookSelect = container.querySelector('#book-filter-select');
+                if (bookSelect) {
+                    bookSelect.addEventListener('change', (e) => {
+                        selectedBook = e.target.value;
+                        renderView();
+                    });
+                }
+
+                const toggleVowels = container.querySelector('#toggle-vowels');
+                const toggleExtDesc = container.querySelector('#toggle-ext-desc');
+
+                function applyToggles() {
+                    const showVowels = toggleVowels ? toggleVowels.checked : false;
+                    const showExt = toggleExtDesc ? toggleExtDesc.checked : false;
+
+                    container.querySelectorAll('.verse-text').forEach(el => {
+                        el.innerHTML = showVowels ? el.dataset.raw : el.dataset.stripped;
+                    });
+
+                    container.querySelectorAll('.verse-ext-desc').forEach(el => {
+                        el.style.display = showExt ? 'block' : 'none';
+                    });
+                }
+
+                if (toggleVowels) toggleVowels.addEventListener('change', applyToggles);
+                if (toggleExtDesc) toggleExtDesc.addEventListener('change', applyToggles);
             }
 
-            // Initial render using defaultBook!
-            renderCards(defaultBook);
+            renderView();
         }
 
-        _escapeAttr(str) {
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;');
-        }
+        
     }
 
     global.HebrewAccentParser = HebrewAccentParser;
