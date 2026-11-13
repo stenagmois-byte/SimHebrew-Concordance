@@ -235,10 +235,40 @@ const PITCH_NAMES = {
             allRecords.forEach(r => {
                 bookCounts[r.b] = (bookCounts[r.b] || 0) + 1;
             });
-            const bookNames = Object.keys(bookCounts);
+            //const bookNames = Object.keys(bookCounts);
+// 1. Extract unique books present in allRecords
+            const uniqueBooksSet = new Set(allRecords.map(r => r.b ? r.b.trim() : ''));
 
+// 2. YOUR RESTORED CANONICAL SORTING LOGIC
+           const availableBooks = [];
+           CANONICAL_BOOKS.forEach(b => {
+              if (uniqueBooksSet.has(b)) availableBooks.push(b);
+           });
+           uniqueBooksSet.forEach(b => {
+              if (!availableBooks.includes(b)) availableBooks.push(b);
+           });
+
+// 3. YOUR RESTORED DEFAULT BOOK SELECTION LOGIC
+           const urlParams = new URLSearchParams(window.location.search);
+           const urlBookParam = urlParams.get('book');
+
+           let defaultBook = 'ALL';
+               if (urlBookParam && availableBooks.includes(urlBookParam)) {
+                   defaultBook = urlBookParam;
+               } else if (availableBooks.length > 0) {
+                   defaultBook = availableBooks[0]; // Defaults to Genesis (or first canonical)
+               }
+
+// 4. SUTURE VARIABLE NAMES FOR YOUR HTML TEMPLATE
+          const bookNames = availableBooks;
+          const selectedBook = defaultBook;
+
+// 5. FILTER THE RECORDS FOR RENDERING
+          const filteredRecords = selectedBook === 'ALL' 
+            ? allRecords 
+            : allRecords.filter(r => r.b && r.b.trim() === selectedBook);
             // AUTO-SELECT FIRST CANONICAL BOOK WITH RECORDS (Prevents browser freeze on 13,000 records)
-            let selectedBook = bookNames.length > 0 ? bookNames[0] : 'ALL';
+            //let selectedBook = bookNames.length > 0 ? bookNames[0] : 'ALL';
 
             const self = this;
 
