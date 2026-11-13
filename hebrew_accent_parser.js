@@ -333,7 +333,7 @@ function getAudioUrl(rawBookCode, chNum, vsNum) {
                     const transText = self.translations[verseKey] || self.translations[`${rec.b}|${rec.c}|${rec.v}`] || self.translations[`${rec.b} ${rec.c}:${rec.v}`] || '';
                     
                     const rawText = rec.t || '';
-                    const strippedText = rawText.replace(/[\u05B0-\u05BD\u05BF\u05C1\u05C2\u05C4\u05C5\u05C7]/g, '');
+                    const strippedText = rawText.replace(/[\u05B0-\u05BC\u05BF\u05C1\u05C2\u05C4\u05C5\u05C7]/g, '');
 
                     // Highlight target words
                     function highlightWords(txt) {
