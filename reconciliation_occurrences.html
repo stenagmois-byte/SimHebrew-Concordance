@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="qstyles.css">
   <script src="./menu.js" defer></script>
+  <script src="./hebrew_accent_parser.js" defer></script>
   <title>Reconciliation Shape Occurrences</title>
   <style>
     body { background: #fffcf4; color: #292929; }
@@ -25,7 +26,20 @@
     .sequence { font-family: sans-serif; white-space: nowrap; }
     .english { line-height: 1.5; }
     .status { padding: 18px 8px; color: #666; }
-    @media (max-width: 700px) {
+/* Restrict the audio column and header width */
+th.audio, 
+td.audio {
+    width: 150px;
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* Restrict the player width inside the cell */
+td.audio audio {
+    width: 140px;
+    height: 30px;
+    vertical-align: middle;
+}    @media (max-width: 700px) {
       main { padding-left: 10px; padding-right: 10px; }
       .results-table th, .results-table td { padding: 7px 6px; font-size: .9rem; }
       .sequence { white-space: normal; }
@@ -43,7 +57,7 @@
     </section>
     <div id="bookFilters" class="book-panel"></div>
     <table class="results-table">
-      <thead><tr><th>Book</th><th>Verse</th><th>Original segment</th><th>English text</th></tr></thead>
+      <thead><tr><th>Book</th><th>Verse</th><th>Original segment</th><th>English text</th><th>Audio</th></tr></thead>
       <tbody id="resultsBody"><tr><td colspan="4" class="status">Loading occurrences…</td></tr></tbody>
     </table>
   </main>
@@ -125,6 +139,18 @@
           || ar.chapter - br.chapter || ar.verse - br.verse;
       });
     }
+    function getAudioUrl(bookCode, chNum, vsNum) {
+    if (!bookCode) return '';
+      const folderName = String(bookCode).trim().replace(/_/g, ' ').toUpperCase();
+      const properBook = folderName
+        .toLowerCase()
+        .split(/\s+/)
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join('_');
+      const c = String(chNum).replace(/^0+/, '') || '1';
+      const v = String(vsNum).replace(/^0+/, '') || '1';
+      return `./musicscores/audio/${encodeURIComponent(folderName)}/${properBook}_${c}_${v}.mp3`;
+    }
     function render() {
       const shown = sortedRecords(matchingRecords.filter(r => visibleBook === 'ALL' || parseRef(r.ref)?.book === visibleBook));
       document.getElementById('resultSummary').textContent = `${shown.length} ${selectedMode} segment${shown.length === 1 ? '' : 's'} · ${contextLabels[selectedContext] || selectedContext}`;
@@ -137,11 +163,18 @@
         const parsed = parseRef(record.ref);
         const label = parsed ? `${parsed.chapter}:${parsed.verse}` : record.ref;
         const english = translations[record.ref] || '[English translation unavailable]';
+        const audioSrc = getAudioUrl(parsed.book, parsed.chapter, parsed.verse);
+
         return `<tr>
           <td>${escapeHtml(displayBook(parsed?.book || ''))}</td>
           <td><a class="reference-link" href="${matrixUrl(record.ref)}">${escapeHtml(label)} ↗</a></td>
           <td class="sequence">[ ${escapeHtml(record.sequence)} ]</td>
           <td class="english">${renderEnglish(english)}</td>
+          <td class="audio">
+            <audio controls style="height: 30px; vertical-align: middle;">
+              <source src="${audioSrc}" type="audio/mpeg">
+            </audio>
+          </td>
         </tr>`;
       }).join('');
     }
