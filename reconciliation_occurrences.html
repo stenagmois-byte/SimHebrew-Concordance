@@ -48,16 +48,14 @@ td.audio audio {
 </head>
 <body>
   <main>
-    <p><a href="reconciliation_matrix.html">← Back to the reconciliation matrix</a></p>
-    <h1>Complete segment occurrences</h1>
-    <p class="subtitle">These are complete verse segments with the selected diatonic shape. Sharps are ignored for matching; the original contour is shown below.</p>
+    <h2 style="color: #800000;">Complete segment occurrences</h2>
     <section class="search-panel" aria-live="polite">
       <div id="shapeTitle" class="shape-title">Loading shape…</div>
       <div id="resultSummary">Loading occurrence data…</div>
     </section>
     <div id="bookFilters" class="book-panel"></div>
     <table class="results-table">
-      <thead><tr><th>Book</th><th>Verse</th><th>Original segment</th><th>English text</th><th>Audio</th></tr></thead>
+      <thead><tr><th>Book</th><th>Verse</th><th>English text</th><th>Audio</th></tr></thead>
       <tbody id="resultsBody"><tr><td colspan="4" class="status">Loading occurrences…</td></tr></tbody>
     </table>
   </main>
@@ -168,7 +166,6 @@ td.audio audio {
         return `<tr>
           <td>${escapeHtml(displayBook(parsed?.book || ''))}</td>
           <td><a class="reference-link" href="${matrixUrl(record.ref)}">${escapeHtml(label)} ↗</a></td>
-          <td class="sequence">[ ${escapeHtml(record.sequence)} ]</td>
           <td class="english">${renderEnglish(english)}</td>
           <td class="audio">
             <audio controls style="height: 30px; vertical-align: middle;">
