@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const ornParam = urlParams.get('ornament') || '';
     const pitchParam = urlParams.get('pitch') || '';
+    const bookParam = urlParams.get('book') || ''; // 1. Read book parameter from URL
 
     if (typeof HebrewAccentParser !== 'undefined') {
         const parser = new HebrewAccentParser();
@@ -51,15 +52,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const resp = await fetch('./ornament_index.json');
             const data = await resp.json();
-            parser.renderOrnamentRecords('#records-target', data, ornParam, pitchParam);
+
+            // 2. Render records using current params
+            parser.renderOrnamentRecords('#records-target', data, ornParam, pitchParam, bookParam);
+
+            // 3. Attach change listener directly to the dropdown after render
+            const selectEl = document.getElementById('book-filter-select');
+            if (selectEl) {
+                // Ensure current book is selected in dropdown
+                if (bookParam) selectEl.value = bookParam;
+
+                selectEl.addEventListener('change', (e) => {
+                    const newBook = e.target.value;
+                    const params = new URLSearchParams(window.location.search);
+                    
+                    if (newBook && newBook !== 'ALL') {
+                        params.set('book', newBook);
+                    } else {
+                        params.delete('book');
+                    }
+                    
+                    // Reload page with new ?book=... URL parameter
+                    window.location.search = params.toString();
+                });
+            }
         } catch (err) {
             console.error('Error loading ornament index data:', err);
-            document.getElementById('records-target').innerHTML = `
-                <div style="padding: 30px; background: #fff; border: 1px solid #e2ddd0; border-radius: 6px;">
-                    <h3 style="color: #800000;">Concordance Index File Not Found</h3>
-                    <p>Could not load <code>ornament_index.json</code>. Run <code>generate_ornament_pitch_table.py</code> to generate the master concordance index.</p>
-                </div>
-            `;
         }
     }
 });
