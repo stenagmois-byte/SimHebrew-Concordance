@@ -33,7 +33,7 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
         "zaqef-gadol": "&#x05D0;&#x0595;",
         "tsinnor": "&#x05D0;&#x05AE;",
         "telisha-gedola": "&#x05D0;&#x05A0;",
-        "segol": "&#x05D0;&#x0596;",
+        "segol": "&#x05D0;&#x0592;",
         "pazer": "&#x05D0;&#x05A1;",
         "ole": "&#x05D0;&#x05AB;",
         "revia-mugrash": "&#x05D0;&#x059D;&#x0597;",
@@ -42,17 +42,17 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
         "shalshelet": "&#x05D0;&#x0593;",
         "qarne-farah": "&#x05D0;&#x059F;",
         "pashta pashta": "&#x05D0;&#x0599;&#x0599;",
-        "z-qatan pazer": "&#x05D0;&#x0594;&#x05A1;",
-        "z-qatan tsinnor": "&#x05D0;&#x0594;&#x05AE;",
-        "pazer z-qatan": "&#x05D0;&#x05A1;&#x0594;",
-        "azla z-qatan": "&#x05D0;&#x059C;&#x0594;",
+        "zaqef-qatan pazer": "&#x05D0;&#x0594;&#x05A1;",
+        "zaqef-qatan tsinnor": "&#x05D0;&#x0594;&#x05AE;",
+        "pazer zaqef-qatan": "&#x05D0;&#x05A1;&#x0594;",
+        "azla zaqef-qatan": "&#x05D0;&#x059C;&#x0594;",
         "tarsin revia": "&#x05D0;&#x059E;&#x0597;",
-        "azla t-qetana": "&#x05D0;&#x059C;&#x05A9;",
-        "revia z-qatan": "&#x05D0;&#x0597;&#x0594;",
-        "z-qatan azla": "&#x05D0;&#x0594;&#x059C;",
+        "azla telisha-qetana": "&#x05D0;&#x059C;&#x05A9;",
+        "revia zaqef-qatan": "&#x05D0;&#x0597;&#x0594;",
+        "zaqef-qatan azla": "&#x05D0;&#x0594;&#x059C;",
         "pazer azla": "&#x05D0;&#x05A1;&#x059C;",
         "azla pashta": "&#x05D0;&#x059C;&#x0599;",
-        "z-gadol pashta": "&#x05D0;&#x0595;&#x0599;",
+        "zaqef-gadol pashta": "&#x05D0;&#x0595;&#x0599;",
         "telisha-gedola azla": "&#x05D0;&#x05A0;&#x059C;"
     }
 
@@ -73,23 +73,23 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
         "pazer": "Pazer",
         "ole": "Ole",
         "revia-mugrash": "Revia-Mugrash",
-        "zarqa": "Tsinnorit (poetic Zarqa)",
+        "zarqa": "Zarqa",
         "illuy": "Illuy",
         "shalshelet": "Shalshalet",
         "qarne-farah": "Qarne-Farah",
         "pashta pashta": "Pashta Pashta",
-        "z-qatan pazer": "Z-Qatan Pazer",
-        "z-qatan tsinnor": "Z-Qatan Tsinnor",
-        "pazer z-qatan": "Pazer Z-Qatan",
-        "azla z-qatan": "Azla Z-Qatan",
+        "z-qatan pazer": "Zaqef-Qatan Pazer",
+        "z-qatan tsinnor": "Zaqef-Qatan Tsinnor",
+        "pazer z-qatan": "Pazer Zaqef-Qatan",
+        "azla z-qatan": "Azla Zaqef-Qatan",
         "tarsin revia": "Tarsin Revia",
-        "azla t-qetana": "Azla T-Qetana",
-        "revia z-qatan": "Revia Z-Qatan",
-        "z-qatan azla": "Z-Qatan Azla",
+        "azla t-qetana": "Azla Telisha-Qetana",
+        "revia z-qatan": "Revia Zaqef-Qatan",
+        "z-qatan azla": "Zaqef-Qatan Azla",
         "pazer azla": "Pazer Azla",
         "azla pashta": "Azla Pashta",
-        "z-gadol pashta": "Z-Gadol Pashta",
-        "telisha-gedola azla": "T-Gedola Azla"
+        "z-gadol pashta": "Zaqef-Gadol Pashta",
+        "telisha-gedola azla": "Telisha-Gedola Azla"
     }
 
     matrix = defaultdict(lambda: defaultdict(int))
@@ -233,7 +233,6 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
         .nav {{ margin-bottom: 25px; font-family: sans-serif; font-size: 0.9rem; }}
         .nav a {{ color: #800000; text-decoration: none; font-weight: bold; }}
         .nav a:hover {{ text-decoration: underline; }}
-        h1 {{ font-family: sans-serif; color: #800000; font-size: 2.2rem; margin-bottom: 10px; font-weight: normal; }}
         p {{ text-align: justify; font-size: 1.1rem; color: #333; margin-bottom: 25px; }}
         table {{ width: 100%; border-collapse: collapse; font-family: sans-serif; font-size: 0.95rem; margin: 35px 0; background-color: #ffffff; box-shadow: 0 1px 4px rgba(0,0,0,0.05); border-top: 2px solid #800000; border-bottom: 2px solid #800000; }}
         th {{ background-color: #f3f0e8; color: #800000; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 10px; border-bottom: 1px solid #800000; text-align: center; }}
@@ -264,6 +263,7 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
             -webkit-font-smoothing: antialiased;
         }}
     </style>
+    <link rel="stylesheet" href="qstyles.css">
     <script src="./menu.js" defer></script>
 </head>
 <body>
@@ -371,6 +371,9 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
         <p>The largest contributor to the musical corpus of the accents above the text is the zaqef-qatan. This is a significant division of the text into phrases, sometimes in surprising contexts where one would not expect a pause in the recitation.</p>
     </div>
 
+  <footer>
+    <p>Suzanne Haïk-Vantoura · Computational Musicology Research Suite</p>
+  </footer>
 <script>
 const chapterBooks = ["Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua", "Judges", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings", "Isaiah", "Jeremiah", "Ezekiel", "Hosea", "Joel", "Amos", "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi", "Psalms", "Proverbs", "Job", "Song", "Ruth", "Lamentations", "Qohelet", "Esther", "Daniel", "Ezra", "Nehemiah", "1 Chronicles", "2 Chronicles"];
 const chapterBookSelect = document.getElementById("chapter-book");
