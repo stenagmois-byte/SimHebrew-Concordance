@@ -194,7 +194,7 @@ const PITCH_NAMES = {
                 for (const [oKey, pitchMap] of Object.entries(indexData)) {
                     if (this._normalizeSlug(oKey) === ornKey) {
                         for (const [pKey, list] of Object.entries(pitchMap)) {
-                            if (pKey.toLowerCase() === pitchKey.toLowerCase()) {
+                            if (pKey === pitchKey) {
                                 rawRecords = list;
                                 break;
                             }
