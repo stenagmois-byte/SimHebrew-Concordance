@@ -123,19 +123,30 @@ def build_reconciliation_matrix(master_sequence_log):
 </head>
 <body>
 
-  <h1>Diatonic Alignment & Reconciliation Matrix</h1>
+  <h1>Diatonic Alignment & Reconciliation</h1>
   <p>Isolated structural note paths compared by stripping accidentals. Grouped functionally to track occurrences and reference locations side-by-side.</p>
   <p class="method-note">Each percentage is calculated separately for prose or poetry, using all phrase segments in the same structural tier as its denominator.</p>
   <div class="filter-controls">
-    <label for="percentThreshold">Show shapes used at least</label>
+    <label for="percentThreshold">Show contours used at least</label>
     <select id="percentThreshold" aria-label="Minimum percentage">
-      <option value="0">0% (all)</option><option value="0.25">0.25%</option><option value="0.5">0.5%</option>
-      <option value="1">1%</option><option value="2">2%</option><option value="5">5%</option><option value="10">10%</option>
+      <option value="0">0% (All Shapes)</option>
+      <option value="0.01">0.01% (≥ 2-3 verses)</option>
+      <option value="0.02">0.02% (≥ 5 verses)</option>
+      <option value="0.05">0.05% (≥ 12 verses)</option>
+      <option value="0.1">0.1% (≥ 23 verses)</option>
+      <option value="0.25">0.25% (≥ 58 verses)</option>
+      <option value="0.5">0.5% (≥ 116 verses)</option>
+      <option value="1">1% (≥ 232 verses)</option>
+      <option value="2">2% (≥ 464 verses)</option>
+      <option value="5">5% (Most frequent Motifs)</option>
     </select>
     <label for="percentScope">in</label>
-    <select id="percentScope" aria-label="Percentage category">
-      <option value="either">either prose or poetry</option><option value="prose">prose</option><option value="poetry">poetry</option>
-    </select>
+	<select id="percentScope">
+	  <option value="all">All</option>
+	  <option value="prose">Prose</option>
+	  <option value="poetry">Poetry</option>
+	  <option value="both">Shared by both genres</option>
+	</select>
     <label for="shapeSearch">Find a note sequence in a full phrase</label>
     <input id="shapeSearch" type="search" placeholder="e.g. E4 F4 G4" aria-label="Search note sequence">
     <span id="filterSummary" aria-live="polite"></span>
@@ -144,9 +155,9 @@ def build_reconciliation_matrix(master_sequence_log):
   <table class="matrix-table">
     <thead>
       <tr>
-        <th class="matrix-hdr" style="width: 25%;">Prose Diatonic Phrase</th>
-        <th class="matrix-hdr" style="width: 25%;">Poetic Diatonic Phrase</th>
-        <th class="matrix-hdr" style="width: 25%;">Sample Text Reference Occurrences</th>
+        <th class="matrix-hdr" style="width: 25%;">Prose</th>
+        <th class="matrix-hdr" style="width: 25%;">Poetry</th>
+        <th class="matrix-hdr" style="width: 25%;">Sample Reference</th>
         <th class="matrix-hdr num-col">Prose Count</th>
         <th class="matrix-hdr num-col">Prose %</th>
         <th class="matrix-hdr num-col">Poetry Count</th>
@@ -269,7 +280,7 @@ def build_reconciliation_matrix(master_sequence_log):
   </div>
 
   <footer>
-    <p>Qualum Publishing · Computational Musicology Research Suite</p>
+    <p>Suzanne Haïk-Vantoura · Computational Musicology Research Suite</p>
   </footer>
 
 <script>
@@ -288,10 +299,11 @@ def build_reconciliation_matrix(master_sequence_log):
         const prose = Number(row.dataset.prosePct);
         const poetry = Number(row.dataset.poetryPct);
         const shapeMatches = !query || row.dataset.shape.toUpperCase().includes(query);
-        const passes = scope.value === 'prose' ? prose >= minimum
-          : scope.value === 'poetry' ? poetry >= minimum
-          : prose >= minimum || poetry >= minimum;
-        row.hidden = !(passes && shapeMatches);
+        const passes = scope.value === 'prose' ? (prose > 0 && prose >= minimum)
+          : scope.value === 'poetry' ? (poetry > 0 && poetry >= minimum)
+          : scope.value === 'both' ? (prose > 0 && poetry > 0 && prose >= minimum && poetry >= minimum)
+          : ((prose > 0 && prose >= minimum) || (poetry > 0 && poetry >= minimum));
+          row.hidden = !(passes && shapeMatches);
         if (!row.hidden) visibleCount++;
       }});
       dividers.forEach(divider => {{
