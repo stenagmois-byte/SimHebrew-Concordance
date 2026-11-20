@@ -44,6 +44,9 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
         "pashta pashta": "&#x05D0;&#x0599;&#x0599;",
         "zaqef-qatan pazer": "&#x05D0;&#x0594;&#x05A1;",
         "zaqef-qatan tsinnor": "&#x05D0;&#x0594;&#x05AE;",
+        # Split this pair across two carriers for legibility; stacking both
+        # marks on one Aleph does not render cleanly in the available fonts.
+        "zaqef-qatan revia": "<span dir='ltr'>&#x05D0;&#x0594;&thinsp;&#x05D0;&#x0597;</span>",
         "pazer zaqef-qatan": "&#x05D0;&#x05A1;&#x0594;",
         "azla zaqef-qatan": "&#x05D0;&#x059C;&#x0594;",
         "tarsin revia": "&#x05D0;&#x059E;&#x0597;",
@@ -80,6 +83,7 @@ def run_distribution_analysis(chapter_index_only=False, pretty_json=False):
         "pashta pashta": "Pashta Pashta",
         "zaqef-qatan pazer": "Zaqef-Qatan Pazer",
         "zaqef-qatan tsinnor": "Zaqef-Qatan Tsinnor",
+        "zaqef-qatan revia": "Zaqef-Qatan Revia",
         "pazer zaqef-qatan": "Pazer Zaqef-Qatan",
         "azla zaqef-qatan": "Azla Zaqef-Qatan",
         "tarsin revia": "Tarsin Revia",

@@ -118,8 +118,13 @@ const PITCH_NAMES = {
                 }
 
                 if (entry.name_translit) {
-                    const slug = this._normalizeSlug(entry.name_translit);
-                    this.bySlug.set(slug, entry);
+                    // Some dictionary entries list accepted names as
+                    // "Primary / Alternate"; index each name so URL slugs such
+                    // as `tarsin` resolve to the shared accent entry.
+                    for (const name of String(entry.name_translit).split('/')) {
+                        const slug = this._normalizeSlug(name);
+                        if (slug) this.bySlug.set(slug, entry);
+                    }
                 }
 
                 if (entry.name_hebrew) {
@@ -223,12 +228,30 @@ const PITCH_NAMES = {
 
             // Find target ornament codepoints/symbols for word-level highlighting
             const accentEntry = this.getByName(targetOrn);
-            const targetSymbols = [];
             const targetDecimals = [];
             if (accentEntry) {
-                if (accentEntry.symbol) targetSymbols.push(accentEntry.symbol);
-                if (accentEntry.decimal) targetDecimals.push(Number(accentEntry.decimal));
+                // Compound dictionary entries store several combining accent marks
+                // in `symbol`, with decimal set to 0. In verse text, vowel points
+                // may occur between those marks, so matching the whole symbol as a
+                // contiguous substring misses valid occurrences. Match each accent
+                // code point independently instead.
+                if (accentEntry.symbol) {
+                    for (const char of Array.from(accentEntry.symbol)) {
+                        const decimal = char.codePointAt(0);
+                        if (decimal >= 0x0591 && decimal <= 0x05AF) {
+                            targetDecimals.push(decimal);
+                        }
+                    }
+                }
+                const entryDecimal = Number(accentEntry.decimal);
+                if (entryDecimal > 0 && !targetDecimals.includes(entryDecimal)) {
+                    targetDecimals.push(entryDecimal);
+                }
             }
+            const requiredAccentCounts = new Map();
+            targetDecimals.forEach(decimal => {
+                requiredAccentCounts.set(decimal, (requiredAccentCounts.get(decimal) || 0) + 1);
+            });
 
             // Group records by Book & count
             const bookCounts = {};
@@ -333,12 +356,20 @@ const PITCH_NAMES = {
                     // Highlight target words
                     function highlightWords(txt) {
                         if (!txt) return '';
-                        if (targetSymbols.length === 0 && targetDecimals.length === 0) return txt;
+                        if (requiredAccentCounts.size === 0) return txt;
                         
                         return txt.split(/\s+/).map(w => {
-                            const hasSym = targetSymbols.some(s => s && w.includes(s));
-                            const hasDec = targetDecimals.some(d => Array.from(w).some(c => c.codePointAt(0) === d));
-                            if (hasSym || hasDec) {
+                            const wordAccentCounts = new Map();
+                            for (const char of Array.from(w)) {
+                                const decimal = char.codePointAt(0);
+                                if (requiredAccentCounts.has(decimal)) {
+                                    wordAccentCounts.set(decimal, (wordAccentCounts.get(decimal) || 0) + 1);
+                                }
+                            }
+                            const hasCompleteOrnament = Array.from(requiredAccentCounts).every(
+                                ([decimal, requiredCount]) => (wordAccentCounts.get(decimal) || 0) >= requiredCount
+                            );
+                            if (hasCompleteOrnament) {
                                 return `<span class="highlight-word" style="background-color: #fff2cc; border-bottom: 2px dashed #d99600; padding: 0 4px; border-radius: 3px; display: inline-block;">${w}</span>`;
                             }
                             return w;
