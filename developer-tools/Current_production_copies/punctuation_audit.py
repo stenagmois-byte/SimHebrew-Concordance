@@ -215,23 +215,36 @@ def repeated_gloss_reordered_prefix_boundary(
 def noun_this_boundary_span(
     text: str, item: dict[str, str], previous_item: dict[str, str] | None
 ) -> tuple[int, int] | None:
-    """Align Hebrew noun + demonstrative `this` to English `this` + noun."""
-    if decode_gloss(item.get("e", "")).casefold() != "this" or not previous_item:
+    """Align a Hebrew demonstrative to the corresponding English noun phrase."""
+    demonstrative = decode_gloss(item.get("e", "")).casefold()
+    if demonstrative not in {"this", "that", "these", "those"} or not previous_item:
         return None
-    noun_gloss = decode_gloss(previous_item.get("lemma", "")) or decode_gloss(previous_item.get("e", ""))
-    noun_words = WORD_RE.findall(noun_gloss)
-    if len(noun_words) != 1:
+    noun_terms = dict.fromkeys(
+        term
+        for term in (
+            decode_gloss(previous_item.get("e", "")),
+            decode_gloss(previous_item.get("lemma", "")),
+        )
+        if term and len(WORD_RE.findall(term)) == 1
+    )
+    if not noun_terms:
         return None
-    noun_spans = gloss_spans(text, noun_words[0])
-    this_spans = gloss_spans(text, "this")
+    noun_spans = list(
+        dict.fromkeys(
+            span
+            for noun_term in noun_terms
+            for span in gloss_spans(text, noun_term)
+        )
+    )
+    demonstrative_spans = gloss_spans(text, demonstrative)
     pairs = []
-    for this_span in this_spans:
+    for demonstrative_span in demonstrative_spans:
         for noun_span in noun_spans:
-            if noun_span[0] < this_span[1]:
+            if noun_span[0] < demonstrative_span[1]:
                 continue
-            gap = len(WORD_RE.findall(text[this_span[1]:noun_span[0]]))
+            gap = len(WORD_RE.findall(text[demonstrative_span[1]:noun_span[0]]))
             if gap <= 2:
-                pairs.append((this_span, noun_span))
+                pairs.append((demonstrative_span, noun_span))
     return pairs[0][1] if len(pairs) == 1 else None
 
 
@@ -562,6 +575,15 @@ def analyze_boundary(
     kind: str,
 ) -> str:
     gloss = decode_gloss(item.get("e", ""))
+    if gloss == "--" and kind == "ATNAH":
+        # An untranslated atnah gloss has no separate English span to locate.
+        # The verse's single line break marks its cadence even when English
+        # word order places the related translated gloss earlier.
+        previous_gloss = decode_gloss(previous_item.get("e", "")) if previous_item else ""
+        if "\n" in text:
+            suffix = f" ({previous_gloss})" if previous_gloss else ""
+            return f"PASS: untranslated atnah gloss; verse line break is present{suffix}"
+        return "CHECK LINE BREAK: untranslated atnah gloss and no verse line break"
     if gloss == "--" and previous_item:
         # An untranslated marked word may be represented by the preceding
         # English gloss, with the boundary punctuation attached there.
@@ -569,16 +591,6 @@ def analyze_boundary(
         if previous_positions:
             previous_end = max(end for _, end in previous_positions)
             previous_gloss = decode_gloss(previous_item.get("e", ""))
-            if kind == "ATNAH":
-                if line_break_after(text, previous_end):
-                    return (
-                        "PASS: untranslated atnah gloss is represented at the "
-                        f"preceding gloss; its line break is present ({previous_gloss})"
-                    )
-                return (
-                    "CHECK LINE BREAK after preceding gloss for untranslated "
-                    f"atnah word ({previous_gloss})"
-                )
             mark = punctuation_after(text, previous_end)
             if mark:
                 return (
@@ -602,6 +614,50 @@ def analyze_boundary(
                     f"PASS: punctuation follows the uniquely located marked gloss "
                     f"({direct_mark}; {gloss})"
                 )
+        demonstrative_span = noun_this_boundary_span(text, item, previous_item)
+        if demonstrative_span:
+            noun = text[demonstrative_span[0]:demonstrative_span[1]]
+            demonstrative = gloss.casefold()
+            demonstrative_mark = punctuation_after(text, demonstrative_span[1])
+            if demonstrative_mark:
+                return (
+                    "PASS: Hebrew noun + demonstrative aligns through English "
+                    f"'{demonstrative} {noun}' and punctuation follows ({demonstrative_mark})"
+                )
+            return (
+                "CHECK punctuation after English noun following Hebrew "
+                f"'{demonstrative}' ({noun})"
+            )
+        # Resolve repeated marked glosses from unique boundary evidence before
+        # trying prefix reordering. Otherwise an earlier occurrence can be
+        # mistaken for the marked one when later Hebrew glosses follow it in
+        # English (for example, the repeated ``the expanse`` in Genesis 1:7).
+        repeated_boundary = repeated_gloss_boundary_span(
+            text, gloss,
+            decode_gloss(next_item.get("e", "")) if next_item else "",
+            kind,
+        )
+        if repeated_boundary:
+            repeated_mark = punctuation_after(text, repeated_boundary[1])
+            if repeated_mark:
+                return (
+                    "PASS: punctuation follows the uniquely aligned repeated "
+                    f"gloss ({repeated_mark}; {gloss})"
+                )
+        previous_anchor = repeated_gloss_after_previous_record(
+            text, gloss, previous_item
+        )
+        if previous_anchor:
+            previous_mark = punctuation_after(text, previous_anchor[1])
+            if previous_mark:
+                return (
+                    "PASS: punctuation follows the repeated gloss aligned after "
+                    f"the preceding Hebrew gloss ({previous_mark}; {gloss})"
+                )
+            return (
+                "CHECK punctuation after the repeated gloss aligned after "
+                f"the preceding Hebrew gloss ({gloss})"
+            )
         repeated_reorder = repeated_gloss_reordered_prefix_boundary(text, prefix_rows)
         if repeated_reorder:
             boundary, represented = repeated_reorder
@@ -649,13 +705,14 @@ def analyze_boundary(
     noun_this_span = noun_this_boundary_span(text, item, previous_item)
     if noun_this_span:
         noun = text[noun_this_span[0]:noun_this_span[1]]
+        demonstrative = gloss.casefold()
         if kind == "ATNAH":
             if line_break_after(text, noun_this_span[1]):
-                return f"PASS: Hebrew noun + 'this' aligns to English 'this {noun}' before the atnah line break"
-            return f"CHECK LINE BREAK after English noun following Hebrew 'this' ({noun})"
+                return f"PASS: Hebrew noun + '{demonstrative}' aligns to English '{demonstrative} {noun}' before the atnah line break"
+            return f"CHECK LINE BREAK after English noun following Hebrew '{demonstrative}' ({noun})"
         if punctuation_after(text, noun_this_span[1]):
-            return f"PASS: Hebrew noun + 'this' aligns through English noun '{noun}' and punctuation follows"
-        return f"CHECK punctuation after English noun following Hebrew 'this' ({noun})"
+            return f"PASS: Hebrew noun + '{demonstrative}' aligns through English noun '{noun}' and punctuation follows"
+        return f"CHECK punctuation after English noun following Hebrew '{demonstrative}' ({noun})"
     next_gloss = decode_gloss(next_item.get("e", "")) if next_item else ""
     span = repeated_gloss_boundary_span(text, gloss, next_gloss, kind)
     if not span and kind == "ZAQEF-QATAN":
@@ -804,6 +861,133 @@ def build_report(items: list[dict[str, str]], checks_only: bool = False) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def _boundary_analysis(
+    rows: list[dict[str, str]], text: str, index: int, item: dict[str, str], kind: str
+) -> tuple[str, str, list[dict[str, str]]]:
+    """Return the same scoped English text, prefix rows, and result as the report."""
+    previous_item = rows[index - 1] if index else None
+    next_item = rows[index + 1] if index + 1 < len(rows) else None
+    atnah_index = next(
+        (i for i, row in enumerate(rows) if row.get("atnah") == "1"), None
+    )
+    prefix_rows = rows[: index + 1]
+    analysis_text = text
+    if "\n" in text and atnah_index is not None:
+        first_half, second_half = text.split("\n", 1)
+        if kind == "ATNAH":
+            analysis_text = first_half + "\n"
+        elif index <= atnah_index:
+            analysis_text = first_half
+        else:
+            analysis_text = second_half
+            prefix_rows = rows[atnah_index + 1:index + 1]
+    result = analyze_boundary(
+        analysis_text, item, prefix_rows, previous_item, next_item, kind
+    )
+    return analysis_text, prefix_rows, result
+
+
+def _word_sequence_count(text: str, phrase: str) -> int:
+    """Count a phrase in text while ignoring punctuation and capitalization."""
+    target = [word.casefold() for word in WORD_RE.findall(phrase)]
+    words = [word.casefold() for word in WORD_RE.findall(text)]
+    if not target:
+        return 0
+    return sum(
+        words[index:index + len(target)] == target
+        for index in range(len(words) - len(target) + 1)
+    )
+
+
+def build_candidate_updates(items: list[dict[str, str]]) -> str:
+    """Build conservative UPDATE candidates for unique, unresolved z-q commas."""
+    groups: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for item in items:
+        groups[verse_key(item)].append(item)
+
+    book_texts: dict[str, list[str]] = defaultdict(list)
+    for key, rows in groups.items():
+        text = next((row.get("e_t", "") for row in rows if row.get("e_t")), "")
+        if text:
+            book_texts[key.split("_")[0]].append(text.replace("\\n", "\n").strip())
+
+    candidates: dict[tuple[str, str, str, str], str] = {}
+    skipped: dict[str, int] = defaultdict(int)
+    for key, rows in groups.items():
+        text = next((row.get("e_t", "") for row in rows if row.get("e_t")), "")
+        if not text:
+            continue
+        text = text.replace("\\n", "\n").strip()
+        book_no, chapter_no, verse_no = key.split("_")
+        for index, item in enumerate(rows):
+            if item.get("z_q") != "1":
+                continue
+            analysis_text, prefix_rows, result = _boundary_analysis(
+                rows, text, index, item, "ZAQEF-QATAN"
+            )
+            # Only these two report outcomes point to a directly usable phrase:
+            # a uniquely located gloss, or the full gloss at a reordered boundary.
+            if result.startswith("CHECK punctuation at reordered Hebrew-prefix end"):
+                reordered = reordered_prefix_boundary(
+                    analysis_text, prefix_rows, "ZAQEF-QATAN"
+                )
+                phrase = (
+                    gloss_ending_at_boundary(analysis_text, reordered[0], prefix_rows)
+                    if reordered and not reordered[1]
+                    else ""
+                )
+                spans = gloss_spans(analysis_text, phrase) if phrase else []
+                if not reordered or reordered[1] or len(spans) != 1 or spans[0][1] != reordered[0][1]:
+                    skipped[book_no] += 1
+                    continue
+                span = spans[0]
+            elif result.startswith("CHECK punctuation: gloss located, none immediately after"):
+                phrase = decode_gloss(item.get("e", ""))
+                spans = gloss_spans(analysis_text, phrase)
+                if len(spans) != 1 or punctuation_after(analysis_text, spans[0][1]):
+                    skipped[book_no] += 1
+                    continue
+                span = spans[0]
+            else:
+                continue
+
+            exact_phrase = analysis_text[span[0]:span[1]]
+            tail = analysis_text[span[1]:]
+            # REPLACE uses the exact phrase plus one literal space. Skip cases
+            # with punctuation, line breaks, or another separator at the target.
+            if not exact_phrase or not tail.startswith(" "):
+                skipped[book_no] += 1
+                continue
+            if _word_sequence_count(text, exact_phrase) != 1:
+                skipped[book_no] += 1
+                continue
+            candidates[(book_no, chapter_no, verse_no, exact_phrase)] = exact_phrase
+
+    lines = [
+        "-- Candidate punctuation updates generated by punctuation_audit.py",
+        "-- Review each statement before running it. Only unique verse-level gloss phrases are included.",
+        "-- Uniqueness ignores punctuation and capitalization; ambiguous or inferred boundaries are omitted.",
+        "",
+    ]
+    if not candidates:
+        lines.append("-- No safe candidate updates found.")
+    for book_no, chapter_no, verse_no, phrase in sorted(candidates):
+        escaped = phrase.replace("'", "''")
+        book_expr = (
+            "(SELECT book_cd FROM bs_books "
+            f"WHERE tnk_seq_no = {int(book_no)})"
+        )
+        lines.extend([
+            "UPDATE dgmtext",
+            f"SET eng_text = REPLACE(eng_text, '{escaped} ', '{escaped}, ')",
+            f"WHERE book_cd = {book_expr}",
+            f"  AND chapter_cd = '{chapter_no}'",
+            f"  AND verse_cd = '{verse_no}';",
+            "",
+        ])
+    return "\n".join(lines).rstrip() + "\n"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("input", type=Path, help="JSON export with items list")
@@ -813,11 +997,19 @@ def main() -> None:
         action="store_true",
         help="include only CHECK/REVIEW boundary rows, retaining their verse text",
     )
+    parser.add_argument(
+        "--sql-output",
+        type=Path,
+        help="candidate UPDATE sidecar path (default: CANDIDATE_UPDATES.SQL beside the text report)",
+    )
     args = parser.parse_args()
     items = read_items(args.input)
     report = build_report(items, checks_only=args.checks_only)
     args.output.write_text(report, encoding="utf-8")
-    print(f"Reviewed {len(items):,} word records; wrote {args.output} ({len(report):,} characters).")
+    sql_output = args.sql_output or args.output.parent / "CANDIDATE_UPDATES.SQL"
+    sql = build_candidate_updates(items)
+    sql_output.write_text(sql, encoding="utf-8")
+    print(f"Reviewed {len(items):,} word records; wrote {args.output} and {sql_output}.")
 
 
 if __name__ == "__main__":

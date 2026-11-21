@@ -244,7 +244,7 @@ python mass_produce_and_log_matrices.py
 * **Outputs Updated:**
   - `motif_relationship_matrix.json` (updates motif occurrences, e.g. eliminating incorrect `E4,F#4,E4` resolutions).
   - 929 individual chapter contour pages (`[BOOK]_[CH]_matrix.html`).
-
+this process also runs generate_reconciliation_matrix.py to create reconciliation_matrix.html 
 ---
 
 ## 📌 Appendix: Reference Tables & Data Contracts

@@ -48,7 +48,7 @@ ZAQEF_SILENCE_BEATS = 2                # ~1s silence after comma
 # Silluq (Final Verse Resolution)
 FINAL_VERSE_NOTE_HOLD = 2.20           # 2.2x hold on final verse note
 
-OVERWRITE_EXISTING = True              # Set to True to replace existing chapter MP3s
+OVERWRITE_EXISTING = False              # Set to True to replace existing chapter MP3s
 
 
 # ==============================================================================

@@ -1,6 +1,10 @@
 import os
+import json
+import html as html_lib
 import pandas as pd
 from collections import Counter
+from pathlib import Path
+from urllib.parse import quote
 
 def build_reconciliation_matrix(master_sequence_log):
     print("🚀 Initializing Comparative Matrix with Reference Mapping...")
@@ -51,6 +55,29 @@ def build_reconciliation_matrix(master_sequence_log):
     df["sort_tier"] = df.apply(get_sort_tier, axis=1)
     df["functional_context"] = df.apply(get_functional_context, axis=1)
 
+    # Store every complete segment for the linked exact-shape occurrence view.
+    occurrence_records = []
+    for record in master_sequence_log:
+        original_sequence = " ".join(str(record.get("sequence_pattern", "")).split())
+        shape = " ".join(original_sequence.replace("#", "").split())
+        book = str(record.get("book", "")).strip().upper()
+        if not shape or not book:
+            continue
+        chapter = str(record.get("chapter", "1")).strip().zfill(3)
+        verse = str(record.get("verse", "1")).strip().zfill(3)
+        occurrence_records.append({
+            "shape": shape,
+            "sequence": original_sequence,
+            "context": get_functional_context(record),
+            "mode": "poetry" if str(record.get("is_poetry", "0")) == "1" else "prose",
+            "ref": f"{book}_{chapter}_{verse}",
+        })
+
+    project_root = Path(__file__).resolve().parent
+    occurrence_path = project_root / "reconciliation_occurrences.json"
+    with occurrence_path.open("w", encoding="utf-8") as occurrence_file:
+        json.dump(occurrence_records, occurrence_file, ensure_ascii=False, separators=(",", ":"))
+
     # 4. Compile Split Counter Subsets
     poetry_subset = df[df["is_poetry"] == "1"]
     prose_subset = df[df["is_poetry"] == "0"]
@@ -63,7 +90,7 @@ def build_reconciliation_matrix(master_sequence_log):
     unique_rows = unique_rows.sort_values(by=["sort_tier", "diatonic_shape"])
 
     # 6. HTML Page Generation
-    html_path = "reconciliation_matrix.html"
+    html_path = project_root / "reconciliation_matrix.html"
     
     html = """<!DOCTYPE html>
 <html lang="en">
@@ -71,15 +98,24 @@ def build_reconciliation_matrix(master_sequence_log):
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="qstyles.css">
+  <script src="./menu.js" defer></script>
   <title>Tanach Modal Comparison Matrix</title>
   <style>
     .matrix-table { width: 100%; border-collapse: collapse; font-family: 'Georgia', serif; margin: 25px 0; }
     .matrix-table td { padding: 12px; border: 1px solid #ddd; vertical-align: middle; }
+    .matrix-table th { position: sticky; top: 58px; z-index: 20; padding: 12px; border: 1px solid #ddd; vertical-align: middle; }
     .matrix-hdr { background-color: #f3f0e8; color: #800000; font-weight: bold; text-align: center; }
+    .filter-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 18px 0 10px; padding: 12px 14px; background: #fffcf4; border: 1px solid #ddd; }
+    .filter-controls select { padding: 5px 8px; }
+    .filter-controls input { padding: 6px 8px; min-width: 240px; flex: 1 1 280px; }
+    #filterSummary { color: #555; margin-left: auto; font-size: .9rem; }
+    .method-note { color: #555; font-size: .92rem; margin: 6px 0 12px; }
     .section-divider { background-color: #eaeaea; color: #222; font-weight: bold; padding: 10px 12px; font-size: 1.1rem; border-top: 3px solid #800000; }
     .blank-cell { background-color: #fafafa; font-style: italic; color: #aaa; text-align: center; }
     .num-col { text-align: right; font-variant-numeric: tabular-nums; padding-right: 15px; }
     .sample-text { font-size: 0.85rem; color: #666; font-family: sans-serif; line-height: 1.4; display: block; max-width: 280px; word-wrap: break-word; }
+    .shape-link { color: #800000; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
+    .shape-link:hover { color: #4b0000; text-decoration-style: solid; }
     .reconcile-box { background-color: #fffcf4; border: 2px solid #800000; padding: 20px; margin-top: 40px; border-radius: 6px; }
     .reconcile-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
     .reconcile-table td { padding: 8px; border-bottom: 1px solid #e1e4e6; }
@@ -87,22 +123,45 @@ def build_reconciliation_matrix(master_sequence_log):
 </head>
 <body>
 
-  <!-- RESOLVED WARNING PATH: Fixed backslash to web forward slash -->
-  <div class="nav"><a href="musicscores/index.html">← Back to Volume Directory</a></div>
-
-  <h1>Diatonic Alignment & Reconciliation Matrix</h1>
+  <h1>Diatonic Alignment & Reconciliation</h1>
   <p>Isolated structural note paths compared by stripping accidentals. Grouped functionally to track occurrences and reference locations side-by-side.</p>
+  <p class="method-note">Each percentage is calculated separately for prose or poetry, using all phrase segments in the same structural tier as its denominator.</p>
+  <div class="filter-controls">
+    <label for="percentThreshold">Show contours used at least</label>
+    <select id="percentThreshold" aria-label="Minimum percentage">
+      <option value="0">0% (All Shapes)</option>
+      <option value="0.01">0.01% (≥ 2-3 verses)</option>
+      <option value="0.02">0.02% (≥ 5 verses)</option>
+      <option value="0.05">0.05% (≥ 12 verses)</option>
+      <option value="0.1">0.1% (≥ 23 verses)</option>
+      <option value="0.25">0.25% (≥ 58 verses)</option>
+      <option value="0.5">0.5% (≥ 116 verses)</option>
+      <option value="1">1% (≥ 232 verses)</option>
+      <option value="2">2% (≥ 464 verses)</option>
+      <option value="5">5% (Most frequent Motifs)</option>
+    </select>
+    <label for="percentScope">in</label>
+	<select id="percentScope">
+	  <option value="all">All</option>
+	  <option value="prose">Prose</option>
+	  <option value="poetry">Poetry</option>
+	  <option value="both">Shared by both genres</option>
+	</select>
+    <label for="shapeSearch">Find a note sequence in a full phrase</label>
+    <input id="shapeSearch" type="search" placeholder="e.g. E4 F4 G4" aria-label="Search note sequence">
+    <span id="filterSummary" aria-live="polite"></span>
+  </div>
 
   <table class="matrix-table">
     <thead>
       <tr>
-        <td class="matrix-hdr" style="width: 25%;">Prose Diatonic Phrase</td>
-        <td class="matrix-hdr" style="width: 25%;">Poetic Diatonic Phrase</td>
-        <td class="matrix-hdr" style="width: 25%;">Sample Text Reference Occurrences</td>
-        <td class="matrix-hdr" class="num-col">Prose Count</td>
-        <td class="matrix-hdr" class="num-col">Prose %</td>
-        <td class="matrix-hdr" class="num-col">Poetry Count</td>
-        <td class="matrix-hdr" class="num-col">Poetry %</td>
+        <th class="matrix-hdr" style="width: 25%;">Prose</th>
+        <th class="matrix-hdr" style="width: 25%;">Poetry</th>
+        <th class="matrix-hdr" style="width: 25%;">Sample Reference</th>
+        <th class="matrix-hdr num-col">Prose Count</th>
+        <th class="matrix-hdr num-col">Prose %</th>
+        <th class="matrix-hdr num-col">Poetry Count</th>
+        <th class="matrix-hdr num-col">Poetry %</th>
       </tr>
     </thead>
     <tbody>"""
@@ -149,17 +208,25 @@ def build_reconciliation_matrix(master_sequence_log):
 
         samples_display_str = ", ".join(samples_list)
 
-        html += "      <tr>\n"
+        html += f'      <tr class="shape-row" data-shape="{html_lib.escape(shape, quote=True)}" data-prose-pct="{prose_pct:.6f}" data-poetry-pct="{poetry_pct:.6f}">\n'
         
         # PROSE VIEW
         if prose_cnt > 0:
-            html += f"        <td><strong>[ {shape} ]</strong></td>\n"
+            shape_href = (
+                "reconciliation_occurrences.html?shape=" + quote(shape, safe="")
+                + "&context=" + quote(context_label, safe="") + "&mode=prose"
+            )
+            html += f"        <td><strong>[ <a class=\"shape-link\" href=\"{shape_href}\">{html_lib.escape(shape)}</a> ]</strong></td>\n"
         else:
             html += "        <td class=\"blank-cell\">— Not used in prose —</td>\n"
             
         # POETRY VIEW
         if poetry_cnt > 0:
-            html += f"        <td><strong>[ {shape} ]</strong></td>\n"
+            shape_href = (
+                "reconciliation_occurrences.html?shape=" + quote(shape, safe="")
+                + "&context=" + quote(context_label, safe="") + "&mode=poetry"
+            )
+            html += f"        <td><strong>[ <a class=\"shape-link\" href=\"{shape_href}\">{html_lib.escape(shape)}</a> ]</strong></td>\n"
         else:
             html += "        <td class=\"blank-cell\">— Not used in poetry —</td>\n"
             
@@ -213,9 +280,51 @@ def build_reconciliation_matrix(master_sequence_log):
   </div>
 
   <footer>
-    <p>Qualum Publishing · Computational Musicology Research Suite</p>
+    <p>Suzanne Haïk-Vantoura · Computational Musicology Research Suite</p>
   </footer>
 
+<script>
+  (() => {{
+    const threshold = document.getElementById('percentThreshold');
+    const scope = document.getElementById('percentScope');
+    const shapeSearch = document.getElementById('shapeSearch');
+    const rows = [...document.querySelectorAll('.shape-row')];
+    const dividers = [...document.querySelectorAll('.section-divider')];
+    const summary = document.getElementById('filterSummary');
+    function applyPercentFilter() {{
+      const minimum = Number(threshold.value);
+      const query = shapeSearch.value.trim().replace(/#/g, '').replace(/\\s+/g, ' ').toUpperCase();
+      let visibleCount = 0;
+      rows.forEach(row => {{
+        const prose = Number(row.dataset.prosePct);
+        const poetry = Number(row.dataset.poetryPct);
+        const shapeMatches = !query || row.dataset.shape.toUpperCase().includes(query);
+        const passes = scope.value === 'prose' ? (prose > 0 && prose >= minimum)
+          : scope.value === 'poetry' ? (poetry > 0 && poetry >= minimum)
+          : scope.value === 'both' ? (prose > 0 && poetry > 0 && prose >= minimum && poetry >= minimum)
+          : ((prose > 0 && prose >= minimum) || (poetry > 0 && poetry >= minimum));
+          row.hidden = !(passes && shapeMatches);
+        if (!row.hidden) visibleCount++;
+      }});
+      dividers.forEach(divider => {{
+        let next = divider.parentElement.nextElementSibling;
+        let hasVisibleRows = false;
+        while (next && !next.classList.contains('section-divider')) {{
+          if (next.classList.contains('shape-row') && !next.hidden) hasVisibleRows = true;
+          next = next.nextElementSibling;
+        }}
+        divider.parentElement.hidden = !hasVisibleRows;
+      }});
+      summary.textContent = `Showing ${{visibleCount}} of ${{rows.length}} shapes`;
+    }}
+    threshold.addEventListener('change', applyPercentFilter);
+    scope.addEventListener('change', applyPercentFilter);
+    shapeSearch.addEventListener('input', applyPercentFilter);
+    const initialQuery = new URLSearchParams(window.location.search).get('q');
+    if (initialQuery) shapeSearch.value = initialQuery;
+    applyPercentFilter();
+  }})();
+</script>
 </body>
 </html>"""
 

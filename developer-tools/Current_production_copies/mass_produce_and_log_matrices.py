@@ -4,7 +4,11 @@ import html
 import pandas as pd
 from collections import Counter
 import json
+import traceback
+import tempfile
 from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent
 
 # Define a distinct, vibrant color palette for each scale degree (Tonic E4 = 1)
 COLOR_PALETTE = {
@@ -27,7 +31,7 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
     Processes the DataFrame and returns a string of HTML content.
     """
 
-    with open("book_map.json", "r", encoding="utf-8") as f:
+    with open(PROJECT_ROOT / "book_map.json", "r", encoding="utf-8") as f:
         book_map = json.load(f)
 
     w_col1 = "3%"   # Compressed number space
@@ -97,9 +101,9 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         .legend-item {{ display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: bold; }}
         .color-box {{ width: 20px; height: 20px; border-radius: 4px; border: 1px solid #999; }}
         .matrix-table {{ width: 100%; border-collapse: collapse; margin-top: 20px;}}
-        .verse-row {{ border-bottom: 1px solid #ddd; display: table-row; }}
+        .verse-row {{ scroll-margin-top: 150px; border-bottom: 1px solid #ddd; display: table-row; }}
         .verse-label {{ font-weight: bold; font-size: 14px; padding: 12px 5px; background: #eaeaea; text-align: center; border-right: 2px solid #bbb; display: table-cell; vertical-align: middle; }}
-        .text-label {{ font-size: 14px; font-weight: bold; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; white-space: normal; direction: rtl; display: table-cell; vertical-align: middle; }}
+        .text-label {{ font-family: 'SBL Hebrew', 'Ezra SIL', 'Times New Roman', serif; font-size: 14px; padding: 10px; background: #fafdff; border-right: 2px solid #bbb; overflow: hidden; white-space: normal; direction: rtl; display: table-cell; vertical-align: middle; }}
         /* 📱 RESPONSIVE TABLET ENGINE: Triggers on iPad screen widths and below */
         @media (max-width: 1024px) {{
             .text-label {{
@@ -112,7 +116,6 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
         /* Highlighting for Hebrew characters carrying te'amim above the text */
         .text-label span.ornamented-word {{
             font-size: 13pt;
-            font-weight: bold;
             background-color: rgba(245, 166, 35, 0.15); /* Soft transparent orange tint */
             border-bottom: 2px dotted #F5A623;          /* Elegant dotted underline below text */
             padding: 0 2px;
@@ -171,7 +174,7 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
 </head>
 <body>
 <!-- Sticky Header Navigation Matching Your Oxford CSS Block Layout -->
-<div class="nav-bar" style="display: flex; justify-content: space-between; align-items: center; position: -webkit-sticky; position: sticky; top: 25px; z-index: 9999; background-color: #fffcf4; border-bottom: 2px solid #800000; padding: 10px 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.08);">
+<div class="nav-bar" style="display: flex; justify-content: space-between; align-items: center; position: -webkit-sticky; position: sticky; top: 45px; z-index: 9999; background-color: #fffcf4; border-bottom: 2px solid #800000; padding: 10px 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.08);">
 
     <!-- Left Hand Narrative Title Alignment -->
     <div class="nav-title" style="margin: 0; font-size: 1.1rem; color: #333;">
@@ -684,6 +687,32 @@ def generate_html_matrix_payload(passage_df, book_id, chapter_id, max_chapter):
 </html>"""
     return html_content
 
+
+def write_html_atomically(output_path, html_content):
+    """Write a complete matrix beside its destination, then replace the old page."""
+    output_dir = os.path.dirname(output_path)
+    prefix = f".{Path(output_path).stem}_"
+    temp_path = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=output_dir,
+            prefix=prefix,
+            suffix=".tmp",
+            delete=False,
+        ) as out_f:
+            temp_path = out_f.name
+            out_f.write(html_content)
+        os.replace(temp_path, output_path)
+        temp_path = None
+    finally:
+        if temp_path is not None:
+            try:
+                os.remove(temp_path)
+            except OSError:
+                pass
+
 def check_verse_poetry_status(book_name, chapter_val, verse_val):
     """
     Returns True if the specific verse belongs to the Poetic Accent System,
@@ -764,7 +793,7 @@ def extract_motif_concordance(accumulated_verse_phrases, translation_lookup):
             "o": motif_occurrences[motif]
         }
         
-    with open("motif_relationship_matrix.json", "w", encoding="utf-8") as f:
+    with open(PROJECT_ROOT / "motif_relationship_matrix.json", "w", encoding="utf-8") as f:
         # Added separators strictly to remove whitespace and compress further
         json.dump(compiled_matrix, f, ensure_ascii=False, separators=(',', ':'))
         
@@ -772,7 +801,7 @@ def extract_motif_concordance(accumulated_verse_phrases, translation_lookup):
 
 
 if __name__ == "__main__":
-    ROOT_DIR = ".." 
+    ROOT_DIR = str(PROJECT_ROOT / "musicscores")
     
     print(f"🚀 STARTING SYSTEM-WIDE MASS PRODUCTION GRID COMPILER")
     print(f"Scanning from root base: {os.path.abspath(ROOT_DIR)}\n")
@@ -808,10 +837,15 @@ if __name__ == "__main__":
         break_outer_loop = False
         for file in files:
             if file.upper().endswith(".JSON"):
-                json_path = os.path.join(current_dir, file)
-                
                 base_name, _ = os.path.splitext(file)
                 name_parts = base_name.split("_")
+
+                # Only chapter exports use a book name followed by a numeric chapter.
+                # Other project JSON files (for example translation.json) are not matrices.
+                if len(name_parts) < 2 or not name_parts[-1].isdigit():
+                    continue
+
+                json_path = os.path.join(current_dir, file)
                 
                 # --- MUSICOLOGICAL STRING RE-ENGINEERING ---
                 # Safe allocation for numerical prefix books like 1_CHRONICLES or 2_SAMUEL
@@ -871,6 +905,19 @@ if __name__ == "__main__":
                     # Create Pandas Dataframe and execute matrix building engine
                     df = pd.DataFrame(items_list)
                     df.columns = df.columns.str.upper()
+
+                    required_matrix_columns = {
+                        "CHAPTER_CD",
+                        "VERSE_CD",
+                        "SYLL_NOTE",
+                        "LYRIC_SYLL",
+                        "ORNAMENT_NAME",
+                    }
+                    missing_columns = required_matrix_columns.difference(df.columns)
+                    if missing_columns:
+                        missing = ", ".join(sorted(missing_columns))
+                        print(f"⚠️  Skipping non-matrix JSON {file}: missing columns {missing}")
+                        continue
                     
                     # Determine the maximum chapter for this book (default to 150 if not found)
                     max_chapter = book_max_chapters.get(book_id, 150)
@@ -892,14 +939,17 @@ if __name__ == "__main__":
                                         compressed_melody.append(note)
                                 
                     # Save HTML file directly into the same subdirectory as the JSON source
-                    with open(output_html_path, "w", encoding="utf-8") as out_f:
-                        out_f.write(page_html)
+                    write_html_atomically(output_html_path, page_html)
                         
                     print(f"✅ Compiled: {os.path.basename(current_dir)} -> {output_html_name}")
                     success_count += 1
 
                 except Exception as e:
-                    print(f"❌ Error processing file {file}: {str(e)}")
+                    print(
+                        f"❌ Error processing {file!r} in {current_dir!r}: "
+                        f"{type(e).__name__}: {e!r}; output path={output_html_path!r}\n"
+                        f"{traceback.format_exc()}"
+                    )
                     error_count += 1
 
                 # --- ADD THIS EXIT CHECK AT THE END OF THE FILE PROCESS ---
@@ -920,7 +970,7 @@ if __name__ == "__main__":
     # --- MASTER SEQUENCE EXTRACER WRITER ---
     if master_sequence_log:
         from collections import Counter
-        sequence_report_path = "global_approaches.txt"
+        sequence_report_path = PROJECT_ROOT / "global_approaches.txt"
         analysis_df = pd.DataFrame(master_sequence_log)
         
         with open(sequence_report_path, "w", encoding="utf-8") as rep_f:
@@ -969,7 +1019,7 @@ if __name__ == "__main__":
         from collections import defaultdict
         
         print("\n[Motif Subsystem] Loading native Oracle text data from translation.json...")
-        with open("translation.json", "r", encoding="utf-8") as f:
+        with open(PROJECT_ROOT / "translation.json", "r", encoding="utf-8") as f:
             translation_data = json.load(f)
             
         # Dig into the nested "results" array to pull out rows safely
@@ -1047,7 +1097,7 @@ if __name__ == "__main__":
                 "o": motif_occurrences[motif]
             }
             
-        with open("motif_relationship_matrix.json", "w", encoding="utf-8") as out_f:
+        with open(PROJECT_ROOT / "motif_relationship_matrix.json", "w", encoding="utf-8") as out_f:
             json.dump(compiled_matrix, fp=out_f, ensure_ascii=False)
             
         print(f"🎉 [Motif Subsystem] Success! Extracted {len(compiled_matrix)} searchable motifs.")
