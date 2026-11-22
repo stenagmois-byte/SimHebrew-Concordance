@@ -38,6 +38,14 @@ def items_from_file(path):
 
 def main():
     dictionary = json.loads(DICTIONARY_PATH.read_text(encoding="utf-8"))
+    poetry_by_verse = {}
+    for row in items_from_file(ROOT / "translation.json"):
+        try:
+            key = (int(row.get("book_seq_no", 0)), int(row.get("chapter_cd", 0)), int(row.get("verse_cd", 0)))
+            poetry_by_verse[key] = "1" if str(row.get("poetry", "0")) == "1" else "0"
+        except (TypeError, ValueError):
+            continue
+
     accents = {}
     for entry in dictionary.values():
         decimal = int(entry.get("decimal", 0))
@@ -46,6 +54,7 @@ def main():
                 "n": entry["name_translit"],
                 "h": entry.get("name_hebrew", ""),
                 "c": entry.get("category", ""),
+                "s": entry.get("scope", "all"),
             }
 
     verses = {}
@@ -72,7 +81,8 @@ def main():
     records = []
     for (book, chapter, verse), words in sorted(verses.items()):
         words.sort(key=lambda item: item[0])
-        records.append([book, chapter, verse, words])
+        poetry = poetry_by_verse.get((book, chapter, verse), "0")
+        records.append([book, chapter, verse, poetry, words])
 
     index = {"books": {str(number): name.replace("_", " ").title() for name, number in BOOK_NUMBERS.items()},
              "accents": accents, "verses": records}

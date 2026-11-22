@@ -31,15 +31,16 @@
 </head>
 <body>
   <main class="sequence-page">
-    <h1>Full (Prototype) Accent Sequence Browser</h1>
+    <h1>Prototype Accent Sequence Browser</h1>
     <p>Browse complete accent sequences by verse. Select two accents to find verses where the first occurs before the second, and optionally exclude accents from the interval.</p>
     <p class="method-note">Accent names follow <em>hebrew_accent_dictionary.json</em>. Each displayed word retains its position in the verse; the labels show every accent in reading order.</p>
     <div class="sequence-filters">
       <label>Book<select id="book"><option value="">All books</option></select></label>
+      <label>Scope<select id="scope"><option value="all">All</option><option value="prose">Prose</option><option value="poetry">Poetry</option></select></label>
       <label>Accent occurs<select id="first"><option value="">Any</option></select></label>
       <label>Before<select id="second"><option value="">Any / none</option></select></label>
-      <label>Exclude between (Ctrl/Cmd-click for multiple)<select id="exclude" multiple aria-label="Accents excluded between selected accents"></select></label>
-      <label>Reference or sequence<input id="search" type="search" placeholder="e.g. Genesis 1:1 or Segol"></label>
+      <label>Exclude between (Ctrl/Cmd-click for multiple)<select id="exclude" multiple aria-label="Accents excluded between selected accents"></select><span id="exclude-count" aria-live="polite">0 selected</span></label>
+      <label>Reference, accent sequence, or Hebrew word<input id="search" type="search" placeholder="e.g. Genesis 1:1 or Atnah or א֥שֽרי"></label>
       <span id="summary" aria-live="polite">Loading accent sequences…</span>
     </div>
     <table class="sequence-table">
@@ -53,12 +54,47 @@
     let indexData;
     let currentPage = 0;
     const label = id => indexData.accents[id]?.n || `U+${Number(id).toString(16).toUpperCase()}`;
+    function scopeForBook(bookNumber) {
+      if (!bookNumber) return 'all';
+      if (bookNumber === '27' || bookNumber === '28') return 'poetry';
+      if (bookNumber === '29') return 'all';
+      return 'prose';
+    }
+    function populateAccentFilters() {
+      const scope = document.getElementById('scope').value;
+      const accents = Object.entries(indexData.accents)
+        .filter(([, accent]) => scope === 'all' || accent.s === 'all' || accent.s === scope)
+        .sort((a,b) => a[1].n.localeCompare(b[1].n));
+      const first = document.getElementById('first');
+      const second = document.getElementById('second');
+      const exclude = document.getElementById('exclude');
+      const previousFirst = first.value;
+      const previousSecond = second.value;
+      const previousExcluded = new Set(Array.from(exclude.selectedOptions, option => option.value));
+      first.replaceChildren(new Option('Any', ''));
+      second.replaceChildren(new Option('Any / none', ''));
+      exclude.replaceChildren();
+      for (const [id, accent] of accents) {
+        first.add(new Option(accent.n, id));
+        second.add(new Option(accent.n, id));
+        const option = new Option(accent.n, id);
+        option.selected = previousExcluded.has(id);
+        exclude.add(option);
+      }
+      first.value = accents.some(([id]) => id === previousFirst) ? previousFirst : '';
+      second.value = accents.some(([id]) => id === previousSecond) ? previousSecond : '';
+      updateExcludeCount();
+    }
+    function updateExcludeCount() {
+      const count = document.getElementById('exclude').selectedOptions.length;
+      document.getElementById('exclude-count').textContent = `${count} selected`;
+    }
     const populate = (select, values) => values.forEach(([value, name]) => {
       const option = document.createElement('option'); option.value = value; option.textContent = name; select.append(option);
     });
     function flatten(record) {
       const events = [];
-      record[3].forEach(([wordNo, text, marks]) => marks.forEach((mark, index) => events.push({wordNo, text, mark, index})));
+      record[4].forEach(([wordNo, text, marks]) => marks.forEach((mark, index) => events.push({wordNo, text, mark, index})));
       return events;
     }
     function reference(record) {
@@ -66,11 +102,13 @@
     }
     function matches(record) {
       const book = document.getElementById('book').value;
+      const scope = document.getElementById('scope').value;
       const first = document.getElementById('first').value;
       const second = document.getElementById('second').value;
       const excluded = Array.from(document.getElementById('exclude').selectedOptions, option => option.value);
       const search = document.getElementById('search').value.trim().toLocaleLowerCase();
       if (book && String(record[0]) !== book) return false;
+      if (scope !== 'all' && record[3] !== (scope === 'poetry' ? '1' : '0')) return false;
       const events = flatten(record);
       if (first) {
         const start = events.findIndex(event => event.mark === first);
@@ -82,7 +120,7 @@
       } else if (second && !events.some(event => event.mark === second)) return false;
       if (search) {
         const names = events.map(event => label(event.mark)).join(' ');
-        const words = record[3].map(item => item[1]).join('');
+        const words = record[4].map(item => item[1]).join('');
         if (!(reference(record).toLocaleLowerCase().includes(search) || names.toLocaleLowerCase().includes(search) || words.includes(search))) return false;
       }
       return true;
@@ -98,7 +136,7 @@
         const row = document.createElement('tr');
         const ref = document.createElement('td'); ref.className = 'ref'; ref.textContent = reference(record); row.append(ref);
         const seq = document.createElement('td'); seq.className = 'heb-sequence';
-        for (const [wordNo, text, marks] of record[3]) {
+        for (const [wordNo, text, marks] of record[4]) {
           const word = document.createElement('span'); word.className = 'word'; word.title = `Word ${wordNo}`;
           const heb = document.createElement('span'); heb.textContent = text; word.append(heb);
           const names = document.createElement('span'); names.className = 'accent-name'; names.textContent = marks.map(label).join(' · '); word.append(names);
@@ -117,15 +155,23 @@
     }).then(data => {
       indexData = data;
       populate(document.getElementById('book'), Object.entries(data.books).sort((a,b) => Number(a[0])-Number(b[0])));
-      const accents = Object.entries(data.accents).sort((a,b) => a[1].n.localeCompare(b[1].n));
-      populate(document.getElementById('first'), accents.map(([id, accent]) => [id, accent.n]));
-      populate(document.getElementById('second'), accents.map(([id, accent]) => [id, accent.n]));
-      populate(document.getElementById('exclude'), accents.map(([id, accent]) => [id, accent.n]));
+      populateAccentFilters();
       const params = new URLSearchParams(location.search);
-      for (const id of ['book','first','second']) if (params.has(id)) document.getElementById(id).value = params.get(id);
+      for (const id of ['book','scope','first','second']) if (params.has(id)) document.getElementById(id).value = params.get(id);
+      if (params.has('book') && !params.has('scope')) document.getElementById('scope').value = scopeForBook(params.get('book'));
+      populateAccentFilters();
       const excluded = new Set((params.get('exclude') || '').split(',').filter(Boolean));
       for (const option of document.getElementById('exclude').options) option.selected = excluded.has(option.value);
-      for (const id of ['book','first','second','exclude','search']) document.getElementById(id).addEventListener('input', () => {currentPage=0;render();});
+      updateExcludeCount();
+      for (const id of ['first','second','search']) document.getElementById(id).addEventListener('input', () => {currentPage=0;render();});
+      document.getElementById('book').addEventListener('change', event => {
+        document.getElementById('scope').value = scopeForBook(event.target.value);
+        populateAccentFilters();
+        currentPage=0;
+        render();
+      });
+      document.getElementById('scope').addEventListener('change', () => {populateAccentFilters();currentPage=0;render();});
+      document.getElementById('exclude').addEventListener('change', () => {updateExcludeCount();currentPage=0;render();});
       document.getElementById('previous').addEventListener('click', () => {currentPage--;render();});
       document.getElementById('next').addEventListener('click', () => {currentPage++;render();});
       render();
