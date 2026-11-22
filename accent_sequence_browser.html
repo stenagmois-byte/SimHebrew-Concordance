@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="qstyles.css">
+  <script src="./menu.js" defer></script>
+  <title>Full Accent Sequence Browser (ProtoType) </title>
+  <style>
+    .sequence-page { max-width: 1180px; margin: 0 auto; padding: 0 18px 40px; }
+    .sequence-filters { display:flex; flex-wrap:wrap; align-items:end; gap:10px; margin:18px 0 10px; padding:14px; background:#fffcf4; border:1px solid #ddd; }
+    .sequence-filters label { display:grid; gap:4px; color:#444; font: .9rem sans-serif; }
+    .sequence-filters select,.sequence-filters input { min-height:34px; padding:5px 8px; border:1px solid #bbb; background:white; }
+    .sequence-filters select[multiple] { min-width:190px; min-height:76px; }
+    .sequence-filters input[type=search] { min-width:180px; }
+    #summary { margin-left:auto; color:#555; font: .9rem sans-serif; }
+    .method-note { color:#555; font-size:.94rem; }
+    .sequence-table { width:100%; border-collapse:collapse; margin:20px 0; background:white; font-family:sans-serif; }
+    .sequence-table th { position:sticky; top:58px; z-index:2; background:#f3f0e8; color:#800000; text-align:left; }
+    .sequence-table th,.sequence-table td { padding:11px 12px; border:1px solid #ddd; vertical-align:top; }
+    .ref { white-space:nowrap; font-weight:bold; }
+    .heb-sequence { direction:rtl; text-align:right; font: bold 1.35rem/2.2 'Times New Roman',serif; }
+    .word { display:inline-flex; flex-direction:column; align-items:center; margin:0 4px; }
+    .accent-name { direction:ltr; color:#800000; font: .68rem/1.15 sans-serif; white-space:nowrap; }
+    .empty { padding:24px; color:#666; text-align:center; }
+    .pagination { display:flex; justify-content:center; align-items:center; gap:12px; font-family:sans-serif; }
+    .pagination button { padding:6px 12px; color:white; background:#800000; border:0; border-radius:3px; cursor:pointer; }
+    .pagination button:disabled { opacity:.45; cursor:default; }
+    @media (max-width:700px) { .sequence-page { padding:0 10px 30px; } .sequence-table th,.sequence-table td { padding:8px 6px; } .ref { white-space:normal; } #summary { width:100%; margin-left:0; } }
+  </style>
+</head>
+<body>
+  <main class="sequence-page">
+    <h1>Full (Prototype) Accent Sequence Browser</h1>
+    <p>Browse complete accent sequences by verse. Select two accents to find verses where the first occurs before the second, and optionally exclude accents from the interval.</p>
+    <p class="method-note">Accent names follow <em>hebrew_accent_dictionary.json</em>. Each displayed word retains its position in the verse; the labels show every accent in reading order.</p>
+    <div class="sequence-filters">
+      <label>Book<select id="book"><option value="">All books</option></select></label>
+      <label>Accent occurs<select id="first"><option value="">Any</option></select></label>
+      <label>Before<select id="second"><option value="">Any / none</option></select></label>
+      <label>Exclude between (Ctrl/Cmd-click for multiple)<select id="exclude" multiple aria-label="Accents excluded between selected accents"></select></label>
+      <label>Reference or sequence<input id="search" type="search" placeholder="e.g. Genesis 1:1 or Segol"></label>
+      <span id="summary" aria-live="polite">Loading accent sequences…</span>
+    </div>
+    <table class="sequence-table">
+      <thead><tr><th style="width:160px">Reference</th><th>Accent sequence (words in reading order)</th></tr></thead>
+      <tbody id="results"><tr><td colspan="2" class="empty">Loading index…</td></tr></tbody>
+    </table>
+    <div class="pagination"><button id="previous">Previous</button><span id="page-label"></span><button id="next">Next</button></div>
+  </main>
+  <script>
+    const PAGE_SIZE = 100;
+    let indexData;
+    let currentPage = 0;
+    const label = id => indexData.accents[id]?.n || `U+${Number(id).toString(16).toUpperCase()}`;
+    const populate = (select, values) => values.forEach(([value, name]) => {
+      const option = document.createElement('option'); option.value = value; option.textContent = name; select.append(option);
+    });
+    function flatten(record) {
+      const events = [];
+      record[3].forEach(([wordNo, text, marks]) => marks.forEach((mark, index) => events.push({wordNo, text, mark, index})));
+      return events;
+    }
+    function reference(record) {
+      return `${indexData.books[record[0]]} ${record[1]}:${record[2]}`;
+    }
+    function matches(record) {
+      const book = document.getElementById('book').value;
+      const first = document.getElementById('first').value;
+      const second = document.getElementById('second').value;
+      const excluded = Array.from(document.getElementById('exclude').selectedOptions, option => option.value);
+      const search = document.getElementById('search').value.trim().toLocaleLowerCase();
+      if (book && String(record[0]) !== book) return false;
+      const events = flatten(record);
+      if (first) {
+        const start = events.findIndex(event => event.mark === first);
+        if (start < 0) return false;
+        if (second) {
+          const end = events.findIndex((event, i) => i > start && event.mark === second);
+          if (end < 0 || events.slice(start + 1, end).some(event => excluded.includes(event.mark))) return false;
+        }
+      } else if (second && !events.some(event => event.mark === second)) return false;
+      if (search) {
+        const names = events.map(event => label(event.mark)).join(' ');
+        const words = record[3].map(item => item[1]).join('');
+        if (!(reference(record).toLocaleLowerCase().includes(search) || names.toLocaleLowerCase().includes(search) || words.includes(search))) return false;
+      }
+      return true;
+    }
+    function render() {
+      const filtered = indexData.verses.filter(matches);
+      const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+      currentPage = Math.min(currentPage, totalPages - 1);
+      const pageRows = filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
+      const body = document.getElementById('results'); body.replaceChildren();
+      if (!pageRows.length) body.innerHTML = '<tr><td colspan="2" class="empty">No verses match these filters.</td></tr>';
+      for (const record of pageRows) {
+        const row = document.createElement('tr');
+        const ref = document.createElement('td'); ref.className = 'ref'; ref.textContent = reference(record); row.append(ref);
+        const seq = document.createElement('td'); seq.className = 'heb-sequence';
+        for (const [wordNo, text, marks] of record[3]) {
+          const word = document.createElement('span'); word.className = 'word'; word.title = `Word ${wordNo}`;
+          const heb = document.createElement('span'); heb.textContent = text; word.append(heb);
+          const names = document.createElement('span'); names.className = 'accent-name'; names.textContent = marks.map(label).join(' · '); word.append(names);
+          seq.append(word);
+        }
+        row.append(seq); body.append(row);
+      }
+      document.getElementById('summary').textContent = `${filtered.length.toLocaleString()} verses · ${indexData.verses.length.toLocaleString()} indexed`;
+      document.getElementById('page-label').textContent = `Page ${currentPage + 1} of ${totalPages}`;
+      document.getElementById('previous').disabled = currentPage === 0;
+      document.getElementById('next').disabled = currentPage >= totalPages - 1;
+    }
+    fetch('./accent_sequence_index.json').then(response => {
+      if (!response.ok) throw new Error('Could not load the accent sequence index.');
+      return response.json();
+    }).then(data => {
+      indexData = data;
+      populate(document.getElementById('book'), Object.entries(data.books).sort((a,b) => Number(a[0])-Number(b[0])));
+      const accents = Object.entries(data.accents).sort((a,b) => a[1].n.localeCompare(b[1].n));
+      populate(document.getElementById('first'), accents.map(([id, accent]) => [id, accent.n]));
+      populate(document.getElementById('second'), accents.map(([id, accent]) => [id, accent.n]));
+      populate(document.getElementById('exclude'), accents.map(([id, accent]) => [id, accent.n]));
+      const params = new URLSearchParams(location.search);
+      for (const id of ['book','first','second']) if (params.has(id)) document.getElementById(id).value = params.get(id);
+      const excluded = new Set((params.get('exclude') || '').split(',').filter(Boolean));
+      for (const option of document.getElementById('exclude').options) option.selected = excluded.has(option.value);
+      for (const id of ['book','first','second','exclude','search']) document.getElementById(id).addEventListener('input', () => {currentPage=0;render();});
+      document.getElementById('previous').addEventListener('click', () => {currentPage--;render();});
+      document.getElementById('next').addEventListener('click', () => {currentPage++;render();});
+      render();
+    }).catch(error => { document.getElementById('results').innerHTML = `<tr><td colspan="2" class="empty">${error.message} Run generate_accent_sequence_index.py to create it.</td></tr>`; });
+  </script>
+</body>
+</html>
