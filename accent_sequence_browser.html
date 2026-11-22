@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="qstyles.css">
   <script src="./menu.js" defer></script>
-  <title>Full Accent Sequence Browser (ProtoType) </title>
+  <title>Accent Full Sequence Browser</title>
   <style>
     .sequence-page { max-width: 1180px; margin: 0 auto; padding: 0 18px 40px; }
     .sequence-filters { display:flex; flex-wrap:wrap; align-items:end; gap:10px; margin:18px 0 10px; padding:14px; background:#fffcf4; border:1px solid #ddd; }
@@ -19,6 +19,8 @@
     .sequence-table th { position:sticky; top:58px; z-index:2; background:#f3f0e8; color:#800000; text-align:left; }
     .sequence-table th,.sequence-table td { padding:11px 12px; border:1px solid #ddd; vertical-align:top; }
     .ref { white-space:nowrap; font-weight:bold; }
+    .ref a { color:#800000; text-decoration:none; }
+    .ref a:hover { text-decoration:underline; }
     .heb-sequence { direction:rtl; text-align:right; font: bold 1.35rem/2.2 'Times New Roman',serif; }
     .word { display:inline-flex; flex-direction:column; align-items:center; margin:0 4px; }
     .accent-name { direction:ltr; color:#800000; font: .68rem/1.15 sans-serif; white-space:nowrap; }
@@ -31,9 +33,9 @@
 </head>
 <body>
   <main class="sequence-page">
-    <h1>Prototype Accent Sequence Browser</h1>
+    <h1>Accent Sequence Browser</h1>
     <p>Browse complete accent sequences by verse. Select two accents to find verses where the first occurs before the second, and optionally exclude accents from the interval.</p>
-    <p class="method-note">Accent names follow <em>hebrew_accent_dictionary.json</em>. Each displayed word retains its position in the verse; the labels show every accent in reading order.</p>
+    <p class="method-note">Accent names follow <em>Hebrew accent dictionary json</em>. Each displayed word retains its position in the verse; the labels show every accent in (rtl) reading order.</p>
     <div class="sequence-filters">
       <label>Book<select id="book"><option value="">All books</option></select></label>
       <label>Scope<select id="scope"><option value="all">All</option><option value="prose">Prose</option><option value="poetry">Poetry</option></select></label>
@@ -134,7 +136,11 @@
       if (!pageRows.length) body.innerHTML = '<tr><td colspan="2" class="empty">No verses match these filters.</td></tr>';
       for (const record of pageRows) {
         const row = document.createElement('tr');
-        const ref = document.createElement('td'); ref.className = 'ref'; ref.textContent = reference(record); row.append(ref);
+        const ref = document.createElement('td'); ref.className = 'ref';
+        const chapterLink = document.createElement('a');
+        chapterLink.href = `ornament_chapter.html?book=${encodeURIComponent(indexData.books[record[0]])}&chapter=${record[1]}`;
+        chapterLink.textContent = `${reference(record)} 📖`;
+        ref.append(chapterLink); row.append(ref);
         const seq = document.createElement('td'); seq.className = 'heb-sequence';
         for (const [wordNo, text, marks] of record[4]) {
           const word = document.createElement('span'); word.className = 'word'; word.title = `Word ${wordNo}`;
