@@ -38,7 +38,7 @@ The project comprises two parallel, interrelated production tracks governed by a
   - An -MOTB- epub that has been uploaded to Amazon has a date appended to the name
 * **File names and dates: PDFs**
   - The original volume name [bookname] - [authorname].pdf is created from the SVG source.
-  - For volumes requiring a wider spine (e.g. Psalms) the pdf will contain the suffix _KDP.pdf
+  - For volumes requiring a wider spine (e.g. Psalms) the pdf will contain the suffix _KDP.pdf -- see fix_margins.py in each subdirectory that requires it.
   - A pdf that has been uploaded to Amazon is renamed with a date appended to the name.
 * So a published file named with a date-stamp less than the latest non-date-stamped file indicates that there are pending changes. Also a pdf file with a date stamp less than the corresponding epub shows that it is out of date.
 
@@ -64,7 +64,39 @@ Composite books are Samuel `08wmual.html`, `09mlcim.html` Kings, `13tri_ywr.html
 7. **TOC & Metadata Maintenance:**
    - Rebuild the Table of Contents.
    - Log the revision details in the `00-5Front-matter.html` page comments for internal version tracking. e.g. `  <!--2026.09.27 12:00 pm PST complete refresh as new baseline-->`
-8. Compare with epubcompare.py in the SimHebrew directory and pipe the results into SimHebrewBible_Changes-timestamp.txt -- this file may need specific changes if file names and locations change.
+8. **Review the new build:** Use the comparison steps below. Keep the original EPUB unchanged until the new EPUB has passed validation and review.
+
+### 2A. Splitting and Reviewing a Large SimHebrew Glossary
+
+Use this procedure when the glossary is too large to keep as one EPUB content file. It creates one glossary index plus separate domain pages, then packages them into a new EPUB. Run commands from the repository root unless a step says otherwise.
+
+1. **Choose the source and output names.** Keep the source EPUB as the working baseline and choose a separate folder for generated glossary pages and a new filename for the packaged EPUB. Do not overwrite the source.
+2. **Split the glossary.** The splitter accepts either an extracted `99Glossary.html` or the EPUB itself. When given an EPUB, it finds and reads `99Glossary.html` inside it.
+   ```cmd
+   cd /d C:\Users\Bob\GitHub\SimHebrew-Concordance
+   python split_glossary_by_domain.py "C:\path\to\source.epub" "C:\path\to\glossary_split"
+   ```
+   The output folder contains a replacement `99Glossary.html` with a domain index and one `99Glossary_<domain>.html` page per semantic domain.
+3. **Package the split pages into a new EPUB.**
+   ```cmd
+   python integrate_split_glossary_epub.py "C:\path\to\source.epub" "C:\path\to\glossary_split" "C:\path\to\candidate.epub"
+   ```
+   The script copies the source, replaces its glossary index, adds every domain page to the EPUB manifest and spine, and adds the Glossary navigation entry. The source EPUB is left unchanged.
+4. **Validate the candidate EPUB.** Run EPUBCheck and resolve any reported errors before review or promotion:
+   ```cmd
+   java -jar "C:\Users\Bob\Downloads\epubcheck-5.4.0\epubcheck.jar" "C:\path\to\candidate.epub"
+   ```
+5. **Review glossary edits by domain.** This creates an HTML report showing changed glossary entries grouped by domain, including their anchor targets:
+   ```cmd
+   python compare_glossary_domains.py --old "C:\path\to\old.epub" --new "C:\path\to\candidate.epub" --output "C:\path\to\glossary-review.html"
+   ```
+6. **Review all EPUB text changes.** In the candidate directory, run the batch file with the old and new EPUB paths. Quote each path, especially when it contains spaces:
+   ```cmd
+   epubcompare.bat "C:\path\to\old.epub" "C:\path\to\candidate.epub"
+   ```
+   The report is written beside `epubcompare.bat`. If run with no arguments, it compares the two most recently modified EPUBs in that directory. The comparison focuses on HTML/XHTML text and link targets; SVG and CSS are excluded.
+7. **If using Beyond Compare for PC/iCloud review, include HTML and XHTML files.** Do not use a file filter that excludes `*.html` or `*.xhtml`; those files contain the changed glossary and Bible text.
+8. **Promote only after review.** Open the candidate in Calibre, confirm the glossary index and domain links, then copy the reviewed candidate to the production location and synchronize it to iCloud.
 
 ### 3. Updating Text Content in Existing Volumes of The Music of the Bible
 1. Edit the master volume inside Calibre Editor.

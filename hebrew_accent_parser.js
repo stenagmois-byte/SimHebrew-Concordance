@@ -276,7 +276,9 @@ const PITCH_NAMES = {
            const urlBookParam = urlParams.get('book');
 
            let defaultBook = 'ALL';
-               if (urlBookParam && availableBooks.includes(urlBookParam)) {
+               if (urlBookParam === 'ALL') {
+                   defaultBook = 'ALL';
+               } else if (urlBookParam && availableBooks.includes(urlBookParam)) {
                    defaultBook = urlBookParam;
                } else if (availableBooks.length > 0) {
                    defaultBook = availableBooks[0]; // Defaults to Genesis (or first canonical)
@@ -284,7 +286,7 @@ const PITCH_NAMES = {
 
 // 4. SUTURE VARIABLE NAMES FOR YOUR HTML TEMPLATE
           const bookNames = availableBooks;
-          const selectedBook = defaultBook;
+          let selectedBook = defaultBook;
 
 // 5. FILTER THE RECORDS FOR RENDERING
           const filteredRecords = selectedBook === 'ALL' 
@@ -309,7 +311,7 @@ const PITCH_NAMES = {
             function renderView() {
                 const filteredRecords = selectedBook === 'ALL' 
                     ? allRecords 
-                    : allRecords.filter(r => r.b === selectedBook);
+                    : allRecords.filter(r => r.b && r.b.trim() === selectedBook);
 
                 let htmlStr = `
                 <div class="ornament-records-view">

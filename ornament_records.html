@@ -43,39 +43,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const ornParam = urlParams.get('ornament') || '';
     const pitchParam = urlParams.get('pitch') || '';
-    const bookParam = urlParams.get('book') || ''; // 1. Read book parameter from URL
 
     if (typeof HebrewAccentParser !== 'undefined') {
         const parser = new HebrewAccentParser();
-        await parser.init('./hebrew_accent_dictionary.json');
 
         try {
-            const resp = await fetch('./ornament_index.json');
-            const data = await resp.json();
+            // Start the large index download while the parser loads its smaller
+            // dictionary and translation resources instead of waiting in series.
+            const indexPromise = fetch('./ornament_index.json').then(resp => {
+                if (!resp.ok) throw new Error(`Could not load ornament index (${resp.status})`);
+                return resp.json();
+            });
+            const [, data] = await Promise.all([
+                parser.init('./hebrew_accent_dictionary.json'),
+                indexPromise
+            ]);
 
-            // 2. Render records using current params
-            parser.renderOrnamentRecords('#records-target', data, ornParam, pitchParam, bookParam);
-
-            // 3. Attach change listener directly to the dropdown after render
-            const selectEl = document.getElementById('book-filter-select');
-            if (selectEl) {
-                // Ensure current book is selected in dropdown
-                if (bookParam) selectEl.value = bookParam;
-
-                selectEl.addEventListener('change', (e) => {
-                    const newBook = e.target.value;
-                    const params = new URLSearchParams(window.location.search);
-                    
-                    if (newBook && newBook !== 'ALL') {
-                        params.set('book', newBook);
-                    } else {
-                        params.delete('book');
-                    }
-                    
-                    // Reload page with new ?book=... URL parameter
-                    window.location.search = params.toString();
-                });
-            }
+            // The parser owns the book filter and updates the results in place.
+            parser.renderOrnamentRecords('#records-target', data, ornParam, pitchParam);
         } catch (err) {
             console.error('Error loading ornament index data:', err);
         }
