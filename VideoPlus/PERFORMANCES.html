@@ -1,874 +1,410 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Biblical Chant Performance Library</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; line-height: 1.6; max-width: 1000px; margin: 0 auto; padding: 20px; color: #24292e; }
-        h1 { border-bottom: 1px solid #eaecef; padding-bottom: 10px; }
-        h2 { margin-top: 30px; color: #0366d6; border-bottom: 1px solid #eaecef; padding-bottom: 5px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; margin-bottom: 40px; }
-        th, td { padding: 10px; border: 1px solid #dfe2e5; text-align: left; }
-        th { background-color: #f6f8fa; font-weight: 600; }
-        tr:nth-child(even) { background-color: #f8f9fa; }
-        a { color: #0366d6; text-decoration: none; font-weight: bold; }
-        a:hover { text-decoration: underline; }
-        .jump-menu { background: #f1f8ff; padding: 12px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #c8e1ff; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Available Bible Performances</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1.55; max-width: 1100px; margin: 0 auto; padding: 1rem; }
+    header { margin-bottom: 1.25rem; }
+    .toolbar { position: sticky; top: 0; z-index: 2; padding: .8rem; background: Canvas; border: 1px solid #8886; border-radius: .5rem; }
+    input { width: min(100%, 36rem); padding: .65rem; font: inherit; }
+    #result-count { margin-left: .6rem; }
+    nav { display: flex; flex-wrap: wrap; gap: .4rem .8rem; margin: 1rem 0; }
+    nav a { white-space: nowrap; }
+    h2 { margin-top: 2rem; border-bottom: 1px solid #8886; padding-bottom: .3rem; }
+    table { border-collapse: collapse; width: 100%; margin: .7rem 0 1.7rem; font-size: .95rem; }
+    th, td { text-align: left; vertical-align: top; padding: .55rem; border: 1px solid #8886; }
+    th { background: color-mix(in srgb, CanvasText 8%, Canvas); }
+    td:first-child { white-space: nowrap; }
+    .back { display: inline-block; margin-bottom: .75rem; }
+    .muted { opacity: .78; }
+    @media (max-width: 650px) { td:first-child { white-space: normal; } table { font-size: .86rem; } }
+  </style>
 </head>
 <body>
-
-    <h1>🎼 Biblical Chant Performance Directory</h1>
-    <p>A static lookup index pointing exclusively to audio performances mapped via the live archive catalog storage layer.</p>
-
-    <div class="jump-menu">
-        <strong>⚡ Quick Scroll Navigation:</strong> 
-        <a href="#torah">Pentateuch (Torah)</a> | 
-        <a href="#prophets">Prophets (Nevi'im)</a> | 
-        <a href="#scrolls">Writings & Scrolls (Ketuvim)</a> |
-        <a href="#misc">Miscellaneous Broadcasts</a>
-    </div>
-    <h2 id="torah">📜 Pentateuch (Torah)</h2>
+  <a class="back" href="./index.html">← VideoPlus home</a>
+  <header>
+    <h1>Available Bible Performances</h1>
+    <p class="muted">Browse Archive.org recordings by biblical book. Each link opens the individual audio or video file.</p>
+  </header>
+  <div class="toolbar"><label for="performance-search">Filter by book, reference, track, or collection</label><br>    <input id="performance-search" type="search" placeholder="e.g. Psalms 23, Esther Lamandier, Exodus 20">    <span id="result-count" aria-live="polite"></span></div>
+  <nav aria-label="Books with available performances">
+    <a href="#book-genesis">Genesis (3)</a>
+    <a href="#book-exodus">Exodus (8)</a>
+    <a href="#book-numbers">Numbers (5)</a>
+    <a href="#book-deuteronomy">Deuteronomy (2)</a>
+    <a href="#book-ruth">Ruth (6)</a>
+    <a href="#book-2-samuel">2 Samuel (7)</a>
+    <a href="#book-2-kings">2 Kings (1)</a>
+    <a href="#book-1-chronicles">1 Chronicles (2)</a>
+    <a href="#book-esther">Esther (2)</a>
+    <a href="#book-psalms">Psalms (98)</a>
+    <a href="#book-ecclesiastes">Ecclesiastes (1)</a>
+    <a href="#book-song-of-songs">Song of Songs (26)</a>
+    <a href="#book-lamentations">Lamentations (4)</a>
+    <a href="#book-isaiah">Isaiah (22)</a>
+    <a href="#book-ezekiel">Ezekiel (1)</a>
+    <a href="#book-amos">Amos (2)</a>
+    <a href="#book-other-performances">Other performances (10)</a>
+  </nav>
+  <section id="book-genesis">
+    <h2>Genesis</h2>
     <table>
-        <thead>
-            <tr>
-                <th>Biblical Reference</th>
-                <th>Track Description</th>
-                <th>Performance Direct Link</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><strong>GENESIS 001_001-002_003</strong></td>
-                <td>01 - Genesis 001_001-002_003.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/02%20-%20L%27esprit%20de%20Dieu/01%20-%20Genesis%20001_001-002_003.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>GENESIS 022_001-014</strong></td>
-                <td>09 - Genesis 022_001-014.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%203/09%20-%20Genesis%20022_001-014.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>GENESIS 028_010-021</strong></td>
-                <td>02 - Genesis 028_010-021.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/03%20-%20Cantique%20des%20cantiques/02%20-%20Genesis%20028_010-021.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>EXODUS 003_001-006</strong></td>
-                <td>15 - Chanticleer - Exodus 003_001-006.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/The%20Music%20of%20the%20Bible%20Revealed%20Live/15%20-%20Chanticleer%20-%20Exodus%20003_001-006.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>EXODUS 003_001-014</strong></td>
-                <td>02 - Exodus 003_001-014.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/02%20-%20L%27esprit%20de%20Dieu/02%20-%20Exodus%20003_001-014.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>EXODUS 003_001-014</strong></td>
-                <td>14 - Exodus 003_001-014.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%201/14%20-%20Exodus%20003_001-014.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>EXODUS 014_015-031</strong></td>
-                <td>03 - Exodus 014_015-031.mp3</td>
-                <td><a href="https://archive.orgmp3/Mira%20Zakai/Visages%20antiques%20d%27Isral/03%20-%20Exodus%20014_015-031.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>EXODUS 020_001-017</strong></td>
-                <td>03 - Exodus 020_001-017.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/02%20-%20L%27esprit%20de%20Dieu/03%20-%20Exodus%20020_001-017.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>EXODUS 020_001-017</strong></td>
-                <td>07 - Exodus 020_001-017.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%202/07%20-%20Exodus%20020_001-017.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>EXODUS 034_001-014</strong></td>
-                <td>04 - Exodus 034_001-014.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/02%20-%20L%27esprit%20de%20Dieu/04%20-%20Exodus%20034_001-014.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>NUMBERS BIRCATH COHENIM - REPRISE</strong></td>
-                <td>16 - Leviticus Bircath Cohenim - Reprise.mp3</td>
-                <td><a href="https://archive.orgmp3/SAVAE/Ancient%20Echoes%20%28Excerpts%29/16%20-%20Leviticus%20Bircath%20Cohenim%20-%20Reprise.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>NUMBERS BIRCATH COHENIM (THE PRIESTLY BLESSING)</strong></td>
-                <td>08 - Leviticus Bircath Cohenim (The Priestly Blessing).mp3</td>
-                <td><a href="https://archive.orgmp3/SAVAE/Ancient%20Echoes%20%28Excerpts%29/08%20-%20Leviticus%20Bircath%20Cohenim%20%28The%20Priestly%20Blessing%29.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>NUMBERS 006_022-027</strong></td>
-                <td>05 - Numbers 006_022-027.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/02%20-%20L%27esprit%20de%20Dieu/05%20-%20Numbers%20006_022-027.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>NUMBERS 006_022-027</strong></td>
-                <td>02 - Numbers 006_022-027.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%201/02%20-%20Numbers%20006_022-027.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>DEUTERONOMY 006_004-009</strong></td>
-                <td>08 - Deuteronomy 006_004-009.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%201/08%20-%20Deuteronomy%20006_004-009.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-        </tbody>
+      <thead><tr><th>Reference</th><th>Track</th><th>Collection</th><th>Listen / view</th></tr></thead>
+      <tbody>
+        <tr class="performance-row" data-search="genesis 1:1-2:3 01 - genesis 001_001-002_003.mp3 esther lamandier / 02 - l&#x27;esprit de dieu"><td>1:1-2:3</td><td>01 - Genesis 001_001-002_003.mp3</td><td>Esther Lamandier / 02 - L&#x27;esprit de Dieu</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/02+-+L&#x27;esprit+de+Dieu/01+-+Genesis+001_001-002_003.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="genesis 22:1-14 09 - genesis 022_001-014.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 3"><td>22:1-14</td><td>09 - Genesis 022_001-014.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 3</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+3/09+-+Genesis+022_001-014.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="genesis 28:10-21 02 - genesis 028_010-021.mp3 esther lamandier / 03 - cantique des cantiques"><td>28:10-21</td><td>02 - Genesis 028_010-021.mp3</td><td>Esther Lamandier / 03 - Cantique des cantiques</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/03+-+Cantique+des+cantiques/02+-+Genesis+028_010-021.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+      </tbody>
     </table>
-
-    <h2 id="prophets">👑 Historical Books & Prophets (Nevi'im)</h2>
+  </section>
+  <section id="book-exodus">
+    <h2>Exodus</h2>
     <table>
-        <thead>
-            <tr>
-                <th>Biblical Reference</th>
-                <th>Track Description</th>
-                <th>Performance Direct Link</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><strong>2 SAMUEL 001 DAVID'S ELEGY</strong></td>
-                <td>17 - 2 samuel 001 David's Elegy.mp3</td>
-                <td><a href="https://archive.orgmp3/Mira%20Zakai/Unaccompanied%20%28Excerpts%29/17%20-%202%20samuel%20001%20David%27s%20Elegy.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>2 SAMUEL 001 THE ELEGY OF DAVID</strong></td>
-                <td>06 - Chanticleer - 2 Samuel 001 The Elegy of David.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/The%20Music%20of%20the%20Bible%20Revealed%20Live/06%20-%20Chanticleer%20-%202%20Samuel%20001%20The%20Elegy%20of%20David.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>2 SAMUEL 001_0019-27</strong></td>
-                <td>2 samuel 001_0019-27.mp3</td>
-                <td><a href="https://archive.orgmp3/SHOFAR/SHOFAR%20-%20CD-ROM/Accompanied/2%20samuel%20001_0019-27.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>2 SAMUEL 001_019-027</strong></td>
-                <td>08 - 2 Samuel 001_019-027.mp3</td>
-                <td><a href="https://archive.orgmp3/Mira%20Zakai/Visages%20antiques%20d%27Isral/08%20-%202%20Samuel%20001_019-027.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>2 SAMUEL 001_019-027</strong></td>
-                <td>04 - 2 Samuel 001_019-027.mp3</td>
-                <td><a href="https://archive.orgmp3/SHOFAR/SHOFAR%20-%20CD/04%20-%202%20Samuel%20001_019-027.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>2 SAMUEL 001_019-027</strong></td>
-                <td>10 - 2 Samuel 001_019-027.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%201/10%20-%202%20Samuel%20001_019-027.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>2 KINGS 019_015-019</strong></td>
-                <td>06 - 2 Kings 019_015-019.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/02%20-%20L%27esprit%20de%20Dieu/06%20-%202%20Kings%20019_015-019.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 002_001-005</strong></td>
-                <td>01 - Isaiah 002_001-005.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/03%20-%20Cantique%20des%20cantiques/01%20-%20Isaiah%20002_001-005.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 006_001-007</strong></td>
-                <td>01 - Isaiah 006_001-007.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/04%20-%20Le%20Livre%20d%27Isaie/01%20-%20Isaiah%20006_001-007.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 006_001-013</strong></td>
-                <td>07 - Isaiah 006_001-013.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/02%20-%20L%27esprit%20de%20Dieu/07%20-%20Isaiah%20006_001-013.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 011_001-009</strong></td>
-                <td>08 - Isaiah 011_001-009.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/02%20-%20L%27esprit%20de%20Dieu/08%20-%20Isaiah%20011_001-009.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 011_001-009</strong></td>
-                <td>02 - Isaiah 011_001-009.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%202/02%20-%20Isaiah%20011_001-009.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 011_001-010</strong></td>
-                <td>02 - Isaiah 011_001-010.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/04%20-%20Le%20Livre%20d%27Isaie/02%20-%20Isaiah%20011_001-010.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 012_001-006</strong></td>
-                <td>03 - Isaiah 012_001-006.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/04%20-%20Le%20Livre%20d%27Isaie/03%20-%20Isaiah%20012_001-006.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 037_015-020</strong></td>
-                <td>04 - Isaiah 037_015-020.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/04%20-%20Le%20Livre%20d%27Isaie/04%20-%20Isaiah%20037_015-020.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 040_001-014</strong></td>
-                <td>05 - Isaiah 040_001-014.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/04%20-%20Le%20Livre%20d%27Isaie/05%20-%20Isaiah%20040_001-014.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 041_001-014</strong></td>
-                <td>06 - Isaiah 041_001-014.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/04%20-%20Le%20Livre%20d%27Isaie/06%20-%20Isaiah%20041_001-014.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 042_001-021</strong></td>
-                <td>07 - Isaiah 042_001-021.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/04%20-%20Le%20Livre%20d%27Isaie/07%20-%20Isaiah%20042_001-021.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 044_001-023</strong></td>
-                <td>08 - Isaiah 044_001-023.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/04%20-%20Le%20Livre%20d%27Isaie/08%20-%20Isaiah%20044_001-023.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 050_004-011</strong></td>
-                <td>09 - Isaiah 050_004-011.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/04%20-%20Le%20Livre%20d%27Isaie/09%20-%20Isaiah%20050_004-011.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 051_001-011</strong></td>
-                <td>10 - Isaiah 051_001-011.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/04%20-%20Le%20Livre%20d%27Isaie/10%20-%20Isaiah%20051_001-011.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 053_001-012</strong></td>
-                <td>11 - Isaiah 053_001-012.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/04%20-%20Le%20Livre%20d%27Isaie/11%20-%20Isaiah%20053_001-012.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 057_014-021</strong></td>
-                <td>12 - Isaiah 057_014-021.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/04%20-%20Le%20Livre%20d%27Isaie/12%20-%20Isaiah%20057_014-021.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 058_001-011</strong></td>
-                <td>13 - Isaiah 058_001-011.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/04%20-%20Le%20Livre%20d%27Isaie/13%20-%20Isaiah%20058_001-011.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 060_001-005</strong></td>
-                <td>07 - Isaiah 060_001-005.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%203/07%20-%20Isaiah%20060_001-005.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 061_001-011</strong></td>
-                <td>09 - Isaiah 061_001-011.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/02%20-%20L%27esprit%20de%20Dieu/09%20-%20Isaiah%20061_001-011.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 061_005-011</strong></td>
-                <td>14 - Isaiah 061_005-011.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/04%20-%20Le%20Livre%20d%27Isaie/14%20-%20Isaiah%20061_005-011.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ISAIAH 60_1-5</strong></td>
-                <td>16 - Chanticleer - Isaiah 60_1-5.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/The%20Music%20of%20the%20Bible%20Revealed%20Live/16%20-%20Chanticleer%20-%20Isaiah%2060_1-5.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>EZEKIEL 037_001-014</strong></td>
-                <td>10 - Ezekiel 037_001-014.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/02%20-%20L%27esprit%20de%20Dieu/10%20-%20Ezekiel%20037_001-014.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>AMOS 001_001-009</strong></td>
-                <td>10 - Chanticleer - Amos 001_001-009.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/The%20Music%20of%20the%20Bible%20Revealed%20Live/10%20-%20Chanticleer%20-%20Amos%20001_001-009.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>AMOS 001_001-009</strong></td>
-                <td>13 - Amos 001_001-009.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%203/13%20-%20Amos%20001_001-009.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-        </tbody>
+      <thead><tr><th>Reference</th><th>Track</th><th>Collection</th><th>Listen / view</th></tr></thead>
+      <tbody>
+        <tr class="performance-row" data-search="exodus 3:1-6 15 - chanticleer - exodus 003_001-006.mp3 suzanne haik-vantoura / the music of the bible revealed live"><td>3:1-6</td><td>15 - Chanticleer - Exodus 003_001-006.mp3</td><td>Suzanne Haik-Vantoura / The Music of the Bible Revealed Live</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/The+Music+of+the+Bible+Revealed+Live/15+-+Chanticleer+-+Exodus+003_001-006.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="exodus 3:1-14 02 - exodus 003_001-014.mp3 esther lamandier / 02 - l&#x27;esprit de dieu"><td>3:1-14</td><td>02 - Exodus 003_001-014.mp3</td><td>Esther Lamandier / 02 - L&#x27;esprit de Dieu</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/02+-+L&#x27;esprit+de+Dieu/02+-+Exodus+003_001-014.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="exodus 3:1-14 14 - exodus 003_001-014.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 1"><td>3:1-14</td><td>14 - Exodus 003_001-014.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 1</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+1/14+-+Exodus+003_001-014.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="exodus 14:15-31 03 - exodus 014_015-031.mp3 mira zakai / visages antiques d&#x27;israil"><td>14:15-31</td><td>03 - Exodus 014_015-031.mp3</td><td>Mira Zakai / Visages antiques d&#x27;Israil</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Mira+Zakai/Visages+antiques+d&#x27;Israil/03+-+Exodus+014_015-031.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="exodus 20:1-17 03 - exodus 020_001-017.mp3 esther lamandier / 02 - l&#x27;esprit de dieu"><td>20:1-17</td><td>03 - Exodus 020_001-017.mp3</td><td>Esther Lamandier / 02 - L&#x27;esprit de Dieu</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/02+-+L&#x27;esprit+de+Dieu/03+-+Exodus+020_001-017.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="exodus 20:1-17 07 - exodus 020_001-017.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 2"><td>20:1-17</td><td>07 - Exodus 020_001-017.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 2</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+2/07+-+Exodus+020_001-017.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="exodus 20:1-17 mbr_exodus 020_001-017.wmv mbr biblical chant dvd 01"><td>20:1-17</td><td>mbr_exodus 020_001-017.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_exodus+020_001-017.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="exodus 34:1-14 04 - exodus 034_001-014.mp3 esther lamandier / 02 - l&#x27;esprit de dieu"><td>34:1-14</td><td>04 - Exodus 034_001-014.mp3</td><td>Esther Lamandier / 02 - L&#x27;esprit de Dieu</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/02+-+L&#x27;esprit+de+Dieu/04+-+Exodus+034_001-014.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+      </tbody>
     </table>
-
-    <h2 id="scrolls">🎼 Poetic Books & Scrolls (Ketuvim)</h2>
+  </section>
+  <section id="book-numbers">
+    <h2>Numbers</h2>
     <table>
-        <thead>
-            <tr>
-                <th>Biblical Reference</th>
-                <th>Track Description</th>
-                <th>Performance Direct Link</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><strong>PSALMS 001</strong></td>
-                <td>03 - Psalms 001.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%203/03%20-%20Psalms%20001.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 003</strong></td>
-                <td>09 - Psalms 003.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%202/09%20-%20Psalms%20003.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 004</strong></td>
-                <td>07 - Psalms 004.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/07%20-%20Psalms%20004.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 006</strong></td>
-                <td>05 - Psalms 006.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%201/05%20-%20Psalms%20006.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 008</strong></td>
-                <td>10 - Psalms 008.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%202/10%20-%20Psalms%20008.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 008</strong></td>
-                <td>09 - Chanticleer - Psalms 008.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/The%20Music%20of%20the%20Bible%20Revealed%20Live/09%20-%20Chanticleer%20-%20Psalms%20008.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 013</strong></td>
-                <td>04 - Psalms 013.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%203/04%20-%20Psalms%20013.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 016</strong></td>
-                <td>13 - Psalms 016.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/13%20-%20Psalms%20016.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 019</strong></td>
-                <td>08 - Psalms 019.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%202/08%20-%20Psalms%20019.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 023</strong></td>
-                <td>01 - Psalms 023.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%201/01%20-%20Psalms%20023.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 023</strong></td>
-                <td>05 - Chanticleer - Psalms 023.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/The%20Music%20of%20the%20Bible%20Revealed%20Live/05%20-%20Chanticleer%20-%20Psalms%20023.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 023</strong></td>
-                <td>21 - Psalms 023.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/21%20-%20Psalms%20023.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 024</strong></td>
-                <td>03 - Psalms 024.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%201/03%20-%20Psalms%20024.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 024</strong></td>
-                <td>01 - Psalms 024.mp3</td>
-                <td><a href="https://archive.orgmp3/SHOFAR/SHOFAR%20-%20CD/01%20-%20Psalms%20024.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 024</strong></td>
-                <td>Psalms 024.mp3</td>
-                <td><a href="https://archive.orgmp3/SHOFAR/SHOFAR%20-%20CD-ROM/A%20Capella/Psalms%20024.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 024_ACC</strong></td>
-                <td>Psalms 024_acc.mp3</td>
-                <td><a href="https://archive.orgmp3/SHOFAR/SHOFAR%20-%20CD-ROM/Accompanied/Psalms%20024_acc.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 027</strong></td>
-                <td>04 - Psalms 027.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%202/04%20-%20Psalms%20027.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 029</strong></td>
-                <td>05 - Psalms 029.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%202/05%20-%20Psalms%20029.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 029</strong></td>
-                <td>08 - Chanticleer - Psalms 029.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/The%20Music%20of%20the%20Bible%20Revealed%20Live/08%20-%20Chanticleer%20-%20Psalms%20029.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 029</strong></td>
-                <td>24 - Psalms 029.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/24%20-%20Psalms%20029.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 043</strong></td>
-                <td>11 - Psalms 043.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/11%20-%20Psalms%20043.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 048</strong></td>
-                <td>03 - Psalms 048.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/03%20-%20Psalms%20048.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 052</strong></td>
-                <td>02 - Psalms 052.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%203/02%20-%20Psalms%20052.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 057</strong></td>
-                <td>02 - Psalms 057.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/02%20-%20Psalms%20057.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 062</strong></td>
-                <td>14 - Psalms 062.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%203/14%20-%20Psalms%20062.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 067</strong></td>
-                <td>05 - Psalms 067.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%203/05%20-%20Psalms%20067.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 080</strong></td>
-                <td>17 - Psalms 080.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/17%20-%20Psalms%20080.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 090</strong></td>
-                <td>09 - Psalms 090.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/09%20-%20Psalms%20090.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 091</strong></td>
-                <td>15 - Psalms 091.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/15%20-%20Psalms%20091.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 093</strong></td>
-                <td>11 - Psalms 093.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%202/11%20-%20Psalms%20093.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 093</strong></td>
-                <td>01 - Psalms 093.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/01%20-%20Psalms%20093.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 096</strong></td>
-                <td>01 - Psalms 096.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%202/01%20-%20Psalms%20096.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 097</strong></td>
-                <td>20 - Psalms 097.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/20%20-%20Psalms%20097.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 098</strong></td>
-                <td>11 - Psalms 098.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%203/11%20-%20Psalms%20098.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 098</strong></td>
-                <td>04 - Chanticleer - Psalms 098.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/The%20Music%20of%20the%20Bible%20Revealed%20Live/04%20-%20Chanticleer%20-%20Psalms%20098.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 099</strong></td>
-                <td>10 - Psalms 099.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/10%20-%20Psalms%20099.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 100</strong></td>
-                <td>01 - Psalms 100.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%203/01%20-%20Psalms%20100.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 104</strong></td>
-                <td>14 - Psalms 104.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/14%20-%20Psalms%20104.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 113 - SONG OF SONGS 1_1-4</strong></td>
-                <td>13 - Chanticleer - Psalms 113 - Song of Songs 1_1-4.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/The%20Music%20of%20the%20Bible%20Revealed%20Live/13%20-%20Chanticleer%20-%20Psalms%20113%20-%20Song%20of%20Songs%201_1-4.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 113</strong></td>
-                <td>05 - Psalms 113.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/05%20-%20Psalms%20113.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 113</strong></td>
-                <td>10 - Psalms 113.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%203/10%20-%20Psalms%20113.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 115</strong></td>
-                <td>06 - Psalms 115.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/06%20-%20Psalms%20115.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 121</strong></td>
-                <td>11 - Chanticleer - Psalms 121.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/The%20Music%20of%20the%20Bible%20Revealed%20Live/11%20-%20Chanticleer%20-%20Psalms%20121.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 121</strong></td>
-                <td>12 - Psalms 121.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%203/12%20-%20Psalms%20121.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 122</strong></td>
-                <td>14 - Chanticleer - Psalms 122.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/The%20Music%20of%20the%20Bible%20Revealed%20Live/14%20-%20Chanticleer%20-%20Psalms%20122.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 122</strong></td>
-                <td>11 - Psalms 122.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%201/11%20-%20Psalms%20122.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 122</strong></td>
-                <td>02 - Psalms 122.mp3</td>
-                <td><a href="https://archive.orgmp3/SHOFAR/SHOFAR%20-%20CD/02%20-%20Psalms%20122.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 122</strong></td>
-                <td>Psalms 122.mp3</td>
-                <td><a href="https://archive.orgmp3/SHOFAR/SHOFAR%20-%20CD-ROM/A%20Capella/Psalms%20122.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 122_ACC</strong></td>
-                <td>Psalms 122_acc.mp3</td>
-                <td><a href="https://archive.orgmp3/SHOFAR/SHOFAR%20-%20CD-ROM/Accompanied/Psalms%20122_acc.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 122_WEB</strong></td>
-                <td>Psalms 122_web.mp3</td>
-                <td><a href="https://archive.orgmp3/SHOFAR/SHOFAR%20-%20CD-ROM/Web%20Samples/Psalms%20122_web.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 123</strong></td>
-                <td>18 - Psalms 123.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/18%20-%20Psalms%20123.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 123</strong></td>
-                <td>12 - Psalms 123.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%201/12%20-%20Psalms%20123.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 129</strong></td>
-                <td>08 - Psalms 129.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/08%20-%20Psalms%20129.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 13</strong></td>
-                <td>04 - Psalms 13.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/04%20-%20Psalms%2013.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 130</strong></td>
-                <td>12 - Psalms 130.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%202/12%20-%20Psalms%20130.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 131</strong></td>
-                <td>25 - Psalms 131.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/25%20-%20Psalms%20131.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 131</strong></td>
-                <td>03 - Psalms 131.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%202/03%20-%20Psalms%20131.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 133</strong></td>
-                <td>23 - Psalms 133.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/23%20-%20Psalms%20133.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 133</strong></td>
-                <td>07 - Psalms 133.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%201/07%20-%20Psalms%20133.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 133</strong></td>
-                <td>05 - Psalms 133.mp3</td>
-                <td><a href="https://archive.orgmp3/SHOFAR/SHOFAR%20-%20CD/05%20-%20Psalms%20133.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 133</strong></td>
-                <td>Psalms 133.mp3</td>
-                <td><a href="https://archive.orgmp3/SHOFAR/SHOFAR%20-%20CD-ROM/A%20Capella/Psalms%20133.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 134</strong></td>
-                <td>22 - Psalms 134.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/22%20-%20Psalms%20134.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 137</strong></td>
-                <td>06 - Psalms 137.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%202/06%20-%20Psalms%20137.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 138</strong></td>
-                <td>07 - Chanticleer - Psalms 138.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/The%20Music%20of%20the%20Bible%20Revealed%20Live/07%20-%20Chanticleer%20-%20Psalms%20138.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 138</strong></td>
-                <td>19 - Psalms 138.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/19%20-%20Psalms%20138.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 142</strong></td>
-                <td>16 - Psalms 142.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/16%20-%20Psalms%20142.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 148</strong></td>
-                <td>17 - Chanticleer - Psalms 148.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/The%20Music%20of%20the%20Bible%20Revealed%20Live/17%20-%20Chanticleer%20-%20Psalms%20148.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 148</strong></td>
-                <td>26 - Psalms 148.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/26%20-%20Psalms%20148.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 148</strong></td>
-                <td>08 - Psalms 148.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%203/08%20-%20Psalms%20148.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 150</strong></td>
-                <td>12 - Psalms 150.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/01%20-%20Psaumes%20de%20David/12%20-%20Psalms%20150.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 150</strong></td>
-                <td>09 - Psalms 150.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%201/09%20-%20Psalms%20150.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 150</strong></td>
-                <td>03 - Psalms 150.mp3</td>
-                <td><a href="https://archive.orgmp3/SHOFAR/SHOFAR%20-%20CD/03%20-%20Psalms%20150.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 150</strong></td>
-                <td>Psalms 150.mp3</td>
-                <td><a href="https://archive.orgmp3/SHOFAR/SHOFAR%20-%20CD-ROM/A%20Capella/Psalms%20150.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 150_ACC</strong></td>
-                <td>Psalms 150_acc.mp3</td>
-                <td><a href="https://archive.orgmp3/SHOFAR/SHOFAR%20-%20CD-ROM/Accompanied/Psalms%20150_acc.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>PSALMS 150_WEB</strong></td>
-                <td>Psalms 150_web.mp3</td>
-                <td><a href="https://archive.orgmp3/SHOFAR/SHOFAR%20-%20CD-ROM/Web%20Samples/Psalms%20150_web.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG 001_001-003</strong></td>
-                <td>04 - Song 001_001-003.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%201/04%20-%20Song%20001_001-003.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG 001_001-017</strong></td>
-                <td>03 - Song 001_001-017.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/03%20-%20Cantique%20des%20cantiques/03%20-%20Song%20001_001-017.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG 001_001-017</strong></td>
-                <td>01 - Song 001_001-017.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/Cantique%20des%20cantiques%20de%20Salomon/01%20-%20Song%20001_001-017.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG 002_001-017</strong></td>
-                <td>04 - Song 002_001-017.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/03%20-%20Cantique%20des%20cantiques/04%20-%20Song%20002_001-017.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG 002_001-017</strong></td>
-                <td>02 - Song 002_001-017.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/Cantique%20des%20cantiques%20de%20Salomon/02%20-%20Song%20002_001-017.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG 003_001-011</strong></td>
-                <td>05 - Song 003_001-011.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/03%20-%20Cantique%20des%20cantiques/05%20-%20Song%20003_001-011.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG 003_001-011</strong></td>
-                <td>03 - Song 003_001-011.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/Cantique%20des%20cantiques%20de%20Salomon/03%20-%20Song%20003_001-011.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG 004_001-016</strong></td>
-                <td>06 - Song 004_001-016.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/03%20-%20Cantique%20des%20cantiques/06%20-%20Song%20004_001-016.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG 004_001-016</strong></td>
-                <td>04 - Song 004_001-016.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/Cantique%20des%20cantiques%20de%20Salomon/04%20-%20Song%20004_001-016.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG 005_001-016</strong></td>
-                <td>07 - Song 005_001-016.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/03%20-%20Cantique%20des%20cantiques/07%20-%20Song%20005_001-016.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG 005_001-016</strong></td>
-                <td>05 - Song 005_001-016.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/Cantique%20des%20cantiques%20de%20Salomon/05%20-%20Song%20005_001-016.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG 006_001-012</strong></td>
-                <td>08 - Song 006_001-012.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/03%20-%20Cantique%20des%20cantiques/08%20-%20Song%20006_001-012.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG 006_001-012</strong></td>
-                <td>06 - Song 006_001-012.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/Cantique%20des%20cantiques%20de%20Salomon/06%20-%20Song%20006_001-012.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG 007_001-014</strong></td>
-                <td>09 - Song 007_001-014.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/03%20-%20Cantique%20des%20cantiques/09%20-%20Song%20007_001-014.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG 007_001-014</strong></td>
-                <td>07 - Song 007_001-014.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/Cantique%20des%20cantiques%20de%20Salomon/07%20-%20Song%20007_001-014.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG 008_001-014</strong></td>
-                <td>10 - Song 008_001-014.mp3</td>
-                <td><a href="https://archive.orgmp3/Esther%20Lamandier/03%20-%20Cantique%20des%20cantiques/10%20-%20Song%20008_001-014.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG 008_001-014</strong></td>
-                <td>08 - Song 008_001-014.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/Cantique%20des%20cantiques%20de%20Salomon/08%20-%20Song%20008_001-014.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>SONG OF SONGS - INTRO</strong></td>
-                <td>12 - Chanticleer - Song of Songs - Intro.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/The%20Music%20of%20the%20Bible%20Revealed%20Live/12%20-%20Chanticleer%20-%20Song%20of%20Songs%20-%20Intro.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>RUTH</strong></td>
-                <td>03 - ASTER - The Song of Ruth.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/The%20Music%20of%20the%20Bible%20Revealed%20Live/03%20-%20ASTER%20-%20The%20Song%20of%20Ruth.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>RUTH - INTRO</strong></td>
-                <td>02 - ASTER - The Song of Ruth - Intro.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/The%20Music%20of%20the%20Bible%20Revealed%20Live/02%20-%20ASTER%20-%20The%20Song%20of%20Ruth%20-%20Intro.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>RUTH 001_001-022</strong></td>
-                <td>04 - Ruth 001_001-022.mp3</td>
-                <td><a href="https://archive.orgmp3/Mira%20Zakai/Visages%20antiques%20d%27Isral/04%20-%20Ruth%20001_001-022.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>RUTH 002_001-023</strong></td>
-                <td>05 - Ruth 002_001-023.mp3</td>
-                <td><a href="https://archive.orgmp3/Mira%20Zakai/Visages%20antiques%20d%27Isral/05%20-%20Ruth%20002_001-023.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>RUTH 003_001-018</strong></td>
-                <td>06 - Ruth 003_001-018.mp3</td>
-                <td><a href="https://archive.orgmp3/Mira%20Zakai/Visages%20antiques%20d%27Isral/06%20-%20Ruth%20003_001-018.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>RUTH 004_001-022</strong></td>
-                <td>07 - Ruth 004_001-022.mp3</td>
-                <td><a href="https://archive.orgmp3/Mira%20Zakai/Visages%20antiques%20d%27Isral/07%20-%20Ruth%20004_001-022.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>LAMENTATIONS 001_001-003</strong></td>
-                <td>06 - Lamentations 001_001-003.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%201/06%20-%20Lamentations%20001_001-003.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>LAMENTATIONS 001_001-022</strong></td>
-                <td>09 - Lamentations 001_001-022.mp3</td>
-                <td><a href="https://archive.orgmp3/Mira%20Zakai/Visages%20antiques%20d%27Isral/09%20-%20Lamentations%20001_001-022.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>LAMENTATIONS 003_001-066</strong></td>
-                <td>10 - Lamentations 003_001-066.mp3</td>
-                <td><a href="https://archive.orgmp3/Mira%20Zakai/Visages%20antiques%20d%27Isral/10%20-%20Lamentations%20003_001-066.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ECCLESIASTES 001_001-009</strong></td>
-                <td>06 - Ecclesiastes 001_001-009.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%203/06%20-%20Ecclesiastes%20001_001-009.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>ESTHER 005_001-003</strong></td>
-                <td>13 - Esther 005_001-003.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/La%20musique%20de%20la%20Bible%20revelee%20Vol.%201/13%20-%20Esther%20005_001-003.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>1 CHRONICLES 016_001-007</strong></td>
-                <td>01 - 1 Chronicles 016_001-007.mp3</td>
-                <td><a href="https://archive.orgmp3/Mira%20Zakai/Visages%20antiques%20d%27Isral/01%20-%201%20Chronicles%20016_001-007.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>1 CHRONICLES 016_008-036</strong></td>
-                <td>02 - 1 Chronicles 016_008-036.mp3</td>
-                <td><a href="https://archive.orgmp3/Mira%20Zakai/Visages%20antiques%20d%27Isral/02%20-%201%20Chronicles%20016_008-036.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-        </tbody>
+      <thead><tr><th>Reference</th><th>Track</th><th>Collection</th><th>Listen / view</th></tr></thead>
+      <tbody>
+        <tr class="performance-row" data-search="numbers 6:22-27 16 - leviticus bircath cohenim - reprise.mp3 savae / ancient echoes (excerpts)"><td>6:22-27</td><td>16 - Leviticus Bircath Cohenim - Reprise.mp3</td><td>SAVAE / Ancient Echoes (Excerpts)</td><td><a href="https://archive.org/details/01-c-250-01/mp3/SAVAE/Ancient+Echoes+(Excerpts)/16+-+Leviticus+Bircath+Cohenim+-+Reprise.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="numbers 6:22-27 08 - leviticus bircath cohenim (the priestly blessing).mp3 savae / ancient echoes (excerpts)"><td>6:22-27</td><td>08 - Leviticus Bircath Cohenim (The Priestly Blessing).mp3</td><td>SAVAE / Ancient Echoes (Excerpts)</td><td><a href="https://archive.org/details/01-c-250-01/mp3/SAVAE/Ancient+Echoes+(Excerpts)/08+-+Leviticus+Bircath+Cohenim+(The+Priestly+Blessing).mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="numbers 6:22-27 05 - numbers 006_022-027.mp3 esther lamandier / 02 - l&#x27;esprit de dieu"><td>6:22-27</td><td>05 - Numbers 006_022-027.mp3</td><td>Esther Lamandier / 02 - L&#x27;esprit de Dieu</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/02+-+L&#x27;esprit+de+Dieu/05+-+Numbers+006_022-027.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="numbers 6:22-27 02 - numbers 006_022-027.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 1"><td>6:22-27</td><td>02 - Numbers 006_022-027.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 1</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+1/02+-+Numbers+006_022-027.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="numbers 6:22-27 mbr_numbers 006_022-027.wmv mbr biblical chant dvd 01"><td>6:22-27</td><td>mbr_numbers 006_022-027.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_numbers+006_022-027.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+      </tbody>
     </table>
-
-    <h2 id="misc">📻 Miscellaneous Tracks & Radio Promos</h2>
+  </section>
+  <section id="book-deuteronomy">
+    <h2>Deuteronomy</h2>
     <table>
-        <thead>
-            <tr>
-                <th>Biblical Reference</th>
-                <th>Track Description</th>
-                <th>Performance Direct Link</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><strong>NPR MORNING EDITION - SONG OF SONGS</strong></td>
-                <td>01 - NPR Morning Edition - Song of Songs.mp3</td>
-                <td><a href="https://archive.orgmp3/Suzanne%20Ha%3Fk-Vantoura/The%20Music%20of%20the%20Bible%20Revealed%20Live/01%20-%20NPR%20Morning%20Edition%20-%20Song%20of%20Songs.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>C250-01</strong></td>
-                <td>01 - C250-01.mp3</td>
-                <td><a href="https://archive.orgmp3/Southwest%20Radio%20Church/SWRC-02%20C250/01%20-%20C250-01.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>C250-02</strong></td>
-                <td>02 - C250-02.mp3</td>
-                <td><a href="https://archive.orgmp3/Southwest%20Radio%20Church/SWRC-02%20C250/02%20-%20C250-02.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>C250-03</strong></td>
-                <td>03 - C250-03.mp3</td>
-                <td><a href="https://archive.orgmp3/Southwest%20Radio%20Church/SWRC-02%20C250/03%20-%20C250-03.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>K491-01</strong></td>
-                <td>01 - K491-01.mp3</td>
-                <td><a href="https://archive.orgmp3/Southwest%20Radio%20Church/SWRC-01%20K491/01%20-%20K491-01.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-            <tr>
-                <td><strong>K491-02</strong></td>
-                <td>02 - K491-02.mp3</td>
-                <td><a href="https://archive.orgmp3/Southwest%20Radio%20Church/SWRC-01%20K491/02%20-%20K491-02.mp3" target="_blank">Listen on Archive.org ↗</a></td>
-            </tr>
-        </tbody>
+      <thead><tr><th>Reference</th><th>Track</th><th>Collection</th><th>Listen / view</th></tr></thead>
+      <tbody>
+        <tr class="performance-row" data-search="deuteronomy 6:4-9 08 - deuteronomy 006_004-009.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 1"><td>6:4-9</td><td>08 - Deuteronomy 006_004-009.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 1</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+1/08+-+Deuteronomy+006_004-009.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="deuteronomy 6:4-9 mbr_deuteronomy 006_004-009.wmv mbr biblical chant dvd 01"><td>6:4-9</td><td>mbr_deuteronomy 006_004-009.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_deuteronomy+006_004-009.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+      </tbody>
     </table>
-
+  </section>
+  <section id="book-ruth">
+    <h2>Ruth</h2>
+    <table>
+      <thead><tr><th>Reference</th><th>Track</th><th>Collection</th><th>Listen / view</th></tr></thead>
+      <tbody>
+        <tr class="performance-row" data-search="ruth performance 03 - aster - the song of ruth.mp3 suzanne haik-vantoura / the music of the bible revealed live"><td>Performance</td><td>03 - ASTER - The Song of Ruth.mp3</td><td>Suzanne Haik-Vantoura / The Music of the Bible Revealed Live</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/The+Music+of+the+Bible+Revealed+Live/03+-+ASTER+-+The+Song+of+Ruth.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="ruth - intro 02 - aster - the song of ruth - intro.mp3 suzanne haik-vantoura / the music of the bible revealed live"><td>- INTRO</td><td>02 - ASTER - The Song of Ruth - Intro.mp3</td><td>Suzanne Haik-Vantoura / The Music of the Bible Revealed Live</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/The+Music+of+the+Bible+Revealed+Live/02+-+ASTER+-+The+Song+of+Ruth+-+Intro.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="ruth 1:1-22 04 - ruth 001_001-022.mp3 mira zakai / visages antiques d&#x27;israil"><td>1:1-22</td><td>04 - Ruth 001_001-022.mp3</td><td>Mira Zakai / Visages antiques d&#x27;Israil</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Mira+Zakai/Visages+antiques+d&#x27;Israil/04+-+Ruth+001_001-022.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="ruth 2:1-23 05 - ruth 002_001-023.mp3 mira zakai / visages antiques d&#x27;israil"><td>2:1-23</td><td>05 - Ruth 002_001-023.mp3</td><td>Mira Zakai / Visages antiques d&#x27;Israil</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Mira+Zakai/Visages+antiques+d&#x27;Israil/05+-+Ruth+002_001-023.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="ruth 3:1-18 06 - ruth 003_001-018.mp3 mira zakai / visages antiques d&#x27;israil"><td>3:1-18</td><td>06 - Ruth 003_001-018.mp3</td><td>Mira Zakai / Visages antiques d&#x27;Israil</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Mira+Zakai/Visages+antiques+d&#x27;Israil/06+-+Ruth+003_001-018.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="ruth 4:1-22 07 - ruth 004_001-022.mp3 mira zakai / visages antiques d&#x27;israil"><td>4:1-22</td><td>07 - Ruth 004_001-022.mp3</td><td>Mira Zakai / Visages antiques d&#x27;Israil</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Mira+Zakai/Visages+antiques+d&#x27;Israil/07+-+Ruth+004_001-022.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="book-2-samuel">
+    <h2>2 Samuel</h2>
+    <table>
+      <thead><tr><th>Reference</th><th>Track</th><th>Collection</th><th>Listen / view</th></tr></thead>
+      <tbody>
+        <tr class="performance-row" data-search="2 samuel 1:19-27 17 - 2 samuel 001 david&#x27;s elegy.mp3 mira zakai / unaccompanied (excerpts)"><td>1:19-27</td><td>17 - 2 samuel 001 David&#x27;s Elegy.mp3</td><td>Mira Zakai / Unaccompanied (Excerpts)</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Mira+Zakai/Unaccompanied+(Excerpts)/17+-+2+samuel+001+David&#x27;s+Elegy.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="2 samuel 1:19-27 06 - chanticleer - 2 samuel 001 the elegy of david.mp3 suzanne haik-vantoura / the music of the bible revealed live"><td>1:19-27</td><td>06 - Chanticleer - 2 Samuel 001 The Elegy of David.mp3</td><td>Suzanne Haik-Vantoura / The Music of the Bible Revealed Live</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/The+Music+of+the+Bible+Revealed+Live/06+-+Chanticleer+-+2+Samuel+001+The+Elegy+of+David.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="2 samuel 1:19-27 2 samuel 001_0019-27.mp3 shofar / shofar - cd-rom / accompanied"><td>1:19-27</td><td>2 samuel 001_0019-27.mp3</td><td>SHOFAR / SHOFAR - CD-ROM / Accompanied</td><td><a href="https://archive.org/details/01-c-250-01/mp3/SHOFAR/SHOFAR+-+CD-ROM/Accompanied/2+samuel+001_0019-27.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="2 samuel 1:19-27 08 - 2 samuel 001_019-027.mp3 mira zakai / visages antiques d&#x27;israil"><td>1:19-27</td><td>08 - 2 Samuel 001_019-027.mp3</td><td>Mira Zakai / Visages antiques d&#x27;Israil</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Mira+Zakai/Visages+antiques+d&#x27;Israil/08+-+2+Samuel+001_019-027.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="2 samuel 1:19-27 04 - 2 samuel 001_019-027.mp3 shofar / shofar - cd"><td>1:19-27</td><td>04 - 2 Samuel 001_019-027.mp3</td><td>SHOFAR / SHOFAR - CD</td><td><a href="https://archive.org/details/01-c-250-01/mp3/SHOFAR/SHOFAR+-+CD/04+-+2+Samuel+001_019-027.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="2 samuel 1:19-27 10 - 2 samuel 001_019-027.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 1"><td>1:19-27</td><td>10 - 2 Samuel 001_019-027.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 1</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+1/10+-+2+Samuel+001_019-027.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="2 samuel 1:19-27 mbr_2 samuel001_019-027.wmv mbr biblical chant dvd 01"><td>1:19-27</td><td>mbr_2 samuel001_019-027.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_2+samuel001_019-027.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="book-2-kings">
+    <h2>2 Kings</h2>
+    <table>
+      <thead><tr><th>Reference</th><th>Track</th><th>Collection</th><th>Listen / view</th></tr></thead>
+      <tbody>
+        <tr class="performance-row" data-search="2 kings 19:15-19 06 - 2 kings 019_015-019.mp3 esther lamandier / 02 - l&#x27;esprit de dieu"><td>19:15-19</td><td>06 - 2 Kings 019_015-019.mp3</td><td>Esther Lamandier / 02 - L&#x27;esprit de Dieu</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/02+-+L&#x27;esprit+de+Dieu/06+-+2+Kings+019_015-019.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="book-1-chronicles">
+    <h2>1 Chronicles</h2>
+    <table>
+      <thead><tr><th>Reference</th><th>Track</th><th>Collection</th><th>Listen / view</th></tr></thead>
+      <tbody>
+        <tr class="performance-row" data-search="1 chronicles 16:1-7 01 - 1 chronicles 016_001-007.mp3 mira zakai / visages antiques d&#x27;israil"><td>16:1-7</td><td>01 - 1 Chronicles 016_001-007.mp3</td><td>Mira Zakai / Visages antiques d&#x27;Israil</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Mira+Zakai/Visages+antiques+d&#x27;Israil/01+-+1+Chronicles+016_001-007.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="1 chronicles 16:8-36 02 - 1 chronicles 016_008-036.mp3 mira zakai / visages antiques d&#x27;israil"><td>16:8-36</td><td>02 - 1 Chronicles 016_008-036.mp3</td><td>Mira Zakai / Visages antiques d&#x27;Israil</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Mira+Zakai/Visages+antiques+d&#x27;Israil/02+-+1+Chronicles+016_008-036.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="book-esther">
+    <h2>Esther</h2>
+    <table>
+      <thead><tr><th>Reference</th><th>Track</th><th>Collection</th><th>Listen / view</th></tr></thead>
+      <tbody>
+        <tr class="performance-row" data-search="esther 5:1-3 13 - esther 005_001-003.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 1"><td>5:1-3</td><td>13 - Esther 005_001-003.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 1</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+1/13+-+Esther+005_001-003.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="esther 5:1-3 mbr_esther 005_001-003.wmv mbr biblical chant dvd 01"><td>5:1-3</td><td>mbr_esther 005_001-003.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_esther+005_001-003.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="book-psalms">
+    <h2>Psalms</h2>
+    <table>
+      <thead><tr><th>Reference</th><th>Track</th><th>Collection</th><th>Listen / view</th></tr></thead>
+      <tbody>
+        <tr class="performance-row" data-search="psalms 1 03 - psalms 001.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 3"><td>1</td><td>03 - Psalms 001.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 3</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+3/03+-+Psalms+001.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 1 mbr_psalms 001.wmv mbr biblical chant dvd 01"><td>1</td><td>mbr_Psalms 001.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+001.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 3 09 - psalms 003.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 2"><td>3</td><td>09 - Psalms 003.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 2</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+2/09+-+Psalms+003.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 4 07 - psalms 004.mp3 esther lamandier / 01 - psaumes de david"><td>4</td><td>07 - Psalms 004.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/07+-+Psalms+004.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 6 05 - psalms 006.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 1"><td>6</td><td>05 - Psalms 006.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 1</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+1/05+-+Psalms+006.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 6 mbr_psalms 006.wmv mbr biblical chant dvd 01"><td>6</td><td>mbr_Psalms 006.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+006.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 8 10 - psalms 008.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 2"><td>8</td><td>10 - Psalms 008.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 2</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+2/10+-+Psalms+008.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 8 09 - chanticleer - psalms 008.mp3 suzanne haik-vantoura / the music of the bible revealed live"><td>8</td><td>09 - Chanticleer - Psalms 008.mp3</td><td>Suzanne Haik-Vantoura / The Music of the Bible Revealed Live</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/The+Music+of+the+Bible+Revealed+Live/09+-+Chanticleer+-+Psalms+008.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 8 mbr_psalms 008.wmv mbr biblical chant dvd 01"><td>8</td><td>mbr_Psalms 008.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+008.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 13 04 - psalms 013.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 3"><td>13</td><td>04 - Psalms 013.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 3</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+3/04+-+Psalms+013.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 16 13 - psalms 016.mp3 esther lamandier / 01 - psaumes de david"><td>16</td><td>13 - Psalms 016.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/13+-+Psalms+016.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 19 08 - psalms 019.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 2"><td>19</td><td>08 - Psalms 019.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 2</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+2/08+-+Psalms+019.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 19 mbr_psalms 019.wmv mbr biblical chant dvd 01"><td>19</td><td>mbr_Psalms 019.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+019.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 23 01 - psalms 023.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 1"><td>23</td><td>01 - Psalms 023.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 1</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+1/01+-+Psalms+023.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 23 05 - chanticleer - psalms 023.mp3 suzanne haik-vantoura / the music of the bible revealed live"><td>23</td><td>05 - Chanticleer - Psalms 023.mp3</td><td>Suzanne Haik-Vantoura / The Music of the Bible Revealed Live</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/The+Music+of+the+Bible+Revealed+Live/05+-+Chanticleer+-+Psalms+023.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 23 21 - psalms 023.mp3 esther lamandier / 01 - psaumes de david"><td>23</td><td>21 - Psalms 023.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/21+-+Psalms+023.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 23 mbr_psalms 023.wmv mbr biblical chant dvd 01"><td>23</td><td>mbr_Psalms 023.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+023.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 24 03 - psalms 024.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 1"><td>24</td><td>03 - Psalms 024.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 1</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+1/03+-+Psalms+024.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 24 01 - psalms 024.mp3 shofar / shofar - cd"><td>24</td><td>01 - Psalms 024.mp3</td><td>SHOFAR / SHOFAR - CD</td><td><a href="https://archive.org/details/01-c-250-01/mp3/SHOFAR/SHOFAR+-+CD/01+-+Psalms+024.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 24 psalms 024.mp3 shofar / shofar - cd-rom / a capella"><td>24</td><td>Psalms 024.mp3</td><td>SHOFAR / SHOFAR - CD-ROM / A Capella</td><td><a href="https://archive.org/details/01-c-250-01/mp3/SHOFAR/SHOFAR+-+CD-ROM/A+Capella/Psalms+024.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 24 mbr_psalms 024.wmv mbr biblical chant dvd 01"><td>24</td><td>mbr_Psalms 024.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+024.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 24_acc psalms 024_acc.mp3 shofar / shofar - cd-rom / accompanied"><td>24_ACC</td><td>Psalms 024_acc.mp3</td><td>SHOFAR / SHOFAR - CD-ROM / Accompanied</td><td><a href="https://archive.org/details/01-c-250-01/mp3/SHOFAR/SHOFAR+-+CD-ROM/Accompanied/Psalms+024_acc.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 27 04 - psalms 027.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 2"><td>27</td><td>04 - Psalms 027.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 2</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+2/04+-+Psalms+027.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 27 mbr_psalms 027.wmv mbr biblical chant dvd 01"><td>27</td><td>mbr_Psalms 027.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+027.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 29 05 - psalms 029.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 2"><td>29</td><td>05 - Psalms 029.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 2</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+2/05+-+Psalms+029.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 29 08 - chanticleer - psalms 029.mp3 suzanne haik-vantoura / the music of the bible revealed live"><td>29</td><td>08 - Chanticleer - Psalms 029.mp3</td><td>Suzanne Haik-Vantoura / The Music of the Bible Revealed Live</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/The+Music+of+the+Bible+Revealed+Live/08+-+Chanticleer+-+Psalms+029.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 29 24 - psalms 029.mp3 esther lamandier / 01 - psaumes de david"><td>29</td><td>24 - Psalms 029.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/24+-+Psalms+029.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 43 11 - psalms 043.mp3 esther lamandier / 01 - psaumes de david"><td>43</td><td>11 - Psalms 043.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/11+-+Psalms+043.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 48 03 - psalms 048.mp3 esther lamandier / 01 - psaumes de david"><td>48</td><td>03 - Psalms 048.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/03+-+Psalms+048.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 52 02 - psalms 052.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 3"><td>52</td><td>02 - Psalms 052.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 3</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+3/02+-+Psalms+052.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 57 02 - psalms 057.mp3 esther lamandier / 01 - psaumes de david"><td>57</td><td>02 - Psalms 057.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/02+-+Psalms+057.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 62 14 - psalms 062.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 3"><td>62</td><td>14 - Psalms 062.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 3</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+3/14+-+Psalms+062.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 67 05 - psalms 067.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 3"><td>67</td><td>05 - Psalms 067.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 3</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+3/05+-+Psalms+067.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 67 mbr_psalms 067.wmv mbr biblical chant dvd 01"><td>67</td><td>mbr_Psalms 067.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+067.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 80 17 - psalms 080.mp3 esther lamandier / 01 - psaumes de david"><td>80</td><td>17 - Psalms 080.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/17+-+Psalms+080.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 90 09 - psalms 090.mp3 esther lamandier / 01 - psaumes de david"><td>90</td><td>09 - Psalms 090.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/09+-+Psalms+090.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 91 15 - psalms 091.mp3 esther lamandier / 01 - psaumes de david"><td>91</td><td>15 - Psalms 091.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/15+-+Psalms+091.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 91 mbr_psalms 091.wmv mbr biblical chant dvd 01"><td>91</td><td>mbr_Psalms 091.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+091.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 93 11 - psalms 093.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 2"><td>93</td><td>11 - Psalms 093.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 2</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+2/11+-+Psalms+093.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 93 01 - psalms 093.mp3 esther lamandier / 01 - psaumes de david"><td>93</td><td>01 - Psalms 093.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/01+-+Psalms+093.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 96 01 - psalms 096.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 2"><td>96</td><td>01 - Psalms 096.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 2</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+2/01+-+Psalms+096.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 96 mbr_psalms 096.wmv mbr biblical chant dvd 01"><td>96</td><td>mbr_Psalms 096.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+096.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 97 20 - psalms 097.mp3 esther lamandier / 01 - psaumes de david"><td>97</td><td>20 - Psalms 097.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/20+-+Psalms+097.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 98 11 - psalms 098.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 3"><td>98</td><td>11 - Psalms 098.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 3</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+3/11+-+Psalms+098.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 98 04 - chanticleer - psalms 098.mp3 suzanne haik-vantoura / the music of the bible revealed live"><td>98</td><td>04 - Chanticleer - Psalms 098.mp3</td><td>Suzanne Haik-Vantoura / The Music of the Bible Revealed Live</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/The+Music+of+the+Bible+Revealed+Live/04+-+Chanticleer+-+Psalms+098.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 98 mbr_psalms 098.wmv mbr biblical chant dvd 01"><td>98</td><td>mbr_Psalms 098.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+098.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 99 10 - psalms 099.mp3 esther lamandier / 01 - psaumes de david"><td>99</td><td>10 - Psalms 099.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/10+-+Psalms+099.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 100 01 - psalms 100.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 3"><td>100</td><td>01 - Psalms 100.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 3</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+3/01+-+Psalms+100.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 100 mbr_psalms 100.wmv mbr biblical chant dvd 01"><td>100</td><td>mbr_Psalms 100.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+100.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 104 14 - psalms 104.mp3 esther lamandier / 01 - psaumes de david"><td>104</td><td>14 - Psalms 104.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/14+-+Psalms+104.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 113 - song of songs 1:1-4 13 - chanticleer - psalms 113 - song of songs 1_1-4.mp3 suzanne haik-vantoura / the music of the bible revealed live"><td>113 - SONG OF SONGS 1:1-4</td><td>13 - Chanticleer - Psalms 113 - Song of Songs 1_1-4.mp3</td><td>Suzanne Haik-Vantoura / The Music of the Bible Revealed Live</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/The+Music+of+the+Bible+Revealed+Live/13+-+Chanticleer+-+Psalms+113+-+Song+of+Songs+1_1-4.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 113 05 - psalms 113.mp3 esther lamandier / 01 - psaumes de david"><td>113</td><td>05 - Psalms 113.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/05+-+Psalms+113.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 113 10 - psalms 113.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 3"><td>113</td><td>10 - Psalms 113.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 3</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+3/10+-+Psalms+113.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 113 mbr_psalms 113.wmv mbr biblical chant dvd 01"><td>113</td><td>mbr_Psalms 113.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+113.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 115 06 - psalms 115.mp3 esther lamandier / 01 - psaumes de david"><td>115</td><td>06 - Psalms 115.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/06+-+Psalms+115.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 121 11 - chanticleer - psalms 121.mp3 suzanne haik-vantoura / the music of the bible revealed live"><td>121</td><td>11 - Chanticleer - Psalms 121.mp3</td><td>Suzanne Haik-Vantoura / The Music of the Bible Revealed Live</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/The+Music+of+the+Bible+Revealed+Live/11+-+Chanticleer+-+Psalms+121.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 121 12 - psalms 121.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 3"><td>121</td><td>12 - Psalms 121.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 3</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+3/12+-+Psalms+121.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 121 mbr_psalms 121.wmv mbr biblical chant dvd 01"><td>121</td><td>mbr_Psalms 121.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+121.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 121:1 mbr_psalms 121_01.wmv mbr others / mbr_musical_accents.wmv"><td>121:1</td><td>mbr_Psalms 121_01.wmv</td><td>MBR Others / mbr_musical_accents.wmv</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Others/mbr_musical_accents.wmv/mbr_Psalms+121_01.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 121:2 mbr_psalms 121_02.wmv mbr others / mbr_musical_accents.wmv"><td>121:2</td><td>mbr_Psalms 121_02.wmv</td><td>MBR Others / mbr_musical_accents.wmv</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Others/mbr_musical_accents.wmv/mbr_Psalms+121_02.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 122 14 - chanticleer - psalms 122.mp3 suzanne haik-vantoura / the music of the bible revealed live"><td>122</td><td>14 - Chanticleer - Psalms 122.mp3</td><td>Suzanne Haik-Vantoura / The Music of the Bible Revealed Live</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/The+Music+of+the+Bible+Revealed+Live/14+-+Chanticleer+-+Psalms+122.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 122 11 - psalms 122.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 1"><td>122</td><td>11 - Psalms 122.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 1</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+1/11+-+Psalms+122.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 122 02 - psalms 122.mp3 shofar / shofar - cd"><td>122</td><td>02 - Psalms 122.mp3</td><td>SHOFAR / SHOFAR - CD</td><td><a href="https://archive.org/details/01-c-250-01/mp3/SHOFAR/SHOFAR+-+CD/02+-+Psalms+122.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 122 psalms 122.mp3 shofar / shofar - cd-rom / a capella"><td>122</td><td>Psalms 122.mp3</td><td>SHOFAR / SHOFAR - CD-ROM / A Capella</td><td><a href="https://archive.org/details/01-c-250-01/mp3/SHOFAR/SHOFAR+-+CD-ROM/A+Capella/Psalms+122.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 122 mbr_psalms 122.wmv mbr biblical chant dvd 01"><td>122</td><td>mbr_Psalms 122.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+122.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 122:1 mbr_psalms 122_01.wmv mbr others / mbr_musical_accents.wmv"><td>122:1</td><td>mbr_Psalms 122_01.wmv</td><td>MBR Others / mbr_musical_accents.wmv</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Others/mbr_musical_accents.wmv/mbr_Psalms+122_01.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 122_acc psalms 122_acc.mp3 shofar / shofar - cd-rom / accompanied"><td>122_ACC</td><td>Psalms 122_acc.mp3</td><td>SHOFAR / SHOFAR - CD-ROM / Accompanied</td><td><a href="https://archive.org/details/01-c-250-01/mp3/SHOFAR/SHOFAR+-+CD-ROM/Accompanied/Psalms+122_acc.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 122_web psalms 122_web.mp3 shofar / shofar - cd-rom / web samples"><td>122_WEB</td><td>Psalms 122_web.mp3</td><td>SHOFAR / SHOFAR - CD-ROM / Web Samples</td><td><a href="https://archive.org/details/01-c-250-01/mp3/SHOFAR/SHOFAR+-+CD-ROM/Web+Samples/Psalms+122_web.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 123 18 - psalms 123.mp3 esther lamandier / 01 - psaumes de david"><td>123</td><td>18 - Psalms 123.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/18+-+Psalms+123.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 123 12 - psalms 123.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 1"><td>123</td><td>12 - Psalms 123.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 1</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+1/12+-+Psalms+123.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 129 08 - psalms 129.mp3 esther lamandier / 01 - psaumes de david"><td>129</td><td>08 - Psalms 129.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/08+-+Psalms+129.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 13 04 - psalms 13.mp3 esther lamandier / 01 - psaumes de david"><td>13</td><td>04 - Psalms 13.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/04+-+Psalms+13.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 130 12 - psalms 130.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 2"><td>130</td><td>12 - Psalms 130.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 2</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+2/12+-+Psalms+130.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 130 mbr_psalms 130.wmv mbr biblical chant dvd 01"><td>130</td><td>mbr_Psalms 130.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+130.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 131 25 - psalms 131.mp3 esther lamandier / 01 - psaumes de david"><td>131</td><td>25 - Psalms 131.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/25+-+Psalms+131.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 131 03 - psalms 131.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 2"><td>131</td><td>03 - Psalms 131.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 2</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+2/03+-+Psalms+131.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 133 23 - psalms 133.mp3 esther lamandier / 01 - psaumes de david"><td>133</td><td>23 - Psalms 133.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/23+-+Psalms+133.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 133 07 - psalms 133.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 1"><td>133</td><td>07 - Psalms 133.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 1</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+1/07+-+Psalms+133.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 133 05 - psalms 133.mp3 shofar / shofar - cd"><td>133</td><td>05 - Psalms 133.mp3</td><td>SHOFAR / SHOFAR - CD</td><td><a href="https://archive.org/details/01-c-250-01/mp3/SHOFAR/SHOFAR+-+CD/05+-+Psalms+133.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 133 psalms 133.mp3 shofar / shofar - cd-rom / a capella"><td>133</td><td>Psalms 133.mp3</td><td>SHOFAR / SHOFAR - CD-ROM / A Capella</td><td><a href="https://archive.org/details/01-c-250-01/mp3/SHOFAR/SHOFAR+-+CD-ROM/A+Capella/Psalms+133.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 134 22 - psalms 134.mp3 esther lamandier / 01 - psaumes de david"><td>134</td><td>22 - Psalms 134.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/22+-+Psalms+134.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 137 06 - psalms 137.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 2"><td>137</td><td>06 - Psalms 137.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 2</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+2/06+-+Psalms+137.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 137 mbr_psalms 137.wmv mbr biblical chant dvd 01"><td>137</td><td>mbr_Psalms 137.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+137.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 138 07 - chanticleer - psalms 138.mp3 suzanne haik-vantoura / the music of the bible revealed live"><td>138</td><td>07 - Chanticleer - Psalms 138.mp3</td><td>Suzanne Haik-Vantoura / The Music of the Bible Revealed Live</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/The+Music+of+the+Bible+Revealed+Live/07+-+Chanticleer+-+Psalms+138.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 138 19 - psalms 138.mp3 esther lamandier / 01 - psaumes de david"><td>138</td><td>19 - Psalms 138.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/19+-+Psalms+138.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 138 mbr_psalms 138.wmv mbr biblical chant dvd 01"><td>138</td><td>mbr_Psalms 138.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+138.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 142 16 - psalms 142.mp3 esther lamandier / 01 - psaumes de david"><td>142</td><td>16 - Psalms 142.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/16+-+Psalms+142.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 148 17 - chanticleer - psalms 148.mp3 suzanne haik-vantoura / the music of the bible revealed live"><td>148</td><td>17 - Chanticleer - Psalms 148.mp3</td><td>Suzanne Haik-Vantoura / The Music of the Bible Revealed Live</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/The+Music+of+the+Bible+Revealed+Live/17+-+Chanticleer+-+Psalms+148.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 148 26 - psalms 148.mp3 esther lamandier / 01 - psaumes de david"><td>148</td><td>26 - Psalms 148.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/26+-+Psalms+148.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 148 08 - psalms 148.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 3"><td>148</td><td>08 - Psalms 148.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 3</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+3/08+-+Psalms+148.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 148 mbr_psalms 148.wmv mbr biblical chant dvd 01"><td>148</td><td>mbr_Psalms 148.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+148.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 150 12 - psalms 150.mp3 esther lamandier / 01 - psaumes de david"><td>150</td><td>12 - Psalms 150.mp3</td><td>Esther Lamandier / 01 - Psaumes de David</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/01+-+Psaumes+de+David/12+-+Psalms+150.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 150 09 - psalms 150.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 1"><td>150</td><td>09 - Psalms 150.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 1</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+1/09+-+Psalms+150.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 150 03 - psalms 150.mp3 shofar / shofar - cd"><td>150</td><td>03 - Psalms 150.mp3</td><td>SHOFAR / SHOFAR - CD</td><td><a href="https://archive.org/details/01-c-250-01/mp3/SHOFAR/SHOFAR+-+CD/03+-+Psalms+150.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 150 psalms 150.mp3 shofar / shofar - cd-rom / a capella"><td>150</td><td>Psalms 150.mp3</td><td>SHOFAR / SHOFAR - CD-ROM / A Capella</td><td><a href="https://archive.org/details/01-c-250-01/mp3/SHOFAR/SHOFAR+-+CD-ROM/A+Capella/Psalms+150.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 150 mbr_psalms 150.wmv mbr biblical chant dvd 01"><td>150</td><td>mbr_Psalms 150.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_Psalms+150.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 150_acc psalms 150_acc.mp3 shofar / shofar - cd-rom / accompanied"><td>150_ACC</td><td>Psalms 150_acc.mp3</td><td>SHOFAR / SHOFAR - CD-ROM / Accompanied</td><td><a href="https://archive.org/details/01-c-250-01/mp3/SHOFAR/SHOFAR+-+CD-ROM/Accompanied/Psalms+150_acc.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="psalms 150_web psalms 150_web.mp3 shofar / shofar - cd-rom / web samples"><td>150_WEB</td><td>Psalms 150_web.mp3</td><td>SHOFAR / SHOFAR - CD-ROM / Web Samples</td><td><a href="https://archive.org/details/01-c-250-01/mp3/SHOFAR/SHOFAR+-+CD-ROM/Web+Samples/Psalms+150_web.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="book-ecclesiastes">
+    <h2>Ecclesiastes</h2>
+    <table>
+      <thead><tr><th>Reference</th><th>Track</th><th>Collection</th><th>Listen / view</th></tr></thead>
+      <tbody>
+        <tr class="performance-row" data-search="ecclesiastes 1:1-9 06 - ecclesiastes 001_001-009.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 3"><td>1:1-9</td><td>06 - Ecclesiastes 001_001-009.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 3</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+3/06+-+Ecclesiastes+001_001-009.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="book-song-of-songs">
+    <h2>Song of Songs</h2>
+    <table>
+      <thead><tr><th>Reference</th><th>Track</th><th>Collection</th><th>Listen / view</th></tr></thead>
+      <tbody>
+        <tr class="performance-row" data-search="song of songs 1:1-3 04 - song 001_001-003.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 1"><td>1:1-3</td><td>04 - Song 001_001-003.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 1</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+1/04+-+Song+001_001-003.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 1:1-17 03 - song 001_001-017.mp3 esther lamandier / 03 - cantique des cantiques"><td>1:1-17</td><td>03 - Song 001_001-017.mp3</td><td>Esther Lamandier / 03 - Cantique des cantiques</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/03+-+Cantique+des+cantiques/03+-+Song+001_001-017.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 1:1-17 01 - song 001_001-017.mp3 suzanne haik-vantoura / cantique des cantiques de salomon"><td>1:1-17</td><td>01 - Song 001_001-017.mp3</td><td>Suzanne Haik-Vantoura / Cantique des cantiques de Salomon</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/Cantique+des+cantiques+de+Salomon/01+-+Song+001_001-017.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 1:1-17 mbr_song 002_001-017.wmv mbr song of songs / mbr_song001_001-017.wmv"><td>1:1-17</td><td>mbr_song 002_001-017.wmv</td><td>MBR Song of Songs / mbr_song001_001-017.wmv</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Song+of+Songs/mbr_song001_001-017.wmv/mbr_song+002_001-017.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 2:1-17 04 - song 002_001-017.mp3 esther lamandier / 03 - cantique des cantiques"><td>2:1-17</td><td>04 - Song 002_001-017.mp3</td><td>Esther Lamandier / 03 - Cantique des cantiques</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/03+-+Cantique+des+cantiques/04+-+Song+002_001-017.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 2:1-17 02 - song 002_001-017.mp3 suzanne haik-vantoura / cantique des cantiques de salomon"><td>2:1-17</td><td>02 - Song 002_001-017.mp3</td><td>Suzanne Haik-Vantoura / Cantique des cantiques de Salomon</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/Cantique+des+cantiques+de+Salomon/02+-+Song+002_001-017.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 2:1-17 mbr_song 002_001-017.wmv mbr song of songs / mbr_song002_001-017.wmv"><td>2:1-17</td><td>mbr_song 002_001-017.wmv</td><td>MBR Song of Songs / mbr_song002_001-017.wmv</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Song+of+Songs/mbr_song002_001-017.wmv/mbr_song+002_001-017.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 3:1-11 05 - song 003_001-011.mp3 esther lamandier / 03 - cantique des cantiques"><td>3:1-11</td><td>05 - Song 003_001-011.mp3</td><td>Esther Lamandier / 03 - Cantique des cantiques</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/03+-+Cantique+des+cantiques/05+-+Song+003_001-011.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 3:1-11 03 - song 003_001-011.mp3 suzanne haik-vantoura / cantique des cantiques de salomon"><td>3:1-11</td><td>03 - Song 003_001-011.mp3</td><td>Suzanne Haik-Vantoura / Cantique des cantiques de Salomon</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/Cantique+des+cantiques+de+Salomon/03+-+Song+003_001-011.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 3:1-11 mbr_song 003_001-011.wmv mbr song of songs / mbr_song003_001-011.wmv"><td>3:1-11</td><td>mbr_song 003_001-011.wmv</td><td>MBR Song of Songs / mbr_song003_001-011.wmv</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Song+of+Songs/mbr_song003_001-011.wmv/mbr_song+003_001-011.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 4:1-16 06 - song 004_001-016.mp3 esther lamandier / 03 - cantique des cantiques"><td>4:1-16</td><td>06 - Song 004_001-016.mp3</td><td>Esther Lamandier / 03 - Cantique des cantiques</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/03+-+Cantique+des+cantiques/06+-+Song+004_001-016.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 4:1-16 04 - song 004_001-016.mp3 suzanne haik-vantoura / cantique des cantiques de salomon"><td>4:1-16</td><td>04 - Song 004_001-016.mp3</td><td>Suzanne Haik-Vantoura / Cantique des cantiques de Salomon</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/Cantique+des+cantiques+de+Salomon/04+-+Song+004_001-016.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 4:1-16 mbr_song 004_001-016.wmv mbr song of songs / mbr_song004_001-016.wmv"><td>4:1-16</td><td>mbr_song 004_001-016.wmv</td><td>MBR Song of Songs / mbr_song004_001-016.wmv</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Song+of+Songs/mbr_song004_001-016.wmv/mbr_song+004_001-016.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 5:1-16 07 - song 005_001-016.mp3 esther lamandier / 03 - cantique des cantiques"><td>5:1-16</td><td>07 - Song 005_001-016.mp3</td><td>Esther Lamandier / 03 - Cantique des cantiques</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/03+-+Cantique+des+cantiques/07+-+Song+005_001-016.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 5:1-16 05 - song 005_001-016.mp3 suzanne haik-vantoura / cantique des cantiques de salomon"><td>5:1-16</td><td>05 - Song 005_001-016.mp3</td><td>Suzanne Haik-Vantoura / Cantique des cantiques de Salomon</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/Cantique+des+cantiques+de+Salomon/05+-+Song+005_001-016.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 5:1-16 mbr_song 005_001-016.wmv mbr song of songs / mbr_song005_001-016.wmv"><td>5:1-16</td><td>mbr_song 005_001-016.wmv</td><td>MBR Song of Songs / mbr_song005_001-016.wmv</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Song+of+Songs/mbr_song005_001-016.wmv/mbr_song+005_001-016.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 6:1-12 08 - song 006_001-012.mp3 esther lamandier / 03 - cantique des cantiques"><td>6:1-12</td><td>08 - Song 006_001-012.mp3</td><td>Esther Lamandier / 03 - Cantique des cantiques</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/03+-+Cantique+des+cantiques/08+-+Song+006_001-012.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 6:1-12 06 - song 006_001-012.mp3 suzanne haik-vantoura / cantique des cantiques de salomon"><td>6:1-12</td><td>06 - Song 006_001-012.mp3</td><td>Suzanne Haik-Vantoura / Cantique des cantiques de Salomon</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/Cantique+des+cantiques+de+Salomon/06+-+Song+006_001-012.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 6:1-12 mbr_song 006_001-012.wmv mbr song of songs / mbr_song006_001-012.wmv"><td>6:1-12</td><td>mbr_song 006_001-012.wmv</td><td>MBR Song of Songs / mbr_song006_001-012.wmv</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Song+of+Songs/mbr_song006_001-012.wmv/mbr_song+006_001-012.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 7:1-14 09 - song 007_001-014.mp3 esther lamandier / 03 - cantique des cantiques"><td>7:1-14</td><td>09 - Song 007_001-014.mp3</td><td>Esther Lamandier / 03 - Cantique des cantiques</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/03+-+Cantique+des+cantiques/09+-+Song+007_001-014.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 7:1-14 07 - song 007_001-014.mp3 suzanne haik-vantoura / cantique des cantiques de salomon"><td>7:1-14</td><td>07 - Song 007_001-014.mp3</td><td>Suzanne Haik-Vantoura / Cantique des cantiques de Salomon</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/Cantique+des+cantiques+de+Salomon/07+-+Song+007_001-014.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 7:1-14 mbr_song 007_001-014.wmv mbr song of songs / mbr_song007_001-014.wmv"><td>7:1-14</td><td>mbr_song 007_001-014.wmv</td><td>MBR Song of Songs / mbr_song007_001-014.wmv</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Song+of+Songs/mbr_song007_001-014.wmv/mbr_song+007_001-014.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 8:1-14 10 - song 008_001-014.mp3 esther lamandier / 03 - cantique des cantiques"><td>8:1-14</td><td>10 - Song 008_001-014.mp3</td><td>Esther Lamandier / 03 - Cantique des cantiques</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/03+-+Cantique+des+cantiques/10+-+Song+008_001-014.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 8:1-14 08 - song 008_001-014.mp3 suzanne haik-vantoura / cantique des cantiques de salomon"><td>8:1-14</td><td>08 - Song 008_001-014.mp3</td><td>Suzanne Haik-Vantoura / Cantique des cantiques de Salomon</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/Cantique+des+cantiques+de+Salomon/08+-+Song+008_001-014.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs 8:1-14 mbr_song 008_001-014.wmv mbr song of songs / mbr_song008_001-014.wmv"><td>8:1-14</td><td>mbr_song 008_001-014.wmv</td><td>MBR Song of Songs / mbr_song008_001-014.wmv</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Song+of+Songs/mbr_song008_001-014.wmv/mbr_song+008_001-014.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="song of songs intro 12 - chanticleer - song of songs - intro.mp3 suzanne haik-vantoura / the music of the bible revealed live"><td>INTRO</td><td>12 - Chanticleer - Song of Songs - Intro.mp3</td><td>Suzanne Haik-Vantoura / The Music of the Bible Revealed Live</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/The+Music+of+the+Bible+Revealed+Live/12+-+Chanticleer+-+Song+of+Songs+-+Intro.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="book-lamentations">
+    <h2>Lamentations</h2>
+    <table>
+      <thead><tr><th>Reference</th><th>Track</th><th>Collection</th><th>Listen / view</th></tr></thead>
+      <tbody>
+        <tr class="performance-row" data-search="lamentations 1:1-2 mbr_lamentations 001_001-002.wmv mbr biblical chant dvd 01"><td>1:1-2</td><td>mbr_lamentations 001_001-002.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_lamentations+001_001-002.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="lamentations 1:1-3 06 - lamentations 001_001-003.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 1"><td>1:1-3</td><td>06 - Lamentations 001_001-003.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 1</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+1/06+-+Lamentations+001_001-003.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="lamentations 1:1-22 09 - lamentations 001_001-022.mp3 mira zakai / visages antiques d&#x27;israil"><td>1:1-22</td><td>09 - Lamentations 001_001-022.mp3</td><td>Mira Zakai / Visages antiques d&#x27;Israil</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Mira+Zakai/Visages+antiques+d&#x27;Israil/09+-+Lamentations+001_001-022.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="lamentations 3:1-66 10 - lamentations 003_001-066.mp3 mira zakai / visages antiques d&#x27;israil"><td>3:1-66</td><td>10 - Lamentations 003_001-066.mp3</td><td>Mira Zakai / Visages antiques d&#x27;Israil</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Mira+Zakai/Visages+antiques+d&#x27;Israil/10+-+Lamentations+003_001-066.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="book-isaiah">
+    <h2>Isaiah</h2>
+    <table>
+      <thead><tr><th>Reference</th><th>Track</th><th>Collection</th><th>Listen / view</th></tr></thead>
+      <tbody>
+        <tr class="performance-row" data-search="isaiah 2:1-5 01 - isaiah 002_001-005.mp3 esther lamandier / 03 - cantique des cantiques"><td>2:1-5</td><td>01 - Isaiah 002_001-005.mp3</td><td>Esther Lamandier / 03 - Cantique des cantiques</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/03+-+Cantique+des+cantiques/01+-+Isaiah+002_001-005.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 6:1-7 01 - isaiah 006_001-007.mp3 esther lamandier / 04 - le livre d&#x27;isaie"><td>6:1-7</td><td>01 - Isaiah 006_001-007.mp3</td><td>Esther Lamandier / 04 - Le Livre d&#x27;Isaie</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/04+-+Le+Livre+d&#x27;Isaie/01+-+Isaiah+006_001-007.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 6:1-13 07 - isaiah 006_001-013.mp3 esther lamandier / 02 - l&#x27;esprit de dieu"><td>6:1-13</td><td>07 - Isaiah 006_001-013.mp3</td><td>Esther Lamandier / 02 - L&#x27;esprit de Dieu</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/02+-+L&#x27;esprit+de+Dieu/07+-+Isaiah+006_001-013.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 11:1-9 08 - isaiah 011_001-009.mp3 esther lamandier / 02 - l&#x27;esprit de dieu"><td>11:1-9</td><td>08 - Isaiah 011_001-009.mp3</td><td>Esther Lamandier / 02 - L&#x27;esprit de Dieu</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/02+-+L&#x27;esprit+de+Dieu/08+-+Isaiah+011_001-009.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 11:1-9 02 - isaiah 011_001-009.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 2"><td>11:1-9</td><td>02 - Isaiah 011_001-009.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 2</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+2/02+-+Isaiah+011_001-009.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 11:1-10 02 - isaiah 011_001-010.mp3 esther lamandier / 04 - le livre d&#x27;isaie"><td>11:1-10</td><td>02 - Isaiah 011_001-010.mp3</td><td>Esther Lamandier / 04 - Le Livre d&#x27;Isaie</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/04+-+Le+Livre+d&#x27;Isaie/02+-+Isaiah+011_001-010.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 12:1-6 03 - isaiah 012_001-006.mp3 esther lamandier / 04 - le livre d&#x27;isaie"><td>12:1-6</td><td>03 - Isaiah 012_001-006.mp3</td><td>Esther Lamandier / 04 - Le Livre d&#x27;Isaie</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/04+-+Le+Livre+d&#x27;Isaie/03+-+Isaiah+012_001-006.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 37:15-20 04 - isaiah 037_015-020.mp3 esther lamandier / 04 - le livre d&#x27;isaie"><td>37:15-20</td><td>04 - Isaiah 037_015-020.mp3</td><td>Esther Lamandier / 04 - Le Livre d&#x27;Isaie</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/04+-+Le+Livre+d&#x27;Isaie/04+-+Isaiah+037_015-020.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 40:1-14 05 - isaiah 040_001-014.mp3 esther lamandier / 04 - le livre d&#x27;isaie"><td>40:1-14</td><td>05 - Isaiah 040_001-014.mp3</td><td>Esther Lamandier / 04 - Le Livre d&#x27;Isaie</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/04+-+Le+Livre+d&#x27;Isaie/05+-+Isaiah+040_001-014.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 41:1-14 06 - isaiah 041_001-014.mp3 esther lamandier / 04 - le livre d&#x27;isaie"><td>41:1-14</td><td>06 - Isaiah 041_001-014.mp3</td><td>Esther Lamandier / 04 - Le Livre d&#x27;Isaie</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/04+-+Le+Livre+d&#x27;Isaie/06+-+Isaiah+041_001-014.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 42:1-21 07 - isaiah 042_001-021.mp3 esther lamandier / 04 - le livre d&#x27;isaie"><td>42:1-21</td><td>07 - Isaiah 042_001-021.mp3</td><td>Esther Lamandier / 04 - Le Livre d&#x27;Isaie</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/04+-+Le+Livre+d&#x27;Isaie/07+-+Isaiah+042_001-021.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 44:1-23 08 - isaiah 044_001-023.mp3 esther lamandier / 04 - le livre d&#x27;isaie"><td>44:1-23</td><td>08 - Isaiah 044_001-023.mp3</td><td>Esther Lamandier / 04 - Le Livre d&#x27;Isaie</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/04+-+Le+Livre+d&#x27;Isaie/08+-+Isaiah+044_001-023.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 50:4-11 09 - isaiah 050_004-011.mp3 esther lamandier / 04 - le livre d&#x27;isaie"><td>50:4-11</td><td>09 - Isaiah 050_004-011.mp3</td><td>Esther Lamandier / 04 - Le Livre d&#x27;Isaie</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/04+-+Le+Livre+d&#x27;Isaie/09+-+Isaiah+050_004-011.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 51:1-11 10 - isaiah 051_001-011.mp3 esther lamandier / 04 - le livre d&#x27;isaie"><td>51:1-11</td><td>10 - Isaiah 051_001-011.mp3</td><td>Esther Lamandier / 04 - Le Livre d&#x27;Isaie</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/04+-+Le+Livre+d&#x27;Isaie/10+-+Isaiah+051_001-011.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 53:1-12 11 - isaiah 053_001-012.mp3 esther lamandier / 04 - le livre d&#x27;isaie"><td>53:1-12</td><td>11 - Isaiah 053_001-012.mp3</td><td>Esther Lamandier / 04 - Le Livre d&#x27;Isaie</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/04+-+Le+Livre+d&#x27;Isaie/11+-+Isaiah+053_001-012.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 57:14-21 12 - isaiah 057_014-021.mp3 esther lamandier / 04 - le livre d&#x27;isaie"><td>57:14-21</td><td>12 - Isaiah 057_014-021.mp3</td><td>Esther Lamandier / 04 - Le Livre d&#x27;Isaie</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/04+-+Le+Livre+d&#x27;Isaie/12+-+Isaiah+057_014-021.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 58:1-11 13 - isaiah 058_001-011.mp3 esther lamandier / 04 - le livre d&#x27;isaie"><td>58:1-11</td><td>13 - Isaiah 058_001-011.mp3</td><td>Esther Lamandier / 04 - Le Livre d&#x27;Isaie</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/04+-+Le+Livre+d&#x27;Isaie/13+-+Isaiah+058_001-011.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 60:1-5 07 - isaiah 060_001-005.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 3"><td>60:1-5</td><td>07 - Isaiah 060_001-005.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 3</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+3/07+-+Isaiah+060_001-005.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 60:1-5 mbr_isaiah 060_001-005.wmv mbr biblical chant dvd 01"><td>60:1-5</td><td>mbr_isaiah 060_001-005.wmv</td><td>MBR Biblical Chant DVD 01</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Biblical+Chant+DVD+01/mbr_isaiah+060_001-005.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 61:1-11 09 - isaiah 061_001-011.mp3 esther lamandier / 02 - l&#x27;esprit de dieu"><td>61:1-11</td><td>09 - Isaiah 061_001-011.mp3</td><td>Esther Lamandier / 02 - L&#x27;esprit de Dieu</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/02+-+L&#x27;esprit+de+Dieu/09+-+Isaiah+061_001-011.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 61:5-11 14 - isaiah 061_005-011.mp3 esther lamandier / 04 - le livre d&#x27;isaie"><td>61:5-11</td><td>14 - Isaiah 061_005-011.mp3</td><td>Esther Lamandier / 04 - Le Livre d&#x27;Isaie</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/04+-+Le+Livre+d&#x27;Isaie/14+-+Isaiah+061_005-011.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="isaiah 60:1-5 16 - chanticleer - isaiah 60_1-5.mp3 suzanne haik-vantoura / the music of the bible revealed live"><td>60:1-5</td><td>16 - Chanticleer - Isaiah 60_1-5.mp3</td><td>Suzanne Haik-Vantoura / The Music of the Bible Revealed Live</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/The+Music+of+the+Bible+Revealed+Live/16+-+Chanticleer+-+Isaiah+60_1-5.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="book-ezekiel">
+    <h2>Ezekiel</h2>
+    <table>
+      <thead><tr><th>Reference</th><th>Track</th><th>Collection</th><th>Listen / view</th></tr></thead>
+      <tbody>
+        <tr class="performance-row" data-search="ezekiel 37:1-14 10 - ezekiel 037_001-014.mp3 esther lamandier / 02 - l&#x27;esprit de dieu"><td>37:1-14</td><td>10 - Ezekiel 037_001-014.mp3</td><td>Esther Lamandier / 02 - L&#x27;esprit de Dieu</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Esther+Lamandier/02+-+L&#x27;esprit+de+Dieu/10+-+Ezekiel+037_001-014.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="book-amos">
+    <h2>Amos</h2>
+    <table>
+      <thead><tr><th>Reference</th><th>Track</th><th>Collection</th><th>Listen / view</th></tr></thead>
+      <tbody>
+        <tr class="performance-row" data-search="amos 1:1-9 10 - chanticleer - amos 001_001-009.mp3 suzanne haik-vantoura / the music of the bible revealed live"><td>1:1-9</td><td>10 - Chanticleer - Amos 001_001-009.mp3</td><td>Suzanne Haik-Vantoura / The Music of the Bible Revealed Live</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/The+Music+of+the+Bible+Revealed+Live/10+-+Chanticleer+-+Amos+001_001-009.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="amos 1:1-9 13 - amos 001_001-009.mp3 suzanne haik-vantoura / la musique de la bible revelee vol. 3"><td>1:1-9</td><td>13 - Amos 001_001-009.mp3</td><td>Suzanne Haik-Vantoura / La musique de la Bible revelee Vol. 3</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/La+musique+de+la+Bible+revelee+Vol.+3/13+-+Amos+001_001-009.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="book-other-performances">
+    <h2>Other performances</h2>
+    <table>
+      <thead><tr><th>Reference</th><th>Track</th><th>Collection</th><th>Listen / view</th></tr></thead>
+      <tbody>
+        <tr class="performance-row" data-search="other performances npr morning edition - song of songs 01 - npr morning edition - song of songs.mp3 suzanne haik-vantoura / the music of the bible revealed live"><td>NPR MORNING EDITION - SONG OF SONGS</td><td>01 - NPR Morning Edition - Song of Songs.mp3</td><td>Suzanne Haik-Vantoura / The Music of the Bible Revealed Live</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Suzanne+Haik-Vantoura/The+Music+of+the+Bible+Revealed+Live/01+-+NPR+Morning+Edition+-+Song+of+Songs.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="other performances c250-1 01 - c250-01.mp3 southwest radio church / swrc-02 c250"><td>C250-1</td><td>01 - C250-01.mp3</td><td>Southwest Radio Church / SWRC-02 C250</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Southwest+Radio+Church/SWRC-02+C250/01+-+C250-01.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="other performances c250-2 02 - c250-02.mp3 southwest radio church / swrc-02 c250"><td>C250-2</td><td>02 - C250-02.mp3</td><td>Southwest Radio Church / SWRC-02 C250</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Southwest+Radio+Church/SWRC-02+C250/02+-+C250-02.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="other performances c250-3 03 - c250-03.mp3 southwest radio church / swrc-02 c250"><td>C250-3</td><td>03 - C250-03.mp3</td><td>Southwest Radio Church / SWRC-02 C250</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Southwest+Radio+Church/SWRC-02+C250/03+-+C250-03.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="other performances k491-1 01 - k491-01.mp3 southwest radio church / swrc-01 k491"><td>K491-1</td><td>01 - K491-01.mp3</td><td>Southwest Radio Church / SWRC-01 K491</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Southwest+Radio+Church/SWRC-01+K491/01+-+K491-01.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="other performances k491-2 02 - k491-02.mp3 southwest radio church / swrc-01 k491"><td>K491-2</td><td>02 - K491-02.mp3</td><td>Southwest Radio Church / SWRC-01 K491</td><td><a href="https://archive.org/details/01-c-250-01/mp3/Southwest+Radio+Church/SWRC-01+K491/02+-+K491-02.mp3" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="other performances npr_morning_edition mbr_npr_morning_edition.wmv mbr others / mbr_musical_accents.wmv"><td>NPR_MORNING_EDITION</td><td>mbr_npr_morning_edition.wmv</td><td>MBR Others / mbr_musical_accents.wmv</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Others/mbr_musical_accents.wmv/mbr_npr_morning_edition.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="other performances shofar_promo mbr_shofar_promo.wmv mbr others / mbr_musical_accents.wmv"><td>SHOFAR_PROMO</td><td>mbr_shofar_promo.wmv</td><td>MBR Others / mbr_musical_accents.wmv</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Others/mbr_musical_accents.wmv/mbr_shofar_promo.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="other performances tsg_2009-5-30 tsg_2009-05-30.wmv mbr others / mbr_musical_accents.wmv"><td>TSG_2009-5-30</td><td>tsg_2009-05-30.wmv</td><td>MBR Others / mbr_musical_accents.wmv</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Others/mbr_musical_accents.wmv/tsg_2009-05-30.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+        <tr class="performance-row" data-search="other performances tsg_2009-5-30_sm tsg_2009-05-30_sm.wmv mbr others / mbr_musical_accents.wmv"><td>TSG_2009-5-30_SM</td><td>tsg_2009-05-30_sm.wmv</td><td>MBR Others / mbr_musical_accents.wmv</td><td><a href="https://archive.org/details/01-c-250-01/wmv/MBR+Others/mbr_musical_accents.wmv/tsg_2009-05-30_sm.wmv" target="_blank" rel="noopener">Archive.org ↗</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <script>
+    const search = document.getElementById('performance-search');
+    const rows = [...document.querySelectorAll('.performance-row')];
+    const sections = [...document.querySelectorAll('section')];
+    const count = document.getElementById('result-count');
+    function filterPerformances() {
+      const query = search.value.trim().toLocaleLowerCase();
+      let visible = 0;
+      for (const row of rows) {
+        const show = !query || row.dataset.search.includes(query);
+        row.hidden = !show;
+        if (show) visible++;
+      }
+      for (const section of sections) {
+        section.hidden = !section.querySelector('.performance-row:not([hidden])');
+      }
+      count.textContent = `${visible} of 200 performances`;
+    }
+    search.addEventListener('input', filterPerformances);
+    filterPerformances();
+  </script>
 </body>
 </html>

@@ -36,11 +36,26 @@ The repository's 1,869 JSON files divide into 11 root-level project datasets, 92
 | Ornament index/page | `generate_ornament_pitch_table.py` | Reads JSON score exports under `musicscores/`; writes `ornament_chapters.json`, `ornament_index.json`, and `ornament_usage_by_pitch.html`. | Runbook production |
 | Score contour matrices | `mass_produce_and_log_matrices.py` | Reads MuseScore `.mscz` files and book mapping; writes chapter matrix HTML and the motif relationship data. The runbook says it also runs reconciliation generation. | Runbook production |
 | Reconciliation matrix | `generate_reconciliation_matrix.py` | Builds the reconciliation matrix view and occurrence data from score/contour inputs. | Runbook production |
-| Translation punctuation review | `check_zaqef_atnah.py`, `check_zaqef_atnah-v2.py`, `punctuation_audit.py`, `developer-tools/analysis-PY-history/find-z-q-errors.py` | Review/audit scripts. `punctuation_audit.py` explicitly says it emits a report and does not edit source. `find-z-q-errors.py` explicitly reads `translation.json` and `ornament_index.json`, then writes a review queue. | Review/support; verify which variants are current |
+| Translation punctuation review | `check_zaqef_atnah.py`, `check_zaqef_atnah-v2.py`, `punctuation_audit.py`, `punctuation_audit_v2.py`, `developer-tools/analysis-PY-history/find-z-q-errors.py` | For the database's word-level accent export (`k`, `h`, `atnah`, `z_q`, `e`, `lemma`, `e_t`), use `punctuation_audit_v2.py` for alignment-aware boundary review and compare its output with the preserved `punctuation_audit.py` baseline. Both emit a review report and candidate SQL; neither edits source or executes SQL. The `check_zaqef_atnah` variants instead take separate interlinear and translation files. `find-z-q-errors.py` reads `translation.json` and `ornament_index.json`. | Review/support; compare V2 before adoption |
 | Concordance/gematria refresh | `update_strict_concordance_gematria.py` | Adds gematria to word concordance HTML generated from Oracle. Owner confirms this is the one critical production Python script in Downloads and remains in use because the Oracle alternative is inconvenient. | **Keep: active production** |
 | Other verse-match/gematria tools | `find_verse_matches_json.py`, `create_verse_matches_json.py` | Build/search verse-match and gematria outputs. Their present use should be reviewed separately from the active HTML updater. | Unconfirmed/support |
 | Audio compilation | `chapter_agogic_compiler.py`, `verse_agogic_compiler.py`, `reduce_bitrate.py`, `reduce_bitrate_chapters.py` | Compiles score audio and compresses chapter/audio outputs; compilers read `.mscz` and book mapping. | Runbook production |
 | EPUB/print pipeline | See the KindleProject inventory below. | EPUB validation, SVG processing/injection, PNG conversion, EPUB comparison, PDF margin and packaging scripts. | Procedure-referenced or requires version choice |
+
+#### Database punctuation review
+
+Run from PowerShell in the repository root. `punctuation_audit_v2.py` accepts an `items` array (including the Oracle export fragment that begins with `"items":`) and writes a text review plus a candidate SQL sidecar. Keep `punctuation_audit.py` as the baseline when comparing a new audit version. Example for a Genesis-through-Samuel export:
+
+```powershell
+Set-Location C:\Users\Bob\GitHub\SimHebrew-Concordance
+python .\punctuation_audit_v2.py `
+  "C:\Users\Bob\Downloads\GenToSam.json" `
+  "C:\Users\Bob\Downloads\GenToSam_punctuation_review.txt" `
+  --checks-only `
+  --sql-output "C:\Users\Bob\Downloads\GenToSam_candidate_updates.sql"
+```
+
+The text report lists only `CHECK`/`REVIEW` boundaries and retains their verse context. Treat each as a review prompt: accent boundaries do not determine English punctuation, and exact gloss matching can miss reordering or inflection. The SQL file is only a set of candidates; inspect it and the text report before considering any database update.
 
 ## Root-level project JSONs
 
@@ -147,6 +162,7 @@ Folder contains retained working/history scripts. Some files may support the own
 | `json_validation.py` | Validates concordance JSON. | Validation/support |
 | `mass_produce_and_log_matrices.py` | Generates chapter contour/motif matrix views from score files. | Runbook production |
 | `punctuation_audit.py` | Creates conservative punctuation-review reports without editing source. | Translation review support |
+| `punctuation_audit_v2.py` | Alignment-aware review variant that checks reordered phrase boundaries and atnah line placement; keeps the same report/SQL format for comparison. | Review against `punctuation_audit.py` before adoption |
 | `reduce_bitrate.py` | Compresses audio output. | Runbook production |
 | `reduce_bitrate_chapters.py` | Compresses chapter audio output. | Runbook production |
 | `split_interlin-v2.py` | Splits `interlin.json` into `/chapters/` shards. | Runbook production |
